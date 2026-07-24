@@ -1,0 +1,227 @@
+/*
+ * Shared design tokens — imported by BOTH stylesheet entries:
+ *   - src/app/(frontend)/globals.css  (public site)
+ *   - src/app/(payload)/admin.css     (Payload admin auth screens)
+ * Keep every brand token here so the two bundles can never drift apart.
+ */
+
+/*
+ * isad.academy design tokens — official Brand Book (PDF, repo root; page 10 palette,
+ * page 11 typography) + CLAUDE.md §12.
+ * Palette: Deep Blue #1C5D99 (`blue`), Steel Blue #407EA2 (`steel`), Ink #222222,
+ * Mist #BBCDE5 (`ice`), White (`paper`); `slate` #808C99 is the caption grey.
+ * Dark surfaces use the Figma dark gradient #1C5D99 44% → #091F33 100% (`navy` = #091F33).
+ * Typography: Poppins (Bold headlines / SemiBold subheads & labels / Regular body),
+ * self-hosted via next/font — `--font-poppins` is set on <html> by the frontend layout.
+ */
+@theme {
+  --color-ink: #222222;
+  --color-paper: #ffffff;
+  --color-blue: #1c5d99;
+  /* Brand has no aqua — Steel Blue replaces it; alias keeps existing `aqua` utilities brand-correct. */
+  --color-aqua: #407ea2;
+  --color-ice: #bbcde5;
+  --color-steel: #407ea2;
+  --color-navy: #091f33;
+  /* Brand caption grey #808C99 is 3.43:1 on white — DECORATIVE ONLY, never text. */
+  --color-slate: #808c99;
+
+  /* Neutral grey ramp (Ink→White axis, cool cast) — the only permitted muted text
+     colors on white. Contrast on white: grey-700 9.04:1, grey-600 6.95:1, grey-500 5.39:1.
+     On Mist surfaces text is Ink (or grey-700 at display sizes) — greys 600/500 fail there. */
+  --color-grey-700: #3e4a57;
+  --color-grey-600: #4d5b6a;
+  --color-grey-500: #5d6c7b;
+
+  /* Course-card frame + start-date notch (Figma: color/grey/96 — tokens-additions.css).
+     Steel Blue ("brand-steel" in the Figma extract) already exists above as `steel`. */
+  --color-line-soft: #f6f6f6;
+  /* Light section background (Figma "surface-subtle" — used by Courses/Testimonials/Corporate). */
+  --color-surface-subtle: #f8f9fa;
+  /* Neutral grey hairline (Figma "line") — input borders, chips (owner 2026-07-13: grey, not blue). */
+  --color-line: #e5e5e5;
+
+  --font-sans:
+    var(--font-poppins), 'Poppins', ui-sans-serif, system-ui, -apple-system, 'Segoe UI',
+    Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+  /* Type scale — very large, tightly tracked headings (§12; brand book 64/44/34/24 rhythm) */
+  --text-display: clamp(2.75rem, 5vw + 1.25rem, 4.75rem);
+  --text-display--line-height: 1.04;
+  --text-display--letter-spacing: -0.035em;
+  --text-display--font-weight: 700;
+
+  --text-h1: clamp(2.25rem, 3.5vw + 1rem, 3.5rem);
+  --text-h1--line-height: 1.08;
+  --text-h1--letter-spacing: -0.03em;
+  --text-h1--font-weight: 700;
+
+  --text-h2: clamp(1.75rem, 2.5vw + 0.75rem, 2.5rem);
+  --text-h2--line-height: 1.15;
+  --text-h2--letter-spacing: -0.02em;
+  --text-h2--font-weight: 700;
+
+  --text-h3: clamp(1.375rem, 1vw + 1rem, 1.625rem);
+  --text-h3--line-height: 1.3;
+  --text-h3--letter-spacing: -0.015em;
+  --text-h3--font-weight: 600;
+
+  --text-h4: 1.25rem;
+  --text-h4--line-height: 1.4;
+  --text-h4--letter-spacing: -0.01em;
+  --text-h4--font-weight: 600;
+
+  --text-body-lg: 1.125rem;
+  --text-body-lg--line-height: 1.7;
+
+  --text-body: 1rem;
+  --text-body--line-height: 1.65;
+
+  --text-small: 0.875rem;
+  --text-small--line-height: 1.5;
+
+  --tracking-tightest: -0.035em;
+  --tracking-eyebrow: 0.14em;
+
+  /* Ambient, navy-tinted shadows — never heavy black drops (redesign spec §3) */
+  --shadow-soft: 0 1px 2px rgb(9 31 51 / 0.05), 0 8px 24px -8px rgb(9 31 51 / 0.1);
+  --shadow-lift: 0 2px 4px rgb(9 31 51 / 0.06), 0 16px 32px -12px rgb(9 31 51 / 0.16);
+  --shadow-cert:
+    0 1px 2px rgb(9 31 51 / 0.06), 0 12px 24px -8px rgb(9 31 51 / 0.1),
+    0 32px 64px -24px rgb(28 93 153 / 0.18);
+  --shadow-chip: 0 1px 2px rgb(9 31 51 / 0.08), 0 8px 20px -6px rgb(9 31 51 / 0.16);
+
+  /* Signature easing — fast-out, soft-landing (redesign spec §3) */
+  --ease-brand: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* Hero chip idle float; per-chip duration/delay set inline so they never sync */
+  --animate-chip-float: chip-float 4s ease-in-out infinite;
+  /* Staggered entrance (fill both → resolves to visible when animations are disabled) */
+  --animate-rise: rise 500ms var(--ease-brand) both;
+
+  /* Infinite rightward logo marquee (duplicated track → seamless) */
+  --animate-marquee: marquee 38s linear infinite;
+
+  @keyframes marquee {
+    from {
+      transform: translateX(-50%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes chip-float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(calc(var(--float-amplitude, 5px) * -1));
+    }
+  }
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      translate: 0 8px;
+      filter: blur(8px);
+    }
+    to {
+      opacity: 1;
+      translate: 0 0;
+      filter: blur(0);
+    }
+  }
+
+  /* Page-transition entry (owner 2026-07-13): every route change fades + un-blurs the new
+     page in (mounted via src/app/(frontend)/template.tsx, which re-mounts per navigation). */
+  --animate-page-enter: page-enter 400ms var(--ease-brand) both;
+
+  @keyframes page-enter {
+    from {
+      opacity: 0;
+      filter: blur(6px);
+    }
+    to {
+      opacity: 1;
+      filter: none;
+    }
+  }
+
+  /* Hero fan-out (owner request 2026-07-12/13): the two side diplomas emerge from BEHIND
+     the front card with fade-in + blur. Animates the standalone `translate`/`scale`
+     properties (the same ones Tailwind's translate/scale utilities set) plus
+     opacity/filter, so the utility values remain the resting state (extract geometry:
+     ±488px, scale 0.834, blur 4px). */
+  --animate-fan-left: fan-out-left 900ms var(--ease-brand) both;
+  --animate-fan-right: fan-out-right 900ms var(--ease-brand) both;
+
+  @keyframes fan-out-left {
+    from {
+      translate: -50% 0;
+      scale: 0.72;
+      opacity: 0;
+      filter: blur(16px);
+    }
+    to {
+      translate: calc(-50% - 488px) 0;
+      scale: 0.834;
+      opacity: 1;
+      filter: blur(4px);
+    }
+  }
+
+  @keyframes fan-out-right {
+    from {
+      translate: -50% 0;
+      scale: 0.72;
+      opacity: 0;
+      filter: blur(16px);
+    }
+    to {
+      translate: calc(-50% + 488px) 0;
+      scale: 0.834;
+      opacity: 1;
+      filter: blur(4px);
+    }
+  }
+}
+
+/* Two-tone heading gradient ("courses", "learners", "professionals") — tokens-additions.css,
+   Figma 167deg variant; distinct from the 92deg `text-gradient` above. */
+@utility text-gradient-brand {
+  background-image: linear-gradient(167deg, #407ea2 24.6%, #1c5d99 56.1%, #407ea2 92.4%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Floating "seats left" chip (course detail, Figma 3790:4223 — tokens-seats-chip.css):
+   red gradient text that continuously shimmers left-to-right. Subtle by design;
+   prefers-reduced-motion collapses it to solid red. */
+@keyframes seats-shimmer {
+  0% {
+    background-position: 0% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+@utility text-seats-alert {
+  background-image: linear-gradient(90deg, #dc2626 0%, #f87171 50%, #dc2626 100%);
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: seats-shimmer 2.5s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .text-seats-alert {
+    animation: none;
+    color: #dc2626;
+  }
+}

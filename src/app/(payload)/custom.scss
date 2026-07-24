@@ -1,0 +1,179 @@
+/*
+ * isad.academy admin theme — brand overlay on the Payload defaults (CLAUDE.md §12).
+ * Admin stays Payload-native (§3.5): fonts, radii, brand colors and graphics only —
+ * no structural/component overrides to maintain across upgrades.
+ *
+ * This stylesheet loads only on /admin routes (imported by (payload)/layout.tsx) AFTER
+ * @payloadcms/next/css, so equal-specificity overrides here win. Color variables are set
+ * globally (:root / html[data-theme='dark']) so React portals (drawers, modals, popups —
+ * rendered outside the wrapper) inherit them too. Only the Poppins variable needs the
+ * `.isad-admin-theme` wrapper (next/font class); portals fall back to system-ui — known,
+ * acceptable limitation.
+ */
+
+/* ---- Brand accent ramp (light): Deep Blue #1C5D99 — drives checkboxes, toggles,
+   selected rows, active states (Payload maps these to --theme-success-*) ---- */
+:root {
+  --theme-success-50: #e8eff5;
+  --theme-success-100: #d2dfeb;
+  --theme-success-150: #bbcee0;
+  --theme-success-200: #a4bed6;
+  --theme-success-250: #8eaecc;
+  --theme-success-300: #779ec2;
+  --theme-success-350: #608eb8;
+  --theme-success-400: #4a7dad;
+  --theme-success-450: #336da3;
+  --theme-success-500: #1c5d99; /* Deep Blue — brand primary accent */
+  --theme-success-550: #19548a;
+  --theme-success-600: #164a7a;
+  --theme-success-650: #14416b;
+  --theme-success-700: #11385c;
+  --theme-success-750: #0e2f4d;
+  --theme-success-800: #0b253d;
+  --theme-success-850: #081c2e;
+  --theme-success-900: #06131f;
+  --theme-success-950: #03090f;
+
+  /* Barely-cool paper white, in the Mist family */
+  --theme-bg: #fbfcfe;
+
+  /* Softer, brand-consistent radii */
+  --style-radius-s: 8px;
+  --style-radius-m: 12px;
+}
+
+/* ---- Dark theme: ramp reversed (Payload flips ramps on dark); accent = Steel Blue
+   #407EA2 — the brand's hover/decorative blue, better contrast on dark surfaces ---- */
+html[data-theme='dark'] {
+  --theme-success-50: #0d1a21;
+  --theme-success-100: #1a3341;
+  --theme-success-150: #264c62;
+  --theme-success-200: #336582;
+  --theme-success-250: #3a7292;
+  --theme-success-300: #3d7898;
+  --theme-success-350: #407ea2;
+  --theme-success-400: #4a85a8;
+  --theme-success-450: #538bab;
+  --theme-success-500: #407ea2; /* Steel Blue — brand accent on dark */
+  --theme-success-550: #538bab;
+  --theme-success-600: #6698b5;
+  --theme-success-650: #79a5be;
+  --theme-success-700: #8cb2c7;
+  --theme-success-750: #a0bfd1;
+  --theme-success-800: #b3cbda;
+  --theme-success-850: #c6d8e3;
+  --theme-success-900: #d9e5ec;
+  --theme-success-950: #ecf2f6;
+
+  /* Navy-tinted dark background (Figma dark endpoint #091F33 family) */
+  --theme-bg: #0d1622;
+}
+
+/* ---- Primary actions in solid brand blue (white labels: 6.83:1 on Deep Blue) ---- */
+.btn--style-primary {
+  background: #1c5d99;
+  color: #fff;
+
+  &:hover,
+  &:focus-visible {
+    background: #407ea2;
+  }
+}
+
+html[data-theme='dark'] .btn--style-primary {
+  background: #407ea2; /* button labels are semibold ≥ large-text threshold — Steel passes */
+
+  &:hover,
+  &:focus-visible {
+    background: #1c5d99;
+  }
+}
+
+/* Brand-blue keyboard focus, consistent with the public site */
+:focus-visible {
+  outline-color: #1c5d99;
+}
+
+html[data-theme='dark'] :focus-visible {
+  outline-color: #bbcde5; /* Mist — a blue ring would vanish on dark (same rule as globals.css) */
+}
+
+/* ---- Poppins + wrapper (next/font variable requires the wrapper class) ---- */
+.isad-admin-theme {
+  display: contents;
+  --font-body: var(--font-poppins), system-ui, -apple-system, sans-serif;
+  font-family: var(--font-body);
+}
+
+/* ---- Theme-aware nav icon (Icon.tsx; the Logo graphic is the Tailwind-styled
+   AdminBrand lockup now — see src/components/admin/AdminAuthShell.tsx) ---- */
+.isad-admin-icon img {
+  height: auto;
+}
+
+.isad-admin-icon img.isad-admin-logo--light {
+  display: inline-block;
+  width: 26px;
+}
+
+.isad-admin-logo--dark {
+  display: none;
+}
+
+html[data-theme='dark'] {
+  .isad-admin-icon img.isad-admin-logo--light {
+    display: none;
+  }
+
+  .isad-admin-icon img.isad-admin-logo--dark {
+    display: inline-block;
+    width: 26px;
+  }
+}
+
+/* ---- Forgot / reset screens — the ONLY remaining minimal-template auth views (login
+   and create-first-user are full custom views now, styled by Tailwind via admin.css;
+   the :not() guards keep these rules off them). White page, soft grey pill fields with
+   GRAY focus (owner 2026-07-13: no blue strokes), Deep Blue pill CTA. ---- */
+.template-minimal:not(.login):not(.createFirstUser) {
+  background: #fff;
+
+  input[type='email'],
+  input[type='password'],
+  input[type='text'] {
+    height: 56px;
+    padding: 0 1.25rem;
+    background: #f6f6f6;
+    border: 1px solid transparent;
+    border-radius: 16px;
+    font-size: 1rem;
+
+    &::placeholder {
+      color: #8b8b8b;
+    }
+
+    &:focus {
+      background: #ffffff;
+      border-color: #bdbdbd;
+    }
+  }
+
+  .form-submit .btn,
+  button[type='submit'] {
+    height: 56px;
+    border-radius: 9999px;
+    background: #1c5d99;
+    border-color: #1c5d99;
+    font-size: 1.05rem;
+    font-weight: 600;
+    transition:
+      background-color 0.2s ease,
+      box-shadow 0.2s ease;
+
+    &:hover {
+      background: #407ea2;
+      border-color: #407ea2;
+      box-shadow: 0 8px 24px rgb(28 93 153 / 0.45);
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "crons": [
+    {
+      "path": "/api/payload-jobs/handle-schedules",
+      "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/payload-jobs/run?queue=nightly",
+      "schedule": "5 8 * * *"
+    }
+  ]
+}

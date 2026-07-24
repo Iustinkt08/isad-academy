@@ -1,0 +1,191 @@
+@import 'tailwindcss';
+/* Brand tokens + shared utilities live in src/styles/tokens.css (also used by the
+   Payload admin bundle — src/app/(payload)/admin.css). */
+@import '../../styles/tokens.css';
+
+/* Gradient text — brand gradient Steel Blue → Deep Blue → Steel Blue on light surfaces
+   (Brand Book p.10). The brand never puts gradient text on dark — use solid white/Mist there. */
+@utility text-gradient {
+  background-image: linear-gradient(
+    92deg,
+    var(--color-steel),
+    var(--color-blue),
+    var(--color-steel)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+/* PillTag ring gradient (Figma PillTag 3701:4) — the deep-blue↔cyan ring used by the
+   site-wide gradient pill (WhyIsad showcase, Corporate hero badge, Early Bird, …). */
+@utility bg-brand-ring {
+  background-image: linear-gradient(
+    90deg,
+    #1c5d99 0%,
+    #46d3f6 25%,
+    #1c5d99 50%,
+    #46d3f6 75%,
+    #1c5d99 100%
+  );
+}
+
+
+/* Testimonials marquee — continuous loop; the list is duplicated in markup
+   (tokens-additions.css). Disabled under prefers-reduced-motion. */
+@keyframes marquee-x {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+@utility animate-marquee {
+  animation: marquee-x 60s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee {
+    animation: none;
+  }
+}
+
+/* Radial washes on light surfaces (§12 "washuri radiale") */
+@utility bg-radial-wash {
+  background-image:
+    radial-gradient(
+      60% 55% at 15% 0%,
+      color-mix(in srgb, var(--color-ice) 45%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      50% 45% at 90% 15%,
+      color-mix(in srgb, var(--color-aqua) 18%, transparent),
+      transparent 70%
+    );
+}
+
+/* Radial glow for dark gradient sections */
+@utility bg-radial-wash-dark {
+  background-image:
+    radial-gradient(
+      55% 50% at 80% 0%,
+      color-mix(in srgb, var(--color-steel) 45%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      45% 40% at 10% 90%,
+      color-mix(in srgb, var(--color-aqua) 25%, transparent),
+      transparent 70%
+    );
+}
+
+/* Dark gradient section — Deep Blue 44% → Navy 100% (client Figma directive; 160deg keeps
+   the top-left → bottom-right sweep of the brand book dark surfaces, pages 9/16) */
+@utility bg-section-dark {
+  background-image: linear-gradient(160deg, var(--color-blue) 44%, var(--color-navy) 100%);
+}
+
+@layer base {
+  /* Visible, palette-consistent keyboard focus (§15) */
+  :focus-visible {
+    outline: 3px solid var(--color-blue);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* On dark surfaces the blue ring would vanish — switch to ice */
+  .bg-section-dark :focus-visible,
+  .bg-ink :focus-visible {
+    outline-color: var(--color-ice);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Respect prefers-reduced-motion everywhere (§15) */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* Hide the browser's native window scrollbar (owner 2026-07-13) — the right-edge gradient
+   progressbar (ScrollProgress) replaces it visually. Only the ROOT scroller is hidden;
+   inner overflow containers keep their own behavior. */
+html {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+/* Scroll-reveal (ui/Reveal.tsx). Hidden state exists ONLY when scripting is enabled —
+   no-JS visitors and crawlers always see the content; reduced-motion shows it instantly. */
+@media (scripting: enabled) {
+  [data-reveal] {
+    opacity: 0;
+    translate: 0 20px;
+    /* Slower + heavier blur (owner 2026-07-13) */
+    filter: blur(18px);
+    transition:
+      opacity 950ms var(--ease-brand),
+      translate 950ms var(--ease-brand),
+      filter 950ms var(--ease-brand);
+  }
+
+  [data-reveal].revealed {
+    opacity: 1;
+    translate: 0 0;
+    filter: blur(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-reveal] {
+      opacity: 1;
+      translate: 0 0;
+      filter: none;
+      transition: none;
+    }
+  }
+}
+
+/* Hover underline for nav/footer hyperlinks: grows from the LEFT, Deep Blue */
+@utility link-underline {
+  position: relative;
+  display: inline-block;
+
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -3px;
+    height: 2px;
+    width: 100%;
+    background: var(--color-blue);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 400ms var(--ease-brand);
+  }
+
+  &:hover::after,
+  &:focus-visible::after {
+    transform: scaleX(1);
+  }
+}

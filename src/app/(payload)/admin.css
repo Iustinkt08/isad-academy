@@ -1,0 +1,73 @@
+/*
+ * Tailwind bundle for the Payload admin — powers the custom auth views
+ * (src/components/admin/AdminLogin / AdminCreateUser) and the brand graphics.
+ *
+ * Deliberately WITHOUT preflight: Payload ships its own base styles (all inside
+ * `@layer payload-default`), and a global reset here would fight the rest of the
+ * admin UI. Because this file is imported AFTER `@payloadcms/next/css` in
+ * (payload)/layout.tsx, the layers declared below rank higher than
+ * `payload-default`, so utilities win exactly where our markup uses them and
+ * touch nothing else. Brand tokens come from the shared src/styles/tokens.css
+ * (same file the frontend globals.css imports — single source of truth).
+ */
+@layer theme, base, components, utilities;
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities);
+@import '../../styles/tokens.css';
+
+/* Scoped mini-preflight: only inside the auth shell, so the 1:1 Figma spacing
+   never depends on Payload's (layered) element defaults. Utilities still win —
+   the `utilities` layer is declared after `base`. */
+@layer base {
+  .isad-admin-auth,
+  .isad-admin-auth *,
+  .isad-admin-auth *::before,
+  .isad-admin-auth *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    border: 0 solid;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+  }
+
+  /* Payload's html { font-size: 13px; line-height: 20px } would otherwise leak in —
+     a 20px ABSOLUTE line box under a 32px title crushes the Figma vertical rhythm.
+     Unitless 1.5 rescales per element (Figma "auto" metrics for Poppins). */
+  .isad-admin-auth {
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  .isad-admin-auth button {
+    background: none;
+    cursor: pointer;
+  }
+
+  .isad-admin-auth a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .isad-admin-auth img {
+    display: block;
+    max-width: 100%;
+  }
+}
+
+/* The custom login / create-first-user views fill the whole viewport — undo the
+   MinimalTemplate frame Payload wraps built-in-view overrides with (centering,
+   60px padding, 480px max-width). Unlayered on purpose: beats `payload-default`. */
+section.template-minimal.login,
+section.template-minimal.createFirstUser {
+  padding: 0;
+  background: none;
+}
+
+section.template-minimal.login .template-minimal__wrap,
+section.template-minimal.createFirstUser .template-minimal__wrap {
+  max-width: none;
+  width: 100%;
+}

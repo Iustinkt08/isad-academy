@@ -1,0 +1,61 @@
+'use client'
+
+import { useId } from 'react'
+import type { InputHTMLAttributes } from 'react'
+
+import { cn } from './cn'
+
+export type InputProps = {
+  label: string
+  error?: string
+  hint?: string
+  /** Applied to the wrapper; use inputClassName for the control itself. */
+  className?: string
+  inputClassName?: string
+} & Omit<InputHTMLAttributes<HTMLInputElement>, 'className'>
+
+export function Input({
+  label,
+  error,
+  hint,
+  className,
+  inputClassName,
+  id: idProp,
+  ...rest
+}: InputProps) {
+  const autoId = useId()
+  const id = idProp ?? autoId
+  const errorId = `${id}-error`
+  const hintId = `${id}-hint`
+  const describedBy =
+    [error ? errorId : null, hint ? hintId : null].filter(Boolean).join(' ') || undefined
+
+  return (
+    <div className={cn('flex flex-col gap-1.5', className)}>
+      <label htmlFor={id} className="text-sm font-semibold text-ink">
+        {label}
+      </label>
+      {hint && (
+        <p id={hintId} className="text-sm text-grey-500">
+          {hint}
+        </p>
+      )}
+      <input
+        id={id}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={describedBy}
+        className={cn(
+          'w-full rounded-xl border bg-paper px-4 py-2.5 text-base text-ink transition-colors placeholder:text-grey-500/70',
+          error ? 'border-red-600' : 'border-ice hover:border-aqua focus:border-blue',
+          inputClassName,
+        )}
+        {...rest}
+      />
+      {error && (
+        <p id={errorId} role="alert" className="text-sm font-medium text-red-700">
+          {error}
+        </p>
+      )}
+    </div>
+  )
+}
