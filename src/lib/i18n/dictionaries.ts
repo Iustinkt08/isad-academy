@@ -1161,7 +1161,7 @@ const ro: Dictionary = {
       'Toate edițiile viitoare au locurile epuizate. Abonează-te și te anunțăm imediat ce se deschide o ediție nouă.',
     fewerSeats: 'Mai puține locuri',
     moreSeats: 'Mai multe locuri',
-    enrolNow: 'Înscrie-te acum',
+    enrolNow: 'Înscrie-te',
     comingSoonTitle: 'Înscrierile se deschid în curând',
     comingSoonBody:
       'Ediții noi sunt în curs de programare. Abonează-te și te anunțăm imediat ce se deschid înscrierile.',
