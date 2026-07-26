@@ -62,14 +62,17 @@ jobs:
           cp -R .next/static deploy/.next/static
           cp -R public deploy/public
 
-      - name: Rsync to server (media/ și tmp/ rămân neatinse)
+      # Hosterion nu are rsync pe server — transferul se face cu tar+scp. Ștergerea
+      # explicită a directoarelor de aplicație dă semantica lui `rsync --delete`;
+      # media/ (uploads) și tmp/ (restart Passenger) NU se ating.
+      - name: Upload bundle (tar prin SSH; media/ și tmp/ rămân neatinse)
         run: |
-          rsync -az --delete \
-            --exclude 'media/' \
-            --exclude 'tmp/' \
-            --exclude '.env' \
-            -e "ssh -i ~/.ssh/deploy_key -p ${{ secrets.SSH_PORT }}" \
-            deploy/ "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.APP_DIR }}/"
+          tar czf bundle.tar.gz -C deploy .
+          scp -i ~/.ssh/deploy_key -P "${{ secrets.SSH_PORT }}" bundle.tar.gz \
+            "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/bundle.tar.gz"
+          ssh -i ~/.ssh/deploy_key -p "${{ secrets.SSH_PORT }}" \
+            "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
+            "cd '${{ secrets.APP_DIR }}' && rm -rf .next node_modules public server.js package.json && tar xzf ~/bundle.tar.gz && rm ~/bundle.tar.gz"
 
       - name: Restart Passenger app
         run: |
