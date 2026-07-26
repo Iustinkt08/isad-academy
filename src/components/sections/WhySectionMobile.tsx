@@ -101,6 +101,8 @@ export default function WhySectionMobile({
   const activeIndexRef = useRef(0);
   const reducedRef = useRef(false);
   const rafRef = useRef<number | null>(null);
+  const settleTimerRef = useRef<number | null>(null);
+  const touchingRef = useRef(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [shellH, setShellH] = useState<number | undefined>(undefined);
   const [tick, setTick] = useState(0);
@@ -160,6 +162,7 @@ export default function WhySectionMobile({
       ro.disconnect();
       window.removeEventListener('resize', onResize);
       mq.removeEventListener('change', onMQ);
+      if (settleTimerRef.current != null) window.clearTimeout(settleTimerRef.current);
     };
   }, [measure, applyBlur]);
 
@@ -170,22 +173,42 @@ export default function WhySectionMobile({
     return () => window.clearInterval(id);
   }, []);
 
+  /* La finalul gestului (fără evenimente de scroll ~160ms): abia ACUM animăm
+     înălțimea cardului și, dacă snap-ul a rămas agățat între două pagini (bug iOS
+     când layout-ul se schimbă mid-swipe), realiniem la pagina cea mai apropiată. */
+  const settle = useCallback(() => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    const unit = el.clientWidth || 1;
+    const idx = Math.max(0, Math.min(cards.length - 1, Math.round(el.scrollLeft / unit)));
+    activeIndexRef.current = idx;
+    setActiveIndex(idx);
+    const h = heightsRef.current[idx];
+    if (h) setShellH(h + CARD_PAD);
+    if (!touchingRef.current && Math.abs(el.scrollLeft - idx * unit) > 2) {
+      el.scrollTo({ left: idx * unit, behavior: 'smooth' });
+    }
+  }, [cards.length]);
+
   function onScroll() {
-    if (rafRef.current != null) return;
-    rafRef.current = requestAnimationFrame(() => {
-      rafRef.current = null;
-      applyBlur();
-      const el = scrollerRef.current;
-      if (!el) return;
-      const unit = el.clientWidth || 1;
-      const idx = Math.max(0, Math.min(cards.length - 1, Math.round(el.scrollLeft / unit)));
-      if (idx !== activeIndexRef.current) {
-        activeIndexRef.current = idx;
-        setActiveIndex(idx);
-        const h = heightsRef.current[idx];
-        if (h) setShellH(h + CARD_PAD);
-      }
-    });
+    if (rafRef.current == null) {
+      rafRef.current = requestAnimationFrame(() => {
+        rafRef.current = null;
+        applyBlur();
+        const el = scrollerRef.current;
+        if (!el) return;
+        const unit = el.clientWidth || 1;
+        const idx = Math.max(0, Math.min(cards.length - 1, Math.round(el.scrollLeft / unit)));
+        if (idx !== activeIndexRef.current) {
+          activeIndexRef.current = idx;
+          // Doar dots-urile se actualizează mid-swipe; înălțimea așteaptă settle()
+          // — schimbarea ei în plin gest rupea scroll-snap-ul pe iOS.
+          setActiveIndex(idx);
+        }
+      });
+    }
+    if (settleTimerRef.current != null) window.clearTimeout(settleTimerRef.current);
+    settleTimerRef.current = window.setTimeout(settle, 160);
   }
 
   function scrollTo(idx: number) {
@@ -219,6 +242,15 @@ export default function WhySectionMobile({
           <div
             ref={scrollerRef}
             onScroll={onScroll}
+            onTouchStart={() => {
+              touchingRef.current = true;
+            }}
+            onTouchEnd={() => {
+              touchingRef.current = false;
+            }}
+            onTouchCancel={() => {
+              touchingRef.current = false;
+            }}
             style={{ height: shellH }}
             className="flex snap-x snap-mandatory overflow-x-auto overflow-y-hidden transition-[height] duration-300 ease-out motion-reduce:transition-none [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
