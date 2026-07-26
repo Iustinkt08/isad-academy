@@ -135,17 +135,14 @@ export function Footer({ settings, locale }: { settings: SiteSetting | null; loc
 
       </Container>
 
-      {/* Giant wordmark — light grey. Desktop: clipped at the page's bottom edge
-          (~10% deeper cut, owner 2026-07-14). Mobil: ÎNTREG + bandă albă dedesubt
-          (owner 2026-07-26) — Safari iOS pune propria bară albă sub toolbarul
-          translucid; cu wordmark-ul tăiat la margine se vedea o „umbră"/seam, iar
-          alb-pe-alb (stil certcar) o face invizibilă. */}
-      <div aria-hidden="true" className="mt-12 flex justify-center overflow-hidden pb-5 lg:pb-0">
+      {/* Giant wordmark — light grey, clipped at the page's bottom edge
+          (~10% deeper cut, owner 2026-07-14) */}
+      <div aria-hidden="true" className="mt-12 flex justify-center overflow-hidden">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/brand/isad-academy-wordmark-gray.svg"
           alt=""
-          className="w-[calc(100%-48px)] max-w-[1280px] select-none opacity-90 lg:translate-y-[28%]"
+          className="w-[calc(100%-48px)] max-w-[1280px] translate-y-[28%] select-none opacity-90"
         />
       </div>
     </footer>
