@@ -21,7 +21,7 @@ export function CookieConsentBanner({ locale = DEFAULT_LOCALE }: { locale?: Loca
     <div
       role="region"
       aria-label={t.aria}
-      className="fixed inset-x-0 bottom-0 z-50 p-4 sm:p-6"
+      className="fixed inset-x-0 bottom-0 z-50 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:p-6 sm:pb-[max(1.5rem,env(safe-area-inset-bottom))]"
     >
       <div className="mx-auto max-w-3xl rounded-3xl border border-ice/70 bg-paper/95 p-5 shadow-2xl shadow-ink/20 backdrop-blur-md sm:p-6">
         <h2 className="text-base font-semibold text-ink">{t.title}</h2>

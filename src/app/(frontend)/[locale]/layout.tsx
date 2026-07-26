@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Poppins } from 'next/font/google'
 import { getPayload } from 'payload'
 import React, { cache } from 'react'
@@ -16,6 +16,15 @@ import { DEFAULT_OG_IMAGE, SITE_NAME, SITE_TAGLINE, getSiteUrl } from '@/lib/seo
 import type { SiteSetting } from '@/payload-types'
 
 import '../globals.css'
+
+/** `viewport-fit=cover` (owner 2026-07-26): pagina se întinde pe sub toolbarul
+ *  translucid al Safari iOS (edge-to-edge) — fără el, Safari umple zona de sub
+ *  bară cu un fundal alb opac care taie vizual conținutul (ex. watermark-ul). */
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+}
 
 /** Both languages are fully static — EN at the bare URLs, RO under /ro (middleware). */
 export function generateStaticParams(): { locale: Locale }[] {
