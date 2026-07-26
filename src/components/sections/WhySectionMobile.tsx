@@ -7,8 +7,10 @@
  *  — Conținutul e ALINIAT SUS: pill-ul (titlul) stă mereu în aceeași poziție, în
  *    partea de sus a cardului, indiferent de slide.
  *  — Cardul ÎȘI ANIMEAZĂ ÎNĂLȚIMEA spre conținutul slide-ului activ (se face mai
- *    mic pentru slide-urile cu mai puțin text), declanșat de swipe
- *    (transition-[height]). Notch-ul urcă/coboară lipit de marginea de jos.
+ *    mic pentru slide-urile cu mai puțin text), SINCRON cu swipe-ul: shell-ul
+ *    vizual interpolează înălțimea după scrollLeft, iar scroller-ul rămâne la
+ *    înălțime FIXĂ (schimbarea geometriei mid-gest rupea snap-ul pe iOS).
+ *    Notch-ul urcă/coboară lipit de marginea de jos.
  *  — La swipe, conținutul următorului slide intră din DREAPTA cu BLUR, sincron cu
  *    gestul (scroll nativ orizontal, blur scrubat). Doar primul slide are poza +
  *    numele Dr. Gresoi; restul sunt doar text; pill-ul își schimbă titlul.
@@ -103,9 +105,16 @@ export default function WhySectionMobile({
   const rafRef = useRef<number | null>(null);
   const settleTimerRef = useRef<number | null>(null);
   const touchingRef = useRef(false);
+  const shellRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [shellH, setShellH] = useState<number | undefined>(undefined);
+  /** Înălțimea FIXĂ a scroller-ului = cel mai înalt slide; shell-ul (vizual) se
+      scrubează imperativ între înălțimile slide-urilor, sincron cu gestul. */
+  const [maxH, setMaxH] = useState<number | undefined>(undefined);
   const [tick, setTick] = useState(0);
+
+  const setShellHeight = useCallback((h: number | undefined) => {
+    if (h && shellRef.current) shellRef.current.style.height = `${h + CARD_PAD}px`;
+  }, []);
 
   /* Blur scrubat: fiecare slide primește blur după cât de departe e de centru (o
      „pagină" = lățimea scroller-ului). Slide-ul centrat = clar; cel care intră din
@@ -128,15 +137,31 @@ export default function WhySectionMobile({
       el.style.filter = dist ? `blur(${(dist * MAX_BLUR).toFixed(2)}px)` : '';
       el.style.opacity = (1 - dist * 0.25).toFixed(3);
     });
+    /* Înălțimea cardului, scrubată SINCRON cu gestul: interpolăm între înălțimile
+       slide-urilor vecine după poziția de scroll. Scroller-ul rămâne la înălțime
+       fixă (geometria snap-ului nu se schimbă mid-gest — bugul iOS); doar shell-ul
+       vizual clipuiește conținutul. */
+    const n = contentRefs.current.length;
+    if (n > 0) {
+      const idxF = Math.max(0, Math.min(n - 1, sl / unit));
+      const i0 = Math.floor(idxF);
+      const i1 = Math.min(i0 + 1, n - 1);
+      const frac = idxF - i0;
+      const h0 = heightsRef.current[i0] ?? 0;
+      const h1 = heightsRef.current[i1] ?? 0;
+      const h = h0 && h1 ? h0 + (h1 - h0) * frac : h0 || h1;
+      if (h && shellRef.current) shellRef.current.style.height = `${h + CARD_PAD}px`;
+    }
   }, []);
 
   /* Măsoară înălțimea NATURALĂ a conținutului fiecărui slide (independent de
      înălțimea shell-ului) și fixează înălțimea cardului pe slide-ul activ. */
   const measure = useCallback(() => {
     heightsRef.current = contentRefs.current.map((el) => (el ? el.offsetHeight : 0));
-    const h = heightsRef.current[activeIndexRef.current];
-    if (h) setShellH(h + CARD_PAD);
-  }, []);
+    const tallest = Math.max(0, ...heightsRef.current);
+    if (tallest) setMaxH(tallest + CARD_PAD);
+    setShellHeight(heightsRef.current[activeIndexRef.current]);
+  }, [setShellHeight]);
 
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -183,12 +208,11 @@ export default function WhySectionMobile({
     const idx = Math.max(0, Math.min(cards.length - 1, Math.round(el.scrollLeft / unit)));
     activeIndexRef.current = idx;
     setActiveIndex(idx);
-    const h = heightsRef.current[idx];
-    if (h) setShellH(h + CARD_PAD);
+    setShellHeight(heightsRef.current[idx]);
     if (!touchingRef.current && Math.abs(el.scrollLeft - idx * unit) > 2) {
       el.scrollTo({ left: idx * unit, behavior: 'smooth' });
     }
-  }, [cards.length]);
+  }, [cards.length, setShellHeight]);
 
   function onScroll() {
     if (rafRef.current == null) {
@@ -236,7 +260,10 @@ export default function WhySectionMobile({
       {/* CARD — shell pe aceeași poziție; înălțimea se ANIMEAZĂ spre slide-ul activ.
           Conținutul e aliniat SUS (pill fix). Centrat, fără peek. */}
       <div className="mt-9 flex justify-center px-5">
-        <div className="relative w-[350px] max-w-full overflow-hidden rounded-[24.7px] border-[6px] border-[#f6f6f6] bg-white shadow-[0_18px_38px_rgba(77,77,77,0.1),0_7px_15px_rgba(77,77,77,0.08),0_2px_6px_rgba(77,77,77,0.06)]">
+        <div
+          ref={shellRef}
+          className="relative w-[350px] max-w-full overflow-hidden rounded-[24.7px] border-[6px] border-[#f6f6f6] bg-white shadow-[0_18px_38px_rgba(77,77,77,0.1),0_7px_15px_rgba(77,77,77,0.08),0_2px_6px_rgba(77,77,77,0.06)]"
+        >
           {/* Scroller orizontal — înălțimea (deci a cardului) se animează spre slide-ul
               activ; slide-urile sunt aliniate SUS (items-start + pt-5). */}
           <div
@@ -251,8 +278,8 @@ export default function WhySectionMobile({
             onTouchCancel={() => {
               touchingRef.current = false;
             }}
-            style={{ height: shellH }}
-            className="flex snap-x snap-mandatory overflow-x-auto overflow-y-hidden transition-[height] duration-300 ease-out motion-reduce:transition-none [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            style={{ height: maxH }}
+            className="flex snap-x snap-mandatory overflow-x-auto overflow-y-hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
             {cards.map((card, i) => (
               <div
