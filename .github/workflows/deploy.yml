@@ -1,0 +1,78 @@
+# Deploy automat pe cPanel la fiecare push pe `main` (owner 2026-07-26).
+# Build-ul rulează pe Linux (binarele sharp ies corecte nativ), paginile statice se
+# pre-randează din DB-ul de PRODUCȚIE printr-un tunel SSH (Postgres-ul serverului nu e
+# expus public), iar bundle-ul ajunge pe server prin rsync + restart Passenger.
+# Secretele stau EXCLUSIV în GitHub Actions Secrets — vezi DEPLOY-CPANEL.md §CI.
+name: Deploy production (cPanel)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Unit tests (quality gate)
+        run: npx vitest run tests/unit
+
+      - name: Load SSH deploy key
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -p "${{ secrets.SSH_PORT }}" "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Open DB tunnel (prerender from the production DB)
+        run: |
+          ssh -i ~/.ssh/deploy_key -p "${{ secrets.SSH_PORT }}" -f -N \
+            -o ExitOnForwardFailure=yes \
+            -L 5432:127.0.0.1:5432 \
+            "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}"
+
+      - name: Build (standalone)
+        env:
+          DATABASE_URI: ${{ secrets.PROD_DATABASE_URI }}
+          PAYLOAD_SECRET: ${{ secrets.PROD_PAYLOAD_SECRET }}
+          NEXT_PUBLIC_SITE_URL: https://isad.academy
+        run: npm run build
+
+      - name: Assemble bundle
+        run: |
+          mkdir -p deploy/.next
+          cp -R .next/standalone/. deploy/
+          cp -R .next/static deploy/.next/static
+          cp -R public deploy/public
+
+      - name: Rsync to server (media/ și tmp/ rămân neatinse)
+        run: |
+          rsync -az --delete \
+            --exclude 'media/' \
+            --exclude 'tmp/' \
+            --exclude '.env' \
+            -e "ssh -i ~/.ssh/deploy_key -p ${{ secrets.SSH_PORT }}" \
+            deploy/ "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.APP_DIR }}/"
+
+      - name: Restart Passenger app
+        run: |
+          ssh -i ~/.ssh/deploy_key -p "${{ secrets.SSH_PORT }}" \
+            "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
+            "mkdir -p '${{ secrets.APP_DIR }}/tmp' && touch '${{ secrets.APP_DIR }}/tmp/restart.txt'"
