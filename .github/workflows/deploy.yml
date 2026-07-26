@@ -18,6 +18,22 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: production
+    # Postgres LOCAL pe runner: build-ul pre-randează dintr-un snapshot al DB-ului de
+    # producție (o comandă ssh de câteva secunde), NU printr-un tunel ținut deschis —
+    # Hosterion omoară sesiunile SSH persistente după ~1-2 minute (2026-07-26).
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: isad
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -57,12 +73,18 @@ jobs:
             TCPKeepAlive yes
           EOF
 
-      - name: Open DB tunnel (prerender from the production DB)
-        run: ssh -f -N -o ExitOnForwardFailure=yes -L 5432:127.0.0.1:5432 deploy
+      # Snapshot-ul DB de producție într-o comandă ssh de câteva secunde (sesiunile
+      # scurte trec de firewall-ul hostului; cele persistente sunt omorâte).
+      - name: Snapshot production DB into runner Postgres
+        run: |
+          ssh deploy "pg_dump --no-owner --no-privileges '${{ secrets.PROD_DATABASE_URI }}'" > prod.sql
+          test -s prod.sql
+          psql "postgres://postgres:ci@127.0.0.1:5432/isad" -q -v ON_ERROR_STOP=0 -f prod.sql > /dev/null
+          rm prod.sql
 
       - name: Build (standalone)
         env:
-          DATABASE_URI: ${{ secrets.PROD_DATABASE_URI }}
+          DATABASE_URI: postgres://postgres:ci@127.0.0.1:5432/isad
           PAYLOAD_SECRET: ${{ secrets.PROD_PAYLOAD_SECRET }}
           NEXT_PUBLIC_SITE_URL: https://isad.academy
         run: npm run build
