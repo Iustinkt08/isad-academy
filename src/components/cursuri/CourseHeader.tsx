@@ -1,3 +1,5 @@
+import Link from 'next/link'
+
 import PillTag from '../PillTag'
 import { Container } from '../ui/Container'
 
@@ -14,7 +16,9 @@ import { Container } from '../ui/Container'
  */
 
 export type CourseHeaderData = {
-  breadcrumb: string[] // ['Courses', 'PECB ISO/IEC 42001', 'Lead Implementer']
+  /** Back la catalog (owner 2026-07-26) — a înlocuit breadcrumb-ul. Pre-localizat. */
+  backLabel: string
+  backHref: string
   pillLabel: string
   titlePlain: string // ink part — e.g. "Lead "
   titleGradient: string // gradient part — e.g. "Implementer" (the "." is added in ink)
@@ -23,11 +27,14 @@ export type CourseHeaderData = {
 
 export default function CourseHeader({ data }: { data: CourseHeaderData }) {
   return (
-    <header className="pb-5 pt-8 lg:pb-9 lg:pt-[130px]">
-      <Container className="flex w-full flex-col gap-3 lg:gap-4">
-        <p className="text-[12px] tracking-[0.2px] text-grey-600 lg:text-[13px]">
-          {data.breadcrumb.join('  →  ')}
-        </p>
+    <header className="pb-5 pt-8 lg:pb-9 lg:pt-20">
+      <Container className="flex w-full flex-col gap-3 px-5 sm:px-5 lg:gap-4 lg:px-8">
+        <Link
+          href={data.backHref}
+          className="w-fit text-[12px] tracking-[0.2px] text-grey-600 transition-colors hover:text-blue lg:text-[13px]"
+        >
+          ← {data.backLabel}
+        </Link>
 
         {/* Mobil: text 13px pe UN rând (Figma 3925-115); desktop: 14px ca până acum */}
         <PillTag>

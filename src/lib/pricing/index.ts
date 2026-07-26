@@ -7,6 +7,7 @@ export {
   DEFAULT_MEMBER_DISCOUNT_PERCENT,
   GROUP_DISCOUNT_PERCENT,
   GROUP_MIN_QUANTITY,
+  MAX_DISCOUNT_CODES,
 } from './computeOrderPricing'
 export { clampPercent, roundCurrency } from './rounding'
 export { bestOf, groupMemberStackCodeExclusive, stackAll, strategies } from './strategies'

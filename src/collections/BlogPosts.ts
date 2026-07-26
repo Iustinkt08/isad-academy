@@ -26,7 +26,9 @@ export const BlogPosts: CollectionConfig = {
   slug: 'blogPosts',
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'author', 'category', '_status'],
+    group: 'Content',
+    defaultColumns: ['title', '_status', 'createdAt'],
+    listSearchableFields: ['title'],
     description: 'Blog articles — rich text supports named colors, link chips and downloadable resources.',
     preview: (doc) => {
       const slug = typeof doc?.slug === 'string' && doc.slug.length > 0 ? doc.slug : null
@@ -132,6 +134,18 @@ export const BlogPosts: CollectionConfig = {
       hasMany: false,
       admin: {
         description: 'Toggle "related to a course" — shows a course callout at the end of the article.',
+      },
+    },
+    {
+      name: 'sendNewsletterOnPublish',
+      label: 'Send newsletter on publish',
+      type: 'checkbox',
+      defaultValue: true,
+      admin: {
+        position: 'sidebar',
+        description:
+          'Uncheck to publish WITHOUT emailing subscribers. First publish only — the broadcast is ever sent once. ' +
+          'Publishing unchecked keeps that one send available: unpublish, tick the box and publish again to send it later.',
       },
     },
     {

@@ -19,7 +19,11 @@ const MAX_CODE_LENGTH = 64
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-const ALLOWED_TOP_LEVEL_KEYS = ['sessionId', 'quantity', 'buyer', 'participants', 'code']
+const ALLOWED_TOP_LEVEL_KEYS = ['sessionId', 'quantity', 'buyer', 'participants', 'code', 'codes']
+
+/** Codes stack, max 2 per order (owner 2026-07-25) — mirrored by the engine's
+ * `MAX_DISCOUNT_CODES`. */
+const MAX_CODES = 2
 
 /**
  * A tampering (or merely naive) client might send a client-computed `total`, a full
@@ -51,7 +55,9 @@ export type NormalizedCheckoutInput = {
   quantity: number
   buyer: NormalizedBuyer
   participants: NormalizedParticipant[]
-  code: string | null
+  /** Trimmed discount codes in application order (max `MAX_CODES`); [] = none. The legacy
+   * single `code` field is folded in here. */
+  codes: string[]
 }
 
 export type CheckoutValidationResult =
@@ -91,7 +97,7 @@ export const validateCheckoutInput = (raw: unknown): CheckoutValidationResult =>
   )
   if (topLevelError) return { ok: false, error: topLevelError }
 
-  const { sessionId, quantity, buyer, participants, code } = raw
+  const { sessionId, quantity, buyer, participants, code, codes } = raw
 
   if (!(typeof sessionId === 'number' && Number.isFinite(sessionId)) && !isNonEmptyString(sessionId, 100)) {
     return { ok: false, error: '"sessionId" is required.' }
@@ -200,12 +206,26 @@ export const validateCheckoutInput = (raw: unknown): CheckoutValidationResult =>
     normalizedParticipants.push({ name: participant.name, email: participant.email })
   }
 
-  let normalizedCode: string | null = null
-  if (code !== undefined && code !== null) {
+  // `codes` (new, ordered, max 2) takes precedence; the legacy single `code` still works.
+  const normalizedCodes: string[] = []
+  if (codes !== undefined && codes !== null) {
+    if (!Array.isArray(codes)) {
+      return { ok: false, error: '"codes" must be an array of strings.' }
+    }
+    if (codes.length > MAX_CODES) {
+      return { ok: false, error: `At most ${MAX_CODES} discount codes can be applied per order.` }
+    }
+    for (const entry of codes) {
+      if (!isNonEmptyString(entry, MAX_CODE_LENGTH)) {
+        return { ok: false, error: 'Every entry in "codes" must be a non-empty string.' }
+      }
+      normalizedCodes.push(entry.trim())
+    }
+  } else if (code !== undefined && code !== null) {
     if (!isNonEmptyString(code, MAX_CODE_LENGTH)) {
       return { ok: false, error: '"code" must be a non-empty string.' }
     }
-    normalizedCode = code.trim()
+    normalizedCodes.push(code.trim())
   }
 
   return {
@@ -215,7 +235,7 @@ export const validateCheckoutInput = (raw: unknown): CheckoutValidationResult =>
       quantity: validQuantity,
       buyer: normalizedBuyer,
       participants: normalizedParticipants,
-      code: normalizedCode,
+      codes: normalizedCodes,
     },
   }
 }

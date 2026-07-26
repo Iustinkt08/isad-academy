@@ -11,6 +11,7 @@ import { revalidateSiteHook } from '../lib/revalidateSite'
 export const SiteSettings: GlobalConfig = {
   slug: 'siteSettings',
   admin: {
+    group: 'Site',
     description: 'Site-wide configuration, including the business decisions still pending from Silviu (CLAUDE.md §13).',
   },
   access: {

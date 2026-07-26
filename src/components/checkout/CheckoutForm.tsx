@@ -24,9 +24,13 @@ type Participant = { name: string; email: string }
 
 type QuoteOutcome =
   | { type: 'ok'; pricing: PricingSnapshot }
-  | { type: 'codeError'; message: string }
+  /** `codeValue` (when the server sends it) = WHICH of the applied codes failed. */
+  | { type: 'codeError'; message: string; codeValue?: string }
   | { type: 'blocked'; message: string; soldOut: boolean }
   | { type: 'unavailable' }
+
+/** Codes stack, max 2 per order (owner 2026-07-25) — mirrors the engine's cap. */
+const MAX_CODES = 2
 
 type GeneralError = { message: string; soldOut?: boolean } | null
 
@@ -74,9 +78,9 @@ export function CheckoutForm({
   const [cui, setCui] = useState('')
   const [address, setAddress] = useState('')
 
-  // ——— Discount code ————————————————————————————————————————————————————————————————
+  // ——— Discount codes (stack, max 2 — owner 2026-07-25) ————————————————————————————————
   const [codeInput, setCodeInput] = useState('')
-  const [appliedCode, setAppliedCode] = useState<string | null>(null)
+  const [appliedCodes, setAppliedCodes] = useState<string[]>([])
   const [codeError, setCodeError] = useState<string | null>(null)
   const [applyingCode, setApplyingCode] = useState(false)
 
@@ -111,12 +115,16 @@ export function CheckoutForm({
   )
 
   const fetchQuote = useCallback(
-    async (qty: number, code: string | null): Promise<QuoteOutcome> => {
+    async (qty: number, codes: string[]): Promise<QuoteOutcome> => {
       try {
         const response = await fetch('/api/checkout/quote', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ sessionId: session.id, quantity: qty, ...(code ? { code } : {}) }),
+          body: JSON.stringify({
+            sessionId: session.id,
+            quantity: qty,
+            ...(codes.length > 0 ? { codes } : {}),
+          }),
         })
         const data = (await response.json().catch(() => null)) as
           | ({ pricing?: PricingSnapshot } & ApiFailureBody)
@@ -126,7 +134,11 @@ export function CheckoutForm({
           return { type: 'ok', pricing: data.pricing }
         }
         if (response.status === 400 && data?.detail) {
-          return { type: 'codeError', message: codeDetailMessage(data.detail, locale) }
+          return {
+            type: 'codeError',
+            message: codeDetailMessage(data.detail, locale),
+            codeValue: data.codeValue,
+          }
         }
         if (response.status === 404 || response.status === 409) {
           return {
@@ -152,7 +164,7 @@ export function CheckoutForm({
     setQuoteUpdating(true)
 
     const timer = setTimeout(async () => {
-      const outcome = await fetchQuote(quantity, appliedCode)
+      const outcome = await fetchQuote(quantity, appliedCodes)
       if (seq !== quoteSeq.current) return // a newer request superseded this one
 
       setQuoteUpdating(false)
@@ -160,9 +172,12 @@ export function CheckoutForm({
         setPricing(outcome.pricing)
         setQuoteFallback(false)
       } else if (outcome.type === 'codeError') {
-        // The previously-applied code became invalid (e.g. usage limit reached since).
+        // A previously-applied code became invalid (e.g. usage limit reached since). Drop
+        // only the failing one when the server names it; otherwise drop them all.
         setCodeError(outcome.message)
-        setAppliedCode(null) // effect re-runs and re-quotes without the code
+        setAppliedCodes((prev) =>
+          outcome.codeValue ? prev.filter((c) => c !== outcome.codeValue) : [],
+        ) // effect re-runs and re-quotes with the remaining codes
       } else if (outcome.type === 'blocked') {
         setGeneralError({ message: outcome.message, soldOut: outcome.soldOut })
         setPricing(null)
@@ -174,7 +189,7 @@ export function CheckoutForm({
     }, 250)
 
     return () => clearTimeout(timer)
-  }, [quantity, appliedCode, fetchQuote, clientFallbackPricing])
+  }, [quantity, appliedCodes, fetchQuote, clientFallbackPricing])
 
   const handleQuantityChange = (next: number) => {
     const clamped = Math.min(MAX_SEATS, Math.max(1, next))
@@ -190,16 +205,22 @@ export function CheckoutForm({
       setCodeError(t.enterCodeFirst)
       return
     }
+    if (appliedCodes.length >= MAX_CODES) return // input is hidden at the cap; defensive
+    if (appliedCodes.some((c) => c.toUpperCase() === candidate.toUpperCase())) {
+      setCodeError(t.codeDuplicate)
+      return
+    }
     setApplyingCode(true)
     setCodeError(null)
     const seq = ++quoteSeq.current
-    const outcome = await fetchQuote(quantity, candidate)
+    const nextCodes = [...appliedCodes, candidate]
+    const outcome = await fetchQuote(quantity, nextCodes)
     if (seq !== quoteSeq.current) return
     setApplyingCode(false)
     setQuoteUpdating(false)
 
     if (outcome.type === 'ok') {
-      setAppliedCode(candidate)
+      setAppliedCodes(nextCodes)
       setCodeInput('')
       setPricing(outcome.pricing)
       setQuoteFallback(false)
@@ -212,9 +233,8 @@ export function CheckoutForm({
     }
   }
 
-  const handleRemoveCode = () => {
-    setAppliedCode(null) // the quote effect re-prices without the code
-    setCodeInput('')
+  const handleRemoveCode = (code: string) => {
+    setAppliedCodes((prev) => prev.filter((c) => c !== code)) // quote effect re-prices
     setCodeError(null)
   }
 
@@ -289,7 +309,7 @@ export function CheckoutForm({
                 })),
             }
           : {}),
-        ...(appliedCode ? { code: appliedCode } : {}),
+        ...(appliedCodes.length > 0 ? { codes: appliedCodes } : {}),
       }
 
       const response = await fetch('/api/checkout', {
@@ -315,7 +335,10 @@ export function CheckoutForm({
       const failure = checkoutSubmitError(response.status, data, locale)
       if (failure.kind === 'code') {
         setCodeError(failure.message)
-        setAppliedCode(null) // re-quote without the rejected code
+        // Drop only the rejected code when the server names it; otherwise drop them all.
+        setAppliedCodes((prev) =>
+          data?.codeValue ? prev.filter((c) => c !== data.codeValue) : [],
+        ) // re-quote with the remaining codes
         focusElement(CODE_INPUT_ID)
       } else if (failure.kind === 'soldOut') {
         setGeneralError({ message: failure.message, soldOut: true })
@@ -348,7 +371,7 @@ export function CheckoutForm({
       onSubmit={handleSubmit}
       noValidate
       data-testid="checkout-form"
-      className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_400px] lg:items-start lg:gap-11"
+      className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_400px] lg:items-start lg:gap-11"
     >
       {/* ——— Form column ——— */}
       <div className="flex min-w-0 flex-col gap-6">
@@ -410,7 +433,8 @@ export function CheckoutForm({
             }}
             onApply={handleApplyCode}
             applying={applyingCode}
-            appliedCode={appliedCode}
+            appliedCodes={appliedCodes}
+            maxCodes={MAX_CODES}
             codeError={codeError}
             onRemoveCode={handleRemoveCode}
             showStackNote={settings.stackingPolicy === 'stackAll'}
@@ -431,8 +455,13 @@ export function CheckoutForm({
             vatDisplay={settings.vatDisplay}
             updating={quoteUpdating || applyingCode}
             fallback={quoteFallback}
-            codeLabel={appliedCode}
-            onRemoveCode={appliedCode ? handleRemoveCode : undefined}
+            // One summary row per applied code — per-code amounts come from the engine's
+            // snapshot lines (same order the codes were applied in).
+            codes={appliedCodes.map((label, index) => ({
+              label,
+              discount: pricing?.codes?.[index]?.discount ?? 0,
+            }))}
+            onRemoveCode={appliedCodes.length > 0 ? handleRemoveCode : undefined}
             generalError={generalError?.message ?? null}
             soldOut={soldOutNow}
             courseHref={coursePath}

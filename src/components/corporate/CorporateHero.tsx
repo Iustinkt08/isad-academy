@@ -28,7 +28,7 @@ export default function CorporateHero({ locale }: { locale: Locale }) {
     <section className="bg-surface-subtle">
       {/* Content aligned to the shared Container (navbar-logo line — owner 2026-07-13);
           Reveal = scroll-triggered fade + blur */}
-      <Container className="pb-[70px] pt-24 lg:pt-[150px]">
+      <Container className="pb-[70px] pt-16 lg:pt-20">
         <Reveal className="flex flex-col items-center gap-[22px]">
           <PillTag>{t.pill}</PillTag>
 
@@ -38,8 +38,9 @@ export default function CorporateHero({ locale }: { locale: Locale }) {
             <br />
             {t.titleBottomPrefix}{' '}
             <span className="text-gradient-brand tracking-[-2.16px]">
-              {t.titleBottomHighlight}.
+              {t.titleBottomHighlight}
             </span>
+            {'.'}
           </h1>
 
           <p className="max-w-[760px] text-center text-[17px] leading-[27px] text-grey-600">

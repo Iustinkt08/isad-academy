@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 
+import { Reveal } from '@/components/ui/Reveal'
 import { getDictionary, localePath, resolveLocale } from '@/lib/i18n'
 
 type Args = { params: Promise<{ locale: string }> }
@@ -26,7 +27,8 @@ export default async function NewsletterConfirmedPage({ params }: Args) {
   const dict = getDictionary(locale)
   return (
     <section className="bg-radial-wash">
-      <div className="mx-auto flex max-w-2xl flex-col items-start gap-4 px-4 py-20 sm:px-6 sm:py-28 lg:px-8">
+      {/* Fade-in (owner 2026-07-25) — același Reveal ca pe homepage */}
+      <Reveal className="mx-auto flex max-w-2xl flex-col items-start gap-4 px-4 py-20 sm:px-6 sm:py-28 lg:px-8">
         <h1 className="text-h1 text-ink">{dict.newsletter.confirmedTitle}</h1>
         <p className="text-body-lg text-ink/70">
           {dict.newsletter.confirmedBody}
@@ -37,7 +39,7 @@ export default async function NewsletterConfirmedPage({ params }: Args) {
         >
           {dict.newsletter.backHome}
         </Link>
-      </div>
+      </Reveal>
     </section>
   )
 }

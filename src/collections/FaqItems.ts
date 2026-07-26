@@ -8,8 +8,9 @@ export const FaqItems: CollectionConfig = {
   slug: 'faqItems',
   admin: {
     useAsTitle: 'question',
+    group: 'Content',
     defaultColumns: ['question', 'order'],
-    description: 'Certification FAQ shown in the certification section on the homepage.',
+    description: 'Q&A shown in the FAQ section on the homepage, grouped by journey tab.',
   },
   access: {
     read: () => true,
@@ -40,10 +41,13 @@ export const FaqItems: CollectionConfig = {
       admin: {
         description: 'Tab the question appears under in the homepage FAQ section.',
       },
+      // Owner 2026-07-25: journey-shaped tabs — Discover (company/site/courses),
+      // Learn (time framing, evaluations), Validate (certifications), Access (enrolment).
       options: [
-        { label: 'Getting started', value: 'gettingStarted' },
-        { label: 'Courses & certification', value: 'coursesCertification' },
-        { label: 'Payments & practical details', value: 'paymentsPractical' },
+        { label: 'Discover', value: 'discover' },
+        { label: 'Learn', value: 'learn' },
+        { label: 'Validate', value: 'validate' },
+        { label: 'Access', value: 'access' },
       ],
     },
     {

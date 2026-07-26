@@ -117,9 +117,11 @@ const priceWindowFields = (label: string): CollectionConfig['fields'] => [
 export const CourseSessions: CollectionConfig = {
   slug: 'courseSessions',
   admin: {
+    group: 'Content',
     defaultColumns: ['course', 'startDate', 'capacity', 'seatsSold'],
     description: 'Editions of a course — dates, schedule, capacity and price windows.',
   },
+  defaultSort: 'startDate',
   access: {
     read: ({ req }) => (req.user ? true : { 'course._status': { equals: 'published' } }),
     create: isAdmin,

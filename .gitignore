@@ -40,3 +40,8 @@ npm-debug.log*
 # client brand source materials (untracked — the app uses the public/brand/ copies)
 /logo&icon/
 /Brand Book isad.academy.pdf
+.gstack/
+
+# deploy artefacts (build local pentru cPanel — nu se versionează)
+/deploy/
+isad-deploy.tar.gz

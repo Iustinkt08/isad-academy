@@ -42,6 +42,20 @@ export const broadcastNewPostOnPublish: CollectionAfterChangeHook<BlogPost> = as
   const firstPublish = nextStatus === PUBLISHED && prevStatus !== PUBLISHED && !alreadyBroadcast
   if (!firstPublish) return doc
 
+  // Editor opt-out ("Send newsletter on publish" checkbox, default true). DECISION: when
+  // unchecked, the broadcast is skipped AND `broadcastSentAt` is deliberately NOT stamped —
+  // the stamp means "the one-and-only broadcast was attempted", so leaving it empty keeps
+  // that single send available: unpublishing and re-publishing with the box ticked again
+  // still triggers the first (and only) broadcast. Stamping here instead would silently
+  // burn the send forever. Explicit `=== false` so older docs created before the field
+  // existed (value undefined/null) keep the default send-on-publish behaviour.
+  if (doc?.sendNewsletterOnPublish === false) {
+    req.payload.logger.info(
+      `[email] blogPost ${doc.id} published WITHOUT newsletter broadcast (sendNewsletterOnPublish unchecked); broadcast stays available for a future re-publish.`,
+    )
+    return doc
+  }
+
   try {
     // `getSiteUrl()` (src/lib/seo/site.ts) falls back to the dev origin when
     // NEXT_PUBLIC_SITE_URL is unset — the broadcast link is never a broken relative path.

@@ -11,6 +11,7 @@ import { revalidateSiteHook } from '../lib/revalidateSite'
 export const ExpertBio: GlobalConfig = {
   slug: 'expertBio',
   admin: {
+    group: 'Site',
     description: 'The expert bio, shown on Home (short) and About (full).',
   },
   access: {

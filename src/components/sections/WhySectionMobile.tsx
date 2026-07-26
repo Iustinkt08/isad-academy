@@ -25,6 +25,9 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import type { Locale } from '@/lib/i18n/config';
+import { getDictionary } from '@/lib/i18n/dictionaries';
+
 type WhyCardData = {
   pill: string;
   /** doar primul slide are foto + nume */
@@ -34,31 +37,6 @@ type WhyCardData = {
 };
 
 type Stat = { value: string; label: string };
-
-const WHY_CARDS: WhyCardData[] = [
-  {
-    pill: 'Learn from a Practitioner',
-    photo: '/silviu-gresoi.png', // ← asset-ul existent al pozei lui Dr. Gresoi din repo
-    name: 'Dr. Silviu Gresoi',
-    body: 'Courses led by Dr. Silviu Gresoi (PhD, CFE), with 20+ years in AI, risk, governance and financial crime.',
-  },
-  {
-    pill: 'Official PECB Partner',
-    body: 'Certifications recognized worldwide. Train for ISO/IEC 42001 and get enrolled directly on the PECB platform.',
-  },
-  {
-    pill: 'AI First, Future Proof',
-    body: 'Specialized in AI Management Systems and Responsible AI — the standards organizations need now, not generic IT training.',
-  },
-];
-
-/** Pool de statistici pentru notch — arată statistica slide-ului activ și se rotește
-    la câteva secunde. Ordinea = maparea per slide (0 → 20+, 1 → 2,000+, 2 → 100+). */
-const NOTCH_STATS: Stat[] = [
-  { value: '20+', label: 'Years of Experience' },
-  { value: '2,000+', label: 'Companies Served' },
-  { value: '100+', label: 'Training Sessions Delivered' },
-];
 
 /** Blur maxim aplicat conținutului complet decalat (cel centrat = 0). */
 const MAX_BLUR = 6;
@@ -82,7 +60,41 @@ function GradientPill({ label }: { label: string }) {
   );
 }
 
-export default function WhySectionMobile({ cards = WHY_CARDS }: { cards?: WhyCardData[] }) {
+export default function WhySectionMobile({
+  locale,
+  cards: cardsProp,
+}: {
+  locale: Locale;
+  cards?: WhyCardData[];
+}) {
+  // Copy din dicționar (site bilingv EN/RO) — refolosește `whyShowcase` (secțiunea
+  // desktop); doar stringurile specifice mobilului stau în `whyMobile`.
+  const dict = getDictionary(locale);
+  const tw = dict.whyShowcase;
+  const tm = dict.whyMobile;
+  const cards: WhyCardData[] = cardsProp ?? [
+    {
+      pill: tw.cards.practitioner.title,
+      photo: '/silviu-gresoi.png', // ← asset-ul existent al pozei lui Dr. Gresoi din repo
+      name: 'Dr. Silviu Gresoi',
+      body: tw.cards.practitioner.body,
+    },
+    {
+      pill: tw.cards.pecb.title,
+      body: tw.cards.pecb.body,
+    },
+    {
+      pill: tm.aiPill,
+      body: tw.cards.ai.body,
+    },
+  ];
+  /** Pool de statistici pentru notch — arată statistica slide-ului activ și se rotește
+      la câteva secunde. Ordinea = maparea per slide (0 → 20+, 1 → 2,000+, 2 → 100+). */
+  const notchStats: Stat[] = [
+    { value: tw.statsFallback.years.num, label: tw.statsFallback.years.label },
+    { value: tw.statsFallback.companies.num, label: tw.statsFallback.companies.label },
+    { value: tw.statsFallback.sessions.num, label: tw.statsFallback.sessions.label },
+  ];
   const scrollerRef = useRef<HTMLDivElement>(null);
   const contentRefs = useRef<(HTMLDivElement | null)[]>([]);
   const heightsRef = useRef<number[]>([]);
@@ -182,20 +194,20 @@ export default function WhySectionMobile({ cards = WHY_CARDS }: { cards?: WhyCar
     el.scrollTo({ left: idx * el.clientWidth, behavior: 'smooth' });
   }
 
-  const stat = NOTCH_STATS[(activeIndex + tick) % NOTCH_STATS.length]!;
-  const statKey = (activeIndex + tick) % NOTCH_STATS.length;
+  const stat = notchStats[(activeIndex + tick) % notchStats.length]!;
+  const statKey = (activeIndex + tick) % notchStats.length;
 
   return (
     <section className="bg-white pb-14 pt-16 lg:hidden">
       {/* Titlu — Poppins SemiBold 28/34, -1px, #222222 */}
       <h2 className="text-center text-[28px] font-semibold leading-[34px] tracking-[-1px] text-[#222222]">
-        Why isad.academy?
+        {tw.heading}
       </h2>
 
-      {/* Subtitlu — 14/21 #959595, max 350px, la 16px sub titlu */}
+      {/* Subtitlu — 14/21 #959595, max 350px, la 16px sub titlu; refolosește cele
+          trei fragmente ale showcase-ului de desktop, îmbinate într-o singură frază */}
       <p className="mx-auto mt-4 max-w-[350px] text-center text-[14px] leading-[21px] text-[#959595]">
-        Internationally recognized AI governance and ISO training delivered by
-        practitioners, built for real-world compliance.
+        {`${tw.subLead} ${tw.subHighlight}, ${tw.subTail}`}
       </p>
 
       {/* CARD — shell pe aceeași poziție; înălțimea se ANIMEAZĂ spre slide-ul activ.
@@ -267,7 +279,7 @@ export default function WhySectionMobile({ cards = WHY_CARDS }: { cards?: WhyCar
       <div
         className="mt-6 flex items-center justify-center gap-[7px]"
         role="tablist"
-        aria-label="Why isad.academy"
+        aria-label={tm.dotsAria}
       >
         {cards.map((card, i) => (
           <button
@@ -276,12 +288,18 @@ export default function WhySectionMobile({ cards = WHY_CARDS }: { cards?: WhyCar
             aria-selected={i === activeIndex}
             aria-label={card.pill}
             onClick={() => scrollTo(i)}
-            className={`h-2 rounded-full transition-all duration-300 ${
-              i === activeIndex
-                ? 'w-[22px] bg-gradient-to-r from-[#407ea2] to-[#1c5d99]'
-                : 'w-2 bg-[#d1d1d1] hover:bg-[#b5b5b5]'
+            className={`relative h-2 overflow-hidden rounded-full bg-[#d1d1d1] transition-[width] duration-300 ease-out ${
+              i === activeIndex ? 'w-[22px]' : 'w-2 hover:bg-[#b5b5b5]'
             }`}
-          />
+          >
+            {/* Crossfade-ul gradientului — strat interior cu opacity animat (smooth) */}
+            <span
+              aria-hidden="true"
+              className={`absolute inset-0 rounded-full bg-gradient-to-r from-[#407ea2] to-[#1c5d99] transition-opacity duration-300 ${
+                i === activeIndex ? 'opacity-100' : 'opacity-0'
+              }`}
+            />
+          </button>
         ))}
       </div>
     </section>

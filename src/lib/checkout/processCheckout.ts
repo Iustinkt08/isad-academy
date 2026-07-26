@@ -7,7 +7,12 @@ import { loadPricedSession } from './loadPricedSession'
 import { maskEmail } from './maskEmail'
 import { validateCheckoutInput } from './validateCheckoutInput'
 
-export type CheckoutFailureDetail = 'inactive' | 'expired' | 'usageLimitReached' | 'notFound'
+export type CheckoutFailureDetail =
+  | 'inactive'
+  | 'expired'
+  | 'usageLimitReached'
+  | 'notFound'
+  | 'duplicate'
 
 export type CheckoutSuccessBody = {
   orderId: number
@@ -21,6 +26,8 @@ export type CheckoutSuccessBody = {
 export type CheckoutFailureBody = {
   error: string
   detail?: CheckoutFailureDetail
+  /** For code failures with 2 applied codes: WHICH code failed (the human-entered string). */
+  codeValue?: string
   soldOut?: boolean
 }
 
@@ -80,7 +87,7 @@ export const processCheckout = async (
     payload,
     sessionId: input.sessionId,
     quantity: input.quantity,
-    code: input.code ?? null,
+    codes: input.codes,
     country: deps.country ?? null,
     now,
   })
@@ -88,7 +95,7 @@ export const processCheckout = async (
     return { status: priced.status, body: priced.body }
   }
 
-  const { session, sessionView, codeDoc, siteSettings, pricing } = priced
+  const { session, sessionView, codeDocs, siteSettings, pricing } = priced
 
   // d. Create the pending order -------------------------------------------------------------
   const order = await payload.create({
@@ -112,7 +119,9 @@ export const processCheckout = async (
         appliedWindow: pricing.appliedWindow,
         groupDiscount: pricing.groupDiscount,
         memberDiscount: pricing.memberDiscount,
-        code: codeDoc ? codeDoc.id : null,
+        // `code` = first code (legacy field, admin continuity); `codes` = the full list.
+        code: codeDocs[0]?.id ?? null,
+        codes: codeDocs.map((doc) => doc.id),
         codeDiscount: pricing.codeDiscount,
         total: pricing.total,
       },
@@ -191,7 +200,7 @@ export const processCheckout = async (
   }
 
   // g. Discount code usage accounting — best-effort, NEVER undoes an already-confirmed order.
-  if (codeDoc) {
+  for (const codeDoc of codeDocs) {
     const applied = await incrementDiscountCodeUsage(payload, codeDoc.id)
     if (!applied) {
       // Race: the code's usageLimit was consumed by a concurrent order between this

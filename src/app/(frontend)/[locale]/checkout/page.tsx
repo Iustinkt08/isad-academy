@@ -231,9 +231,11 @@ export default async function CheckoutPage({
   }
 
   return (
-    <main className="bg-surface-subtle pb-16 sm:pb-[100px]">
+    <main className="bg-surface-subtle pb-16 lg:pb-[100px]">
       <CheckoutHeader locale={locale} currentStep={1} />
-      <Container className="pt-6 lg:pt-12">
+      {/* Gutter mobil 20px (Figma 3977-251) — replică clasele Container cu px-5 pe <sm;
+          desktop identic (max-w-6xl + lg:px-8 + lg:pt-12). */}
+      <div className="mx-auto w-full max-w-6xl px-5 pt-6 sm:px-6 lg:px-8 lg:pt-12">
         <CheckoutForm
           locale={locale}
           session={sessionView}
@@ -241,7 +243,7 @@ export default async function CheckoutPage({
           initialQuantity={initialQuantity}
           initialPricing={initialPricingResult.ok ? initialPricingResult.pricing : null}
         />
-      </Container>
+      </div>
     </main>
   )
 }

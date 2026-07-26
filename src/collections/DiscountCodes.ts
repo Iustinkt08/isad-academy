@@ -11,7 +11,8 @@ export const DiscountCodes: CollectionConfig = {
   slug: 'discountCodes',
   admin: {
     useAsTitle: 'code',
-    defaultColumns: ['code', 'type', 'percentage', 'isActive', 'usageCount'],
+    group: 'Sales',
+    defaultColumns: ['code', 'percentage', 'type', 'isActive', 'usageCount'],
     description: 'Discount codes. Never publicly readable — checkout validates codes server-side.',
   },
   access: {

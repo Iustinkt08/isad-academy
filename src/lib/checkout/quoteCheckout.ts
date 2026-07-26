@@ -40,16 +40,19 @@ export type QuoteCheckoutDeps = {
   now?: Date
 }
 
-/** Mirrors `validateCheckoutInput`'s caps for the three fields a quote actually needs. */
+/** Mirrors `validateCheckoutInput`'s caps for the fields a quote actually needs. */
 const MAX_QUANTITY = 500
 const MAX_CODE_LENGTH = 64
+/** Codes stack, max 2 per order (owner 2026-07-25) — mirrors the engine's cap. */
+const MAX_CODES = 2
 
-const ALLOWED_KEYS = ['sessionId', 'quantity', 'code']
+const ALLOWED_KEYS = ['sessionId', 'quantity', 'code', 'codes']
 
 type NormalizedQuoteInput = {
   sessionId: number | string
   quantity: number
-  code: string | null
+  /** Trimmed codes in application order (max 2); [] = none. Legacy `code` folded in. */
+  codes: string[]
 }
 
 const isPlainObject = (value: unknown): value is Record<string, unknown> =>
@@ -67,7 +70,7 @@ const validateQuoteInput = (
     return { ok: false, error: `Unknown field(s) in request body: ${unknown.join(', ')}.` }
   }
 
-  const { sessionId, quantity, code } = raw
+  const { sessionId, quantity, code, codes } = raw
 
   const sessionIdOk =
     (typeof sessionId === 'number' && Number.isFinite(sessionId)) ||
@@ -83,12 +86,26 @@ const validateQuoteInput = (
     return { ok: false, error: `"quantity" may not exceed ${MAX_QUANTITY}.` }
   }
 
-  let normalizedCode: string | null = null
-  if (code !== undefined && code !== null) {
+  // `codes` (new, ordered, max 2) takes precedence; the legacy single `code` still works.
+  const normalizedCodes: string[] = []
+  if (codes !== undefined && codes !== null) {
+    if (!Array.isArray(codes)) {
+      return { ok: false, error: '"codes" must be an array of strings.' }
+    }
+    if (codes.length > MAX_CODES) {
+      return { ok: false, error: `At most ${MAX_CODES} discount codes can be applied per order.` }
+    }
+    for (const entry of codes) {
+      if (typeof entry !== 'string' || entry.trim().length === 0 || entry.length > MAX_CODE_LENGTH) {
+        return { ok: false, error: 'Every entry in "codes" must be a non-empty string.' }
+      }
+      normalizedCodes.push(entry.trim())
+    }
+  } else if (code !== undefined && code !== null) {
     if (typeof code !== 'string' || code.trim().length === 0 || code.length > MAX_CODE_LENGTH) {
       return { ok: false, error: '"code" must be a non-empty string.' }
     }
-    normalizedCode = code.trim()
+    normalizedCodes.push(code.trim())
   }
 
   return {
@@ -96,7 +113,7 @@ const validateQuoteInput = (
     value: {
       sessionId: sessionId as number | string,
       quantity: quantity as number,
-      code: normalizedCode,
+      codes: normalizedCodes,
     },
   }
 }
@@ -120,7 +137,7 @@ export const quoteCheckout = async (
     payload,
     sessionId: input.sessionId,
     quantity: input.quantity,
-    code: input.code,
+    codes: input.codes,
     country: deps.country ?? null,
     now,
   })

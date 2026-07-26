@@ -8,18 +8,17 @@ import { formatDotStamp } from './BlogCard'
 import type { BlogPost } from '@/payload-types'
 
 /**
- * Article header — Figma 3838:64 (blog article redesign): breadcrumb (Blog → title) →
- * meta row (category chip + reading time) → 40px title with the last word in the brand
- * gradient → author row (initials avatar + name + date · category, LinkedIn share pill
- * on the right, wraps on mobile) → OPTIONAL 760×360 cover. When the post has no cover
- * the block is omitted entirely — no placeholder, the title simply sits higher (§6).
+ * Article header — Figma 3977-687 (desktop ≥lg) / 3977-718 (mobile <lg), single DOM with
+ * responsive classes: title with the LAST word in the brand gradient → author row (44px
+ * round avatar on white with a diffuse shadow + name 14 Medium + "date · category" meta
+ * 12.5 #959595) → cover. The cover is ALWAYS rendered: the real image when the post has
+ * one (166px mobile / 360px desktop, radius 24, object-cover), otherwise the branded
+ * placeholder panel — #BBCDE5 → #407EA2 gradient with the brand "A" watermark
+ * (public/brand/icon-black.svg, fill #222222) centered at 76×70 mobile / 120×110 desktop.
+ * All values are explicit px/hex from the delivered redesign files. Server component.
  */
 
-/** Brand text gradient (Figma 3838:72) — Steel → Deep Blue → Steel, §12. */
-const TITLE_GRADIENT =
-  'linear-gradient(152deg, #407ea2 20.331%, #1c5d99 46.364%, #407ea2 76.364%)'
-
-/** "Dr. Silviu Gresoi" → "SG" (last two initials, matching the mock's compact avatar). */
+/** "Dr. Silviu Gresoi" → "SG" — fallback avatar when no expert photo matches the author. */
 const initials = (name: string): string => {
   const parts = name
     .split(/\s+/)
@@ -28,98 +27,94 @@ const initials = (name: string): string => {
   return parts.slice(-2).join('') || parts.join('')
 }
 
-/** Last word gets the gradient (Figma 3838:72); whitespace is preserved for the a11y name. */
+/** Last word gets the gradient (delivered spec); whitespace is preserved for the a11y name. */
 function GradientTitle({ title }: { title: string }) {
   const words = title.trim().split(/\s+/)
   const last = words.at(-1) ?? ''
   const head = words.slice(0, -1).join(' ')
   return (
-    <h1 className="w-full text-[32px] font-semibold leading-[42px] tracking-[-1.3px] text-[#222222] [word-break:break-word] sm:text-[40px] sm:leading-[50px]">
+    <h1 className="w-full text-[24px] font-semibold leading-8 tracking-[-0.8px] text-[#222222] [word-break:break-word] lg:text-[40px] lg:leading-[50px] lg:tracking-[-1px]">
       {head && <>{head} </>}
-      <span
-        className="bg-clip-text tracking-[-1.6px] text-transparent"
-        style={{ backgroundImage: TITLE_GRADIENT }}
-      >
+      <span className="bg-[linear-gradient(90deg,#407ea2_0%,#1c5d99_100%)] bg-clip-text text-transparent">
         {last}
       </span>
     </h1>
   )
 }
 
-export function ArticleHeader({ post, locale }: { post: BlogPost; locale: Locale }) {
+/** Cover — real image, or the gradient placeholder with the brand "A" watermark centered. */
+function ArticleCover({ post }: { post: BlogPost }) {
+  const cover = asMedia(post.coverImage)
+  if (cover) {
+    return (
+      <div className="relative h-[166px] w-full overflow-hidden rounded-[24px] lg:h-[360px]">
+        <MediaImage media={cover} fill sizes="(min-width: 1024px) 760px, 100vw" priority />
+      </div>
+    )
+  }
+  return (
+    <div className="flex h-[166px] w-full items-center justify-center overflow-hidden rounded-[24px] bg-[linear-gradient(135deg,#bbcde5_0%,#407ea2_100%)] lg:h-[360px]">
+      {/* Brand "A" watermark — the EXISTING mark asset, fill #222222 */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/brand/icon-black.svg"
+        alt=""
+        aria-hidden="true"
+        className="h-[70px] w-[76px] select-none object-contain lg:h-[110px] lg:w-[120px]"
+      />
+    </div>
+  )
+}
+
+export function ArticleHeader({
+  post,
+  locale,
+  authorPhotoUrl,
+}: {
+  post: BlogPost
+  locale: Locale
+  /** Expert photo URL (resolved by the page from the expertBio global, name-matched). */
+  authorPhotoUrl?: string | null
+}) {
   const dict = getDictionary(locale)
   const category = post.category ? dict.blog.categories[post.category] : null
-  const cover = asMedia(post.coverImage)
   const dateStamp = formatDotStamp(post.createdAt)
-
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
-  const shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
-    `${siteUrl}${localePath(locale, `/blog/${post.slug}`)}`,
-  )}`
 
   return (
     <>
-      {/* ——— Breadcrumb: Blog → title ——— */}
-      <nav
-        aria-label={dict.blog.breadcrumbAria}
-        className="w-full text-[13px] tracking-[0.2px] text-[#959595]"
+      {/* ——— Back către listă (owner 2026-07-26) — navigare mai ușoară decât breadcrumb ——— */}
+      <Link
+        href={localePath(locale, '/blog')}
+        className="w-fit text-[12px] tracking-[0.2px] text-[#959595] transition-colors hover:text-[#1c5d99] lg:text-[13px]"
       >
-        <ol className="flex items-center gap-[8px]">
-          <li className="shrink-0">
-            <Link
-              href={localePath(locale, '/blog')}
-              className="transition-colors hover:text-[#1c5d99]"
-            >
-              {dict.blog.listTitle}
-            </Link>
-          </li>
-          <li aria-hidden="true" className="shrink-0">
-            →
-          </li>
-          <li aria-current="page" className="min-w-0 truncate">
-            {post.title}
-          </li>
-        </ol>
-      </nav>
+        ← {dict.blog.backToBlog}
+      </Link>
 
-      {/* ——— Meta row: category chip + reading time ——— */}
-      {(category || post.readingTime != null) && (
-        <div className="flex items-center gap-[10px]">
-          {category && (
-            <span className="flex items-center gap-[7px] rounded-[20px] bg-white px-[11px] py-[5px] shadow-[0_0_5px_rgba(0,0,0,0.07)]">
-              <span aria-hidden="true" className="size-[8px] rounded-full bg-[#1c5d99]" />
-              <span className="whitespace-nowrap text-[12px] font-medium tracking-[-0.3px] text-[#222222]">
-                {category}
-              </span>
-            </span>
-          )}
-          {post.readingTime != null && (
-            <span className="text-[12.5px] text-[#959595]">
-              {dict.blog.minRead(post.readingTime)}
-            </span>
-          )}
-        </div>
-      )}
-
-      {/* ——— Title (last word in brand gradient) ——— */}
+      {/* ——— Title (last word in the brand gradient) ——— */}
       <GradientTitle title={post.title} />
 
-      {/* ——— Author row + LinkedIn share (wraps on mobile) ——— */}
-      <div className="flex w-full flex-wrap items-center justify-between gap-x-[16px] gap-y-[12px]">
-        <div className="flex items-center gap-[12px]">
-          {post.author && (
-            <span
-              aria-hidden="true"
-              className="flex size-[44px] shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#407ea2] to-[#1c5d99] text-[15px] font-semibold text-white shadow-[0_0_2.65px_rgba(0,0,0,0.28)]"
-            >
-              {initials(post.author)}
-            </span>
-          )}
-          <div className="flex flex-col gap-px">
+      {/* ——— Author row: 44px avatar (photo on white / initials fallback) + name + meta ——— */}
+      {(post.author || dateStamp || category) && (
+        <div className="flex items-center gap-3">
+          {post.author &&
+            (authorPhotoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={authorPhotoUrl}
+                alt={post.author}
+                className="size-11 shrink-0 rounded-full bg-white object-cover shadow-[0_0_5.3px_rgba(0,0,0,0.28)]"
+              />
+            ) : (
+              <span
+                aria-hidden="true"
+                className="flex size-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#407ea2] to-[#1c5d99] text-[15px] font-semibold text-white shadow-[0_0_5.3px_rgba(0,0,0,0.28)]"
+              >
+                {initials(post.author)}
+              </span>
+            ))}
+          <div className="flex min-w-0 flex-col gap-[1px]">
             {post.author && (
-              <p className="text-[14px] font-medium tracking-[-0.3px] text-[#222222]">
-                {post.author}
-              </p>
+              <p className="text-[14px] font-medium text-[#222222]">{post.author}</p>
             )}
             {(dateStamp || category) && (
               <p className="text-[12.5px] text-[#959595]">
@@ -130,22 +125,10 @@ export function ArticleHeader({ post, locale }: { post: BlogPost; locale: Locale
             )}
           </div>
         </div>
-        <a
-          href={shareUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="rounded-[999px] bg-white px-[16px] pb-[9px] pt-[8px] text-[13px] font-medium tracking-[-0.3px] text-[#222222] shadow-[0_0_4.4px_rgba(0,0,0,0.07)] transition-transform hover:scale-[1.03] motion-reduce:transition-none"
-        >
-          {dict.blog.shareLinkedIn} <span aria-hidden="true">↗</span>
-        </a>
-      </div>
-
-      {/* ——— Cover (optional — omitted entirely when the post has none, NO placeholder) ——— */}
-      {cover && (
-        <div className="relative h-[240px] w-full overflow-hidden rounded-[24px] sm:h-[360px]">
-          <MediaImage media={cover} fill sizes="(min-width: 800px) 760px, 100vw" priority />
-        </div>
       )}
+
+      {/* ——— Cover (image, or the branded gradient placeholder) ——— */}
+      <ArticleCover post={post} />
     </>
   )
 }

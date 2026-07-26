@@ -13,11 +13,14 @@ type Status = 'idle' | 'loading' | 'success' | 'error'
 type LeadMagnetBody = DeliverLeadMagnetResult['body']
 
 /**
- * Lead-magnet card — Figma 3839:87 (blog article redesign, UI-only rename of the old
- * LeadMagnetGate): dark-gradient panel with an email-capture pill, shown on articles with
- * an enabled lead magnet. SAME contract as before: posts `{ slug, email }` (+ the shared
- * honeypot field) to /api/blog/lead-magnet, which emails the download link — the file URL
- * is never exposed in the page markup. Success swaps the form for a confirmation line.
+ * Lead-magnet card — Figma 3977-687 (desktop ≥lg) / 3977-718 (mobile <lg): FLAT white
+ * card (radius 24, NO border/shadow) with a decorative gradient blob (blur 43px) bleeding
+ * out of the top-right corner, clipped by the card. The form is a pill with a 2px BLACK
+ * border and the site's black button ("Send me the file"). SAME contract as before:
+ * posts `{ slug, email }` (+ the shared honeypot field) to /api/blog/lead-magnet, which
+ * emails the download link — the file URL is never exposed in the page markup. Success
+ * swaps the form for a confirmation line. All values are explicit px/hex per the
+ * delivered redesign files.
  */
 export function LeadMagnetCard({ slug, locale }: { slug: string; locale: Locale }) {
   const t = getDictionary(locale).blog.leadMagnet
@@ -60,48 +63,60 @@ export function LeadMagnetCard({ slug, locale }: { slug: string; locale: Locale 
   return (
     <div
       data-testid="lead-magnet-gate"
-      className="relative flex w-full flex-col gap-[12px] rounded-[24px] bg-[linear-gradient(163deg,#1c5d99_0%,#091f33_71.429%)] px-[28px] py-[26px]"
+      className="relative w-full overflow-hidden rounded-[24px] bg-white p-6 lg:px-7 lg:py-[26px]"
     >
-      <h2 className="text-[19px] font-medium tracking-[-0.5px] text-white [word-break:break-word]">
-        {t.title}
-      </h2>
-      {status === 'success' ? (
-        <p role="status" className="text-[14px] font-medium text-[#e0edf7]">
-          {t.success}
-        </p>
-      ) : (
-        <>
-          <p className="text-[13.5px] text-[#e0edf7] [word-break:break-word]">{t.intro}</p>
-          <form onSubmit={handleSubmit} className="w-full">
-            <HoneypotField />
-            <label htmlFor={inputId} className="sr-only">
-              {t.emailLabel}
-            </label>
-            <div className="flex w-full items-center gap-[6px] rounded-[999px] bg-white p-[6px] focus-within:ring-1 focus-within:ring-[#bdbdbd]">
-              <input
-                id={inputId}
-                name="email"
-                type="email"
-                required
-                autoComplete="email"
-                placeholder={t.emailPlaceholder}
-                disabled={status === 'loading'}
-                className="w-full min-w-0 border-0 bg-transparent pl-[16px] text-[14px] text-[#222222] outline-none placeholder:text-[#959595]"
-              />
-              <button
-                type="submit"
-                disabled={status === 'loading'}
-                className="shrink-0 whitespace-nowrap rounded-[999px] bg-gradient-to-b from-[#407ea2] to-[#1c5d99] to-[80%] px-[18px] pb-[11px] pt-[10px] text-[14px] font-medium text-white shadow-[0_4px_4px_-2px_rgba(0,0,0,0.21)] transition-transform hover:scale-[1.03] disabled:cursor-not-allowed disabled:opacity-60 motion-reduce:transition-none"
-              >
-                {status === 'loading' ? t.sending : t.submit}
-              </button>
-            </div>
-            <p role="status" aria-live="polite" className="mt-2 min-h-5 px-2 text-[13px] text-[#e0edf7]">
-              {error}
+      {/* Decorative blob — blurred gradient bleeding out of the top-right corner */}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute right-[-32px] top-[-68px] h-[168px] w-[178px] rounded-full bg-[linear-gradient(135deg,#407ea2_0%,#1c5d99_28%,#407ea2_71%,#ffffff_100%)] blur-[43px]"
+      />
+
+      <div className="relative flex flex-col gap-3">
+        <h2 className="text-[16px] font-medium leading-6 tracking-[-0.3px] text-[#222222] [word-break:break-word] lg:text-[19px] lg:leading-normal">
+          {t.title}
+        </h2>
+        {status === 'success' ? (
+          <p role="status" className="text-[12.5px] leading-[18px] font-medium text-[#222222] lg:text-[13.5px] lg:leading-normal">
+            {t.success}
+          </p>
+        ) : (
+          <>
+            <p className="text-[12.5px] leading-[18px] text-[#222222] [word-break:break-word] lg:text-[13.5px] lg:leading-normal">
+              {t.intro}
             </p>
-          </form>
-        </>
-      )}
+            <form onSubmit={handleSubmit} className="w-full">
+              <HoneypotField />
+              <label htmlFor={inputId} className="sr-only">
+                {t.emailLabel}
+              </label>
+              <div className="mt-1 flex items-center justify-between gap-2 rounded-[999px] border-2 border-black p-1.5">
+                <input
+                  id={inputId}
+                  name="email"
+                  type="email"
+                  required
+                  autoComplete="email"
+                  placeholder={t.emailPlaceholder}
+                  disabled={status === 'loading'}
+                  className="min-w-0 flex-1 bg-transparent pl-2.5 text-[11px] text-[#222222] placeholder:text-[#222222] focus:outline-none lg:pl-4 lg:text-[14px]"
+                />
+                <button
+                  type="submit"
+                  disabled={status === 'loading'}
+                  className="shrink-0 rounded-[20px] bg-black px-4 py-2 text-[11px] font-semibold text-white transition-transform hover:scale-[1.03] disabled:cursor-not-allowed disabled:opacity-60 motion-reduce:transition-none lg:text-[14px]"
+                >
+                  {status === 'loading' ? t.sending : t.submitFile}
+                </button>
+              </div>
+              {status === 'error' && error && (
+                <p role="alert" className="mt-2 px-2 text-[12.5px] text-[#595959]">
+                  {error}
+                </p>
+              )}
+            </form>
+          </>
+        )}
+      </div>
     </div>
   )
 }

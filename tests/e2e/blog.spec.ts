@@ -52,11 +52,10 @@ test.describe('blog article', () => {
     await page.goto(POST_1_URL)
 
     // Breadcrumb + header line (author · date · reading time)
-    const breadcrumb = page.getByRole('navigation', { name: 'Breadcrumb' })
-    await expect(breadcrumb.getByRole('link', { name: 'Blog' })).toBeVisible()
+    // Redesign (Figma 3977-687/3977-718): title + author row only — no breadcrumb,
+    // no reading-time chip, no LinkedIn share on the article page.
     await expect(page.getByRole('heading', { level: 1, name: POST_1_TITLE })).toBeVisible()
     await expect(page.getByText('Dr. Silviu Gresoi')).toBeVisible()
-    await expect(page.getByText('min read')).toBeVisible()
 
     // Colored text runs (TextStateFeature) — style comes from the named palette preset
     const coloredRuns = page.locator('span[data-text-state]')
@@ -99,11 +98,7 @@ test.describe('blog article', () => {
       /\/cursuri\/iso-iec-42001-2023/,
     )
 
-    // LinkedIn share (same pattern as course detail) + newsletter CTA always present
-    await expect(page.getByRole('link', { name: 'Share on LinkedIn' })).toHaveAttribute(
-      'href',
-      /^https:\/\/www\.linkedin\.com\/sharing\/share-offsite\/\?url=/,
-    )
+    // Newsletter CTA always present
     await expect(page.getByText('Get new articles in your inbox')).toBeVisible()
 
     // Post 1 has no lead magnet — no gate
@@ -123,13 +118,13 @@ test.describe('blog article', () => {
     await expect(gate.getByText('We’ll email you the download link.')).toBeVisible()
 
     await gate.getByLabel('Email address').fill('reader@example.com')
-    await gate.getByRole('button', { name: 'Send me the link' }).click()
+    await gate.getByRole('button', { name: 'Send me the file' }).click()
 
     await expect(
       gate.getByText('Check your inbox — the download link is on its way.'),
     ).toBeVisible()
     // The form is gone after success
-    await expect(gate.getByRole('button', { name: 'Send me the link' })).toHaveCount(0)
+    await expect(gate.getByRole('button', { name: 'Send me the file' })).toHaveCount(0)
   })
 
   test('draft article URL returns 404 publicly', async ({ page }) => {

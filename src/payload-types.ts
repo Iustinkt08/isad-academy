@@ -279,6 +279,33 @@ export interface Course {
     hasNextPage?: boolean;
     totalDocs?: number;
   };
+  /**
+   * Quiz matching tags. Fill these in so the "Which course is right for me?" quiz can recommend this course. Leave Level empty to keep the course OUT of the quiz.
+   */
+  quizProfile?: {
+    /**
+     * Depth of the course. Required for the course to appear in quiz results.
+     */
+    level?: ('introductory' | 'intermediate' | 'advanced' | 'specialization') | null;
+    /**
+     * What a participant walks away with (pick all that apply).
+     */
+    outcomes?:
+      | ('overview' | 'practicalSkills' | 'implementationPlan' | 'auditPrep' | 'certification' | 'foundationForMore')[]
+      | null;
+    /**
+     * Mirrors quiz question 2 ("Ce domeniu te interesează cel mai mult?") — pick all that apply.
+     */
+    domains?:
+      | (
+          'isoManagement' | 'quality' | 'sustainability' | 'riskCompliance' | 'infosec' | 'ai' | 'leadership' | 'audit'
+        )[]
+      | null;
+    /**
+     * One–two sentences shown on the quiz result screen ("why we recommend it"). The quiz is in Romanian — write the RO version at least.
+     */
+    quizPitch?: string | null;
+  };
   meta?: {
     title?: string | null;
     description?: string | null;
@@ -401,7 +428,7 @@ export interface Order {
       }[]
     | null;
   /**
-   * Snapshot of the pricing engine output at the moment of purchase (CLAUDE.md §8) — never recomputed after the fact.
+   * Snapshot of the pricing engine output at the moment of purchase (CLAUDE.md §8) — never recomputed after the fact. Read-only: not hand-editable.
    */
   pricing?: {
     basePrice?: number | null;
@@ -413,16 +440,17 @@ export interface Order {
     groupDiscount?: number | null;
     memberDiscount?: number | null;
     code?: (number | null) | DiscountCode;
+    codes?: (number | DiscountCode)[] | null;
     codeDiscount?: number | null;
     total?: number | null;
   };
   paymentStatus: 'pending' | 'confirmed' | 'failed' | 'refunded';
   /**
-   * Payment provider that handled this order, e.g. "mock", "stripe".
+   * Payment provider that handled this order, e.g. "mock", "stripe". Set by checkout — read-only.
    */
   provider?: string | null;
   /**
-   * Provider's transaction/session reference.
+   * Provider's transaction/session reference. Set by checkout — read-only.
    */
   providerRef?: string | null;
   updatedAt: string;
@@ -595,6 +623,10 @@ export interface BlogPost {
    */
   relatedCourse?: (number | null) | Course;
   /**
+   * Uncheck to publish WITHOUT emailing subscribers. First publish only — the broadcast is ever sent once. Publishing unchecked keeps that one send available: unpublish, tick the box and publish again to send it later.
+   */
+  sendNewsletterOnPublish?: boolean | null;
+  /**
    * Set automatically once the first-publish newsletter broadcast has been attempted (T7) — prevents re-sending on subsequent re-saves/re-publishes. Do not edit by hand.
    */
   broadcastSentAt?: string | null;
@@ -611,7 +643,7 @@ export interface BlogPost {
   _status?: ('draft' | 'published') | null;
 }
 /**
- * Certification FAQ shown in the certification section on the homepage.
+ * Q&A shown in the FAQ section on the homepage, grouped by journey tab.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "faqItems".
@@ -637,7 +669,7 @@ export interface FaqItem {
   /**
    * Tab the question appears under in the homepage FAQ section.
    */
-  category?: ('gettingStarted' | 'coursesCertification' | 'paymentsPractical') | null;
+  category?: ('discover' | 'learn' | 'validate' | 'access') | null;
   /**
    * Display order, ascending.
    */
@@ -1017,6 +1049,14 @@ export interface CoursesSelect<T extends boolean = true> {
       };
   certificationCredits?: T;
   sessions?: T;
+  quizProfile?:
+    | T
+    | {
+        level?: T;
+        outcomes?: T;
+        domains?: T;
+        quizPitch?: T;
+      };
   meta?:
     | T
     | {
@@ -1101,6 +1141,7 @@ export interface OrdersSelect<T extends boolean = true> {
         groupDiscount?: T;
         memberDiscount?: T;
         code?: T;
+        codes?: T;
         codeDiscount?: T;
         total?: T;
       };
@@ -1186,6 +1227,7 @@ export interface BlogPostsSelect<T extends boolean = true> {
         file?: T;
       };
   relatedCourse?: T;
+  sendNewsletterOnPublish?: T;
   broadcastSentAt?: T;
   meta?:
     | T

@@ -8,6 +8,7 @@ export const Users: CollectionConfig = {
   slug: 'users',
   admin: {
     useAsTitle: 'email',
+    group: 'System',
     description: 'Payload admin users only. Clients never log in.',
   },
   auth: true,

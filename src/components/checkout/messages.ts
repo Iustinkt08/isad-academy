@@ -32,6 +32,8 @@ export const codeDetailMessage = (
       return t.codeInactive
     case 'usageLimitReached':
       return t.codeUsageLimitReached
+    case 'duplicate':
+      return t.codeDuplicate
   }
 }
 

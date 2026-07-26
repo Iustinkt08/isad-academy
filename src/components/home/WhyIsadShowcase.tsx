@@ -191,6 +191,11 @@ export function WhyIsadShowcase({
 }) {
   void expertName
   const t = getDictionary(locale).whyShowcase
+  // Ruptura fixă a subtitlului (owner 2026-07-26): ultimul cuvânt al frazei evidențiate
+  // rămâne lipit de coadă („practitioners, built for real-world compliance.").
+  const subHighlightWords = t.subHighlight.trim().split(/\s+/)
+  const subHighlightLast = subHighlightWords.at(-1) ?? ''
+  const subHighlightHead = subHighlightWords.slice(0, -1).join(' ')
   const cards = buildCards(t)
   const photoUrl = expertPhotoUrl || '/silviu-gresoi.png'
   const statList = stats && stats.length > 0 ? stats : buildFallbackStats(t)
@@ -293,9 +298,14 @@ export function WhyIsadShowcase({
             style={{ fontSize: 'clamp(1rem,1.5vw,28px)', letterSpacing: '-1px', lineHeight: 1.5 }}
           >
             {t.subLead}{' '}
-            {/* Brand gradient on the phrase only — the comma stays grey (owner 2026-07-13) */}
-            <span className="text-gradient-brand">{t.subHighlight}</span>
-            ,<br className="max-md:hidden" aria-hidden="true" /> {t.subTail}
+            {/* Brand gradient on the phrase only — the comma stays grey (owner 2026-07-13).
+                Ruptura de rând e FIXATĂ (owner 2026-07-26): ultimul cuvânt al frazei
+                evidențiate („practitioners") + coada formează un grup non-rupibil, deci
+                rândul 2 e mereu „practitioners, built for real-world compliance.". */}
+            <span className="text-gradient-brand">{subHighlightHead} </span>
+            <span className="whitespace-nowrap">
+              <span className="text-gradient-brand">{subHighlightLast}</span>, {t.subTail}
+            </span>
           </p>
         </div>
 

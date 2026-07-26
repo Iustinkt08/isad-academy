@@ -9,12 +9,17 @@ export type StrategyInput = {
   subtotal: number
   group: DiscountLine
   member: DiscountLine
-  code: DiscountLine
+  /** Applied discount codes IN APPLICATION ORDER (max enforced upstream by
+   * `computeOrderPricing`/`MAX_DISCOUNT_CODES`). Empty array = no code. */
+  codes: DiscountLine[]
 }
 
 export type StrategyOutput = {
   groupDiscount: number
   memberDiscount: number
+  /** Per-code discount amounts, index-aligned with `StrategyInput.codes`. */
+  codeDiscounts: number[]
+  /** Total across all codes — always the exact sum of `codeDiscounts`. */
   codeDiscount: number
   total: number
 }

@@ -2,6 +2,9 @@ import { withPayload } from '@payloadcms/next/withPayload'
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Deploy pe cPanel/Passenger (owner 2026-07-26): bundle-ul .next/standalone conține
+  // server.js + doar modulele necesare — pe server se urcă standalone + static + public.
+  output: 'standalone',
   async redirects() {
     return [
       // /certificare retired 2026-07-11 — certification lives on Home as a section

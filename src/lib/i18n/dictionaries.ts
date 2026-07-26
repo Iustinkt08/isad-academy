@@ -68,9 +68,10 @@ const en = {
     newsletterTitleFallback: 'Stay ahead of AI governance & compliance',
     newsletterSubFallback: 'Get new articles and course announcements in your inbox.',
     faqCategories: {
-      gettingStarted: 'Getting started',
-      coursesCertification: 'Courses & certification',
-      paymentsPractical: 'Payments & practical details',
+      discover: 'Discover',
+      learn: 'Learn',
+      validate: 'Validate',
+      access: 'Access',
     },
   },
   whyShowcase: {
@@ -103,6 +104,12 @@ const en = {
     previous: 'Previous',
     next: 'Next',
   },
+  // Mobile-only strings of the Why section (WhySectionMobile) that differ from the
+  // desktop showcase copy — the rest is reused from `whyShowcase`.
+  whyMobile: {
+    aiPill: 'AI First, Future Proof',
+    dotsAria: 'Why isad.academy',
+  },
   ourCourses: {
     headingLead: 'Explore our upcoming',
     headingHighlight: 'courses',
@@ -129,72 +136,101 @@ const en = {
   },
   faqSection: {
     headingLead: 'Frequently asked',
-    headingHighlight: 'questions.',
+    headingHighlight: 'questions',
     sub: 'Everything our learners ask before getting started.',
     allQuestions: 'All questions',
     stillQuestions: 'Still have questions?',
     contactSub: 'Book a discovery call or use the contact form — we reply by email.',
     contactCta: 'Contact us →',
     items: [
+      // Discover — the company, the site, the courses
       {
-        category: 'gettingStarted',
-        q: 'How do I enrol in a course?',
-        a: 'Pick your course, choose an edition and click Enrol. You add the participants (name + email for each seat), fill in your billing details and pay online. The confirmation and the invoice arrive by email right away, and the Google Meet invite follows before the start date.',
+        category: 'discover',
+        q: 'What is isad.academy?',
+        a: 'isad.academy is the course platform of International Security and Defence (ISAD), an official PECB partner. We deliver live, practitioner-led training on AI governance and ISO/IEC 42001 — built to help you renew your knowledge and stay in step with global policies and evolving ISO standards.',
       },
       {
-        category: 'gettingStarted',
+        category: 'discover',
+        q: 'Who teaches the courses?',
+        a: 'All courses are taught live by Dr. Silviu Gresoi — PhD in AI & Machine Learning, Certified Fraud Examiner, with 20+ years of experience in anti-fraud, risk management and data analytics, and a speaker at AI Expo Europe and AI Summit Europe.',
+      },
+      {
+        category: 'discover',
+        q: 'What courses can I take?',
+        a: 'At launch we run four courses: the official PECB ISO/IEC 42001 tracks — Foundation, Lead Implementer and Lead Auditor — plus AI Governance & Responsible AI, ISAD Academy’s own practical course. The catalog lists every upcoming edition; not sure which fits you, take the short quiz on the courses page.',
+      },
+      {
+        category: 'discover',
+        q: 'Are the courses live or self-paced?',
+        a: 'All courses are delivered live on Google Meet, in small groups, directly by Dr. Silviu Gresoi. There are no pre-recorded lessons — every session leaves room for your questions and your organization’s real cases.',
+      },
+      // Learn — time framing, evaluations
+      {
+        category: 'learn',
+        q: 'How long does a course take and how is it scheduled?',
+        a: 'Duration differs per course and is listed in hours on each course page. Every edition has its own concrete programme — the exact days and hours are published on the course page, so you know the full schedule before you enrol.',
+      },
+      {
+        category: 'learn',
+        q: 'When do the next editions start?',
+        a: 'Each course page lists its upcoming editions with start dates and available seats. If an edition is sold out or no dates are open yet, leave your email under “Notify me” or subscribe to the newsletter — you’ll hear the moment new dates are announced.',
+      },
+      {
+        category: 'learn',
         q: 'Do I need prior experience with ISO standards?',
         a: 'Not for the Foundation course or AI Governance & Responsible AI — they start from the ground up. For Lead Implementer and Lead Auditor, basic familiarity with management systems helps but is not mandatory. Not sure which level fits you? Take the short quiz and we will recommend a course.',
       },
       {
-        category: 'gettingStarted',
-        q: 'Are the courses live or self-paced?',
-        a: 'All courses are delivered live on Google Meet, in small groups, directly by Dr. Silviu Gresoi. There are no pre-recorded lessons — every session leaves room for your questions and your organization’s real cases.',
+        category: 'learn',
+        q: 'How am I evaluated — is there an exam?',
+        a: 'For the PECB tracks, the evaluation is the official PECB exam, taken online through the PECB platform after the training — and the preparation is built into the final day of the course. For ISAD Academy’s own courses there is no external exam: you complete the live sessions and receive your certificate of completion.',
       },
+      // Validate — certifications
       {
-        category: 'coursesCertification',
+        category: 'validate',
         q: 'What certificate do I receive after the course?',
         a: 'For the PECB tracks (ISO/IEC 42001 Foundation, Lead Implementer, Lead Auditor), you receive the official, internationally recognized PECB certificate after passing the exam. For ISAD Academy’s own courses, you receive an ISAD Academy certificate of completion stating your CPD credits.',
       },
       {
-        category: 'coursesCertification',
-        q: 'How do CPD credits work?',
-        a: 'Simple: one hour of learning equals one CPD credit. A 35-hour course earns you 35 CPD credits, stated on your certificate — recognized for your continuing professional development.',
-      },
-      {
-        category: 'coursesCertification',
-        q: 'How is the PECB exam organized?',
-        a: 'The exam is part of the PECB certification track and is taken online through the PECB platform after the training. We handle your exam enrolment — you focus on the preparation, which is built into the final day of the course.',
-      },
-      {
-        category: 'coursesCertification',
+        category: 'validate',
         q: 'How does enrolment on the PECB platform work?',
         a: 'After your payment is confirmed, we register you on the PECB platform. There you get access to the official course materials, your exam scheduling and, once you pass, your certificate.',
       },
       {
-        category: 'coursesCertification',
-        q: 'Is the AI Governance & Responsible AI course right for beginners?',
-        a: 'Yes. It’s a practical, vendor-neutral course on governing AI responsibly — ethics, risk, transparency and accountability — with no ISO experience required. It also works great as a complement to the PECB certification tracks.',
+        category: 'validate',
+        q: 'How do CPD credits work?',
+        a: 'Simple: one hour of learning equals one CPD credit. A 35-hour course earns you 35 CPD credits, stated on your certificate — recognized for your continuing professional development.',
       },
       {
-        category: 'paymentsPractical',
+        category: 'validate',
+        q: 'Is the certification recognized internationally?',
+        a: 'Yes. PECB is a global certification body and its certificates are recognized internationally. ISO/IEC 42001:2023 itself is the international standard for AI management systems — so the credential travels with you across employers and borders.',
+      },
+      // Access — enrolment for individuals and organizations
+      {
+        category: 'access',
+        q: 'How do I enrol in a course?',
+        a: 'Pick your course, choose an edition and click Enrol. You add the participants (name + email for each seat), fill in your billing details and pay online. The confirmation and the invoice arrive by email right away, and the Google Meet invite follows before the start date.',
+      },
+      {
+        category: 'access',
+        q: 'Can I enrol my team or my company?',
+        a: 'Yes. At checkout you can buy several seats on the same edition — each with a named participant — and pay as a company, with your billing details on the invoice. From 3 seats, the 10% group discount applies automatically. And for a private session delivered just for your team, online or on-site, head to the Corporate page and tell us what you need.',
+      },
+      {
+        category: 'access',
         q: 'Can I pay in RON or EUR?',
         a: 'Both: prices are in RON for participants from Romania and in EUR for international participants. All prices are final — isad.academy is not VAT registered, so no VAT is added at checkout.',
       },
       {
-        category: 'paymentsPractical',
+        category: 'access',
         q: 'Do discounts stack — group, member, promo codes?',
         a: 'Yes, discounts stack. The 10% group discount applies automatically from 3 seats on the same edition, APCF members get their member discount with their code, and promo codes apply on top — all combined in your order summary before payment.',
       },
       {
-        category: 'paymentsPractical',
+        category: 'access',
         q: 'What is the cancellation & refund policy?',
         a: 'If you can no longer attend, you can request a refund (depending on how close to the start date you cancel) or, where possible, transfer to a future edition. If we cancel or reschedule an edition, you choose between a full refund, a free transfer to a future edition, or a voucher for the full amount. Refunded seats are released automatically. Full details are in our Terms & Conditions.',
-      },
-      {
-        category: 'paymentsPractical',
-        q: 'Can my company book in-house training?',
-        a: 'Yes — every course in our catalog can be delivered as a private group session for your team, online or on-site. Head over to the Corporate page and tell us about your team; we’ll come back with a proposal.',
       },
     ],
   },
@@ -208,6 +244,7 @@ const en = {
     notSure: 'Not sure where to start?',
     quizCta: 'Which course is right for me?',
     gridAria: 'Course catalog',
+    dotsAria: 'Courses',
     upcomingCount: (n: number) => `${n} upcoming ${n === 1 ? 'course' : 'courses'}`,
     sortLabel: 'Sort: Start date',
     viewCourse: 'View course',
@@ -225,6 +262,7 @@ const en = {
   courseDetail: {
     metaNotFound: 'Course not found',
     metaFallbackDescription: 'Live, expert-led training taught one-to-one on Google Meet.',
+    backToCourses: 'Back to courses',
     pillPecb: 'PECB ISO/IEC 42001 · Official Certification Track',
     pillOwn: 'ISAD Academy · Own Course',
     share: 'Share',
@@ -373,6 +411,57 @@ const en = {
     metaTitle: 'About us',
     metaDescription:
       'isad.academy is your curated navigation instrument for a changing world — a course platform built by International Security and Defence (ISAD), an official PECB partner.',
+    // v3 redesign (owner Figma 3873-94 desktop / 3977-571 mobile) — copy delivered 1:1.
+    heroPill: 'About us',
+    heroTitlePlain: 'Your navigation instrument for a ',
+    heroTitleGradient: 'changing world',
+    heroIntro1:
+      'The world is spinning faster than ever. New technologies emerge, new skills take shape, and fresh, flexible perspectives become essential.',
+    heroIntro2:
+      'isad.academy is, before anything else, your curated navigation instrument for this changing world — a course platform designed to help you renew your knowledge, strengthen your competencies, and move in step with global policies and evolving ISO standards.',
+    heroBuiltBy: 'Built by International Security and Defence (ISAD) — an official PECB partner.',
+    beliefsHeading: 'What guides us',
+    beliefs: [
+      {
+        lead: 'We believe in ',
+        tail: 'innovation.',
+        infoTitle: 'We curate with purpose. ',
+        infoBody:
+          'We value innovation and progress; these rarely occur without intention. At isad.academy, we design learning paths based on your objectives and starting level.',
+      },
+      {
+        lead: 'We are guided by ',
+        tail: 'structure.',
+        infoTitle: 'We teach with clarity. ',
+        infoBody:
+          'Complex subjects need clear, coherent journeys. Everything you find on our learning paths has been carefully designed to enrich your learning experience.',
+      },
+      {
+        lead: 'We help you stay ready for ',
+        tail: 'what comes next.',
+        infoTitle: 'We evolve with the world. ',
+        infoBody:
+          'We are constantly connected to the world’s movement and chatter. We analyze trends; we know what is next and we are preparing for it.',
+      },
+    ],
+    valuesTitlePlain: 'Our ',
+    valuesTitleGradient: 'values',
+    values: [
+      {
+        title: 'We curate with purpose.',
+        body: 'We value innovation and progress; these rarely occur without intention. At isad.academy, we design learning paths based on your objectives and starting level.',
+      },
+      {
+        title: 'We teach with clarity.',
+        body: 'Complex subjects need clear, coherent journeys. Everything you find on our learning paths has been carefully designed to enrich your learning experience.',
+      },
+      {
+        title: 'We evolve with the world.',
+        body: 'We are constantly connected to the world’s movement and chatter. We analyze trends; we know what is next and we are preparing for it.',
+      },
+    ],
+    ctaLine: 'Ready to move in step with what’s next?',
+    ctaLabel: 'Explore our courses →',
     heroTitle: 'Serious training for the people who make AI trustworthy',
     heroSubtitle:
       'isad.academy is an independent online academy for AI governance, risk and compliance — every course taught live, one-to-one, by a practitioner.',
@@ -408,7 +497,10 @@ const en = {
       'Ask about a course, corporate training or certification — send us a message and we will get back to you by email.',
     title: 'Contact',
     intro: 'Questions about a course, corporate training or certification? Send us a message.',
+    headerTitlePlain: 'Questions?',
+    headerTitleGradient: 'Let’s talk.',
     form: {
+      title: 'Send us a message',
       name: 'Full name',
       email: 'Email',
       phone: 'Phone (optional)',
@@ -432,12 +524,17 @@ const en = {
       submitting: 'Sending…',
       successTitle: 'Thanks — we’ll get back to you.',
       successMessage: 'Your message has been sent. We usually reply by email, so keep an eye on your inbox.',
+      privacyPrefix: 'By sending, you agree to our ',
+      privacyLinkLabel: 'Privacy Policy',
+      privacySuffix: '.',
     },
     details: {
       aria: 'Direct contact details',
       title: 'Reach us directly',
       email: 'Email',
       phone: 'Phone',
+      responseTime: 'Response time',
+      responseTimeValue: 'Within one business day',
       linkedin: 'LinkedIn',
       linkedinCta: 'Connect on LinkedIn',
       fallback: 'The form is the fastest way to reach us — we reply by email.',
@@ -463,6 +560,12 @@ const en = {
     newBadge: 'New',
     readArticle: 'Read article',
     emailPlaceholder: 'Your email address',
+    // Mobile list layout (Figma 3977-612)
+    backToBlog: 'Back to blog',
+    latestLabel: 'Latest article',
+    swipeLabel: 'More articles — swipe',
+    mobileNewsTitle: 'Get new articles in your inbox.',
+    mobileNewsSub: 'One email when we publish — no spam, unsubscribe anytime.',
     listTitle: 'Blog',
     metaDescription:
       'Articles on AI governance, ISO/IEC 42001, anti-fraud and risk management from Dr. Silviu Gresoi.',
@@ -494,6 +597,8 @@ const en = {
       emailPlaceholder: 'you@company.com',
       sending: 'Sending…',
       submit: 'Send me the link',
+      // Article redesign (Figma 3977-687 / 3977-718) — black pill button label
+      submitFile: 'Send me the file',
       success: 'Check your inbox — the download link is on its way.',
       genericError: 'Something went wrong. Please try again later.',
     },
@@ -658,6 +763,7 @@ const en = {
     codeExpired: 'This code has expired.',
     codeInactive: 'This code is no longer active.',
     codeUsageLimitReached: 'This code has reached its usage limit.',
+    codeDuplicate: 'This code is already applied.',
     errorCheckDetails: 'Please check your details and try again.',
     errorPaymentDeclined: 'Payment was declined — please try again.',
     errorEditionNotFound: 'This edition could not be found. It may have been removed.',
@@ -802,9 +908,10 @@ const ro: Dictionary = {
     newsletterTitleFallback: 'Rămâi cu un pas înaintea guvernanței AI',
     newsletterSubFallback: 'Primești articole noi și anunțuri despre cursuri direct pe email.',
     faqCategories: {
-      gettingStarted: 'Primii pași',
-      coursesCertification: 'Cursuri și certificare',
-      paymentsPractical: 'Plăți și detalii practice',
+      discover: 'Descoperă',
+      learn: 'Învață',
+      validate: 'Validează',
+      access: 'Acces',
     },
   },
   whyShowcase: {
@@ -837,6 +944,12 @@ const ro: Dictionary = {
     previous: 'Anterior',
     next: 'Următorul',
   },
+  // Stringurile doar-mobil ale secțiunii Why (WhySectionMobile) care diferă de
+  // copy-ul showcase-ului de desktop — restul se refolosește din `whyShowcase`.
+  whyMobile: {
+    aiPill: 'AI First, pregătit pentru viitor',
+    dotsAria: 'De ce isad.academy',
+  },
   ourCourses: {
     headingLead: 'Explorează viitoarele noastre',
     headingHighlight: 'cursuri',
@@ -863,72 +976,101 @@ const ro: Dictionary = {
   },
   faqSection: {
     headingLead: 'Întrebări',
-    headingHighlight: 'frecvente.',
+    headingHighlight: 'frecvente',
     sub: 'Tot ce ne întreabă cursanții înainte de a începe.',
     allQuestions: 'Toate întrebările',
     stillQuestions: 'Mai ai întrebări?',
     contactSub: 'Programează un call de descoperire sau folosește formularul de contact — îți răspundem pe email.',
     contactCta: 'Contactează-ne →',
     items: [
+      // Descoperă — compania, site-ul, cursurile
       {
-        category: 'gettingStarted',
-        q: 'Cum mă înscriu la un curs?',
-        a: 'Alege cursul, selectează o ediție și apasă Înscrie-te. Adaugi participanții (nume + email pentru fiecare loc), completezi datele de facturare și plătești online. Confirmarea și factura sosesc imediat pe email, iar invitația de Google Meet urmează înainte de data de început.',
+        category: 'discover',
+        q: 'Ce este isad.academy?',
+        a: 'isad.academy este platforma de cursuri a International Security and Defence (ISAD), partener oficial PECB. Livrăm training live, condus de practicieni, pe guvernanța AI și ISO/IEC 42001 — construit să te ajute să îți înnoiești cunoștințele și să ții pasul cu politicile globale și standardele ISO în continuă evoluție.',
       },
       {
-        category: 'gettingStarted',
+        category: 'discover',
+        q: 'Cine predă cursurile?',
+        a: 'Toate cursurile sunt predate live de Dr. Silviu Gresoi — doctor în AI & Machine Learning, Certified Fraud Examiner, cu peste 20 de ani de experiență în anti-fraudă, managementul riscului și data analytics, speaker la AI Expo Europe și AI Summit Europe.',
+      },
+      {
+        category: 'discover',
+        q: 'Ce cursuri pot urma?',
+        a: 'La lansare avem patru cursuri: traseele oficiale PECB ISO/IEC 42001 — Foundation, Lead Implementer și Lead Auditor — plus AI Governance & Responsible AI, cursul practic propriu ISAD Academy. Catalogul listează fiecare ediție viitoare; dacă nu ești sigur care ți se potrivește, completează quiz-ul scurt din pagina de cursuri.',
+      },
+      {
+        category: 'discover',
+        q: 'Cursurile sunt live sau în ritm propriu?',
+        a: 'Toate cursurile sunt livrate live pe Google Meet, în grupuri mici, direct de Dr. Silviu Gresoi. Nu există lecții preînregistrate — fiecare sesiune lasă loc pentru întrebările tale și pentru cazurile reale din organizația ta.',
+      },
+      // Învață — programul în timp, evaluările
+      {
+        category: 'learn',
+        q: 'Cât durează un curs și cum e programat?',
+        a: 'Durata diferă de la curs la curs și e afișată în ore pe fiecare pagină de curs. Fiecare ediție are propriul program concret — zilele și orele exacte sunt publicate pe pagina cursului, așa că știi întregul calendar înainte să te înscrii.',
+      },
+      {
+        category: 'learn',
+        q: 'Când încep următoarele ediții?',
+        a: 'Fiecare pagină de curs listează edițiile viitoare, cu date de început și locuri disponibile. Dacă o ediție e sold out sau nu sunt încă date anunțate, lasă-ți emailul la „Anunță-mă" sau abonează-te la newsletter — afli imediat ce apar date noi.',
+      },
+      {
+        category: 'learn',
         q: 'Am nevoie de experiență anterioară cu standardele ISO?',
         a: 'Nu pentru cursul Foundation sau AI Governance & Responsible AI — acestea pornesc de la zero. Pentru Lead Implementer și Lead Auditor, o familiaritate de bază cu sistemele de management ajută, dar nu e obligatorie. Nu ești sigur ce nivel ți se potrivește? Completează quiz-ul scurt și îți recomandăm noi un curs.',
       },
       {
-        category: 'gettingStarted',
-        q: 'Cursurile sunt live sau în ritm propriu?',
-        a: 'Toate cursurile sunt livrate live pe Google Meet, în grupuri mici, direct de Dr. Silviu Gresoi. Nu există lecții preînregistrate — fiecare sesiune lasă loc pentru întrebările tale și pentru cazurile reale din organizația ta.',
+        category: 'learn',
+        q: 'Cum sunt evaluat — există examen?',
+        a: 'Pentru traseele PECB, evaluarea este examenul oficial PECB, susținut online prin platforma PECB după training — iar pregătirea e inclusă în ultima zi de curs. Pentru cursurile proprii ISAD Academy nu există examen extern: finalizezi sesiunile live și primești certificatul de absolvire.',
       },
+      // Validează — certificările
       {
-        category: 'coursesCertification',
+        category: 'validate',
         q: 'Ce certificat primesc după curs?',
         a: 'Pentru traseele PECB (ISO/IEC 42001 Foundation, Lead Implementer, Lead Auditor), primești certificatul oficial PECB, recunoscut internațional, după promovarea examenului. Pentru cursurile proprii ISAD Academy, primești un certificat de absolvire ISAD Academy care menționează creditele tale CPD.',
       },
       {
-        category: 'coursesCertification',
-        q: 'Cum funcționează creditele CPD?',
-        a: 'Simplu: o oră de învățare înseamnă un credit CPD. Un curs de 35 de ore îți aduce 35 de credite CPD, menționate pe certificat — recunoscute pentru dezvoltarea ta profesională continuă.',
-      },
-      {
-        category: 'coursesCertification',
-        q: 'Cum se organizează examenul PECB?',
-        a: 'Examenul face parte din traseul de certificare PECB și se susține online, prin platforma PECB, după training. Ne ocupăm noi de înrolarea ta la examen — tu te concentrezi pe pregătire, care e inclusă în ultima zi de curs.',
-      },
-      {
-        category: 'coursesCertification',
+        category: 'validate',
         q: 'Cum funcționează înrolarea pe platforma PECB?',
         a: 'După confirmarea plății, te înregistrăm pe platforma PECB. Acolo primești acces la materialele oficiale de curs, la programarea examenului și, după promovare, la certificatul tău.',
       },
       {
-        category: 'coursesCertification',
-        q: 'Cursul AI Governance & Responsible AI e potrivit pentru începători?',
-        a: 'Da. E un curs practic, neutru față de furnizori, despre guvernarea responsabilă a AI — etică, risc, transparență și responsabilitate — fără să fie nevoie de experiență ISO. Funcționează excelent și ca o completare a traseelor de certificare PECB.',
+        category: 'validate',
+        q: 'Cum funcționează creditele CPD?',
+        a: 'Simplu: o oră de învățare înseamnă un credit CPD. Un curs de 35 de ore îți aduce 35 de credite CPD, menționate pe certificat — recunoscute pentru dezvoltarea ta profesională continuă.',
       },
       {
-        category: 'paymentsPractical',
+        category: 'validate',
+        q: 'Certificarea e recunoscută internațional?',
+        a: 'Da. PECB este un organism global de certificare, iar certificatele sale sunt recunoscute internațional. ISO/IEC 42001:2023 este chiar standardul internațional pentru sistemele de management al AI — așa că acreditarea te însoțește oriunde, indiferent de angajator sau țară.',
+      },
+      // Acces — înscrierea pentru persoane fizice și organizații
+      {
+        category: 'access',
+        q: 'Cum mă înscriu la un curs?',
+        a: 'Alege cursul, selectează o ediție și apasă Înscrie-te. Adaugi participanții (nume + email pentru fiecare loc), completezi datele de facturare și plătești online. Confirmarea și factura sosesc imediat pe email, iar invitația de Google Meet urmează înainte de data de început.',
+      },
+      {
+        category: 'access',
+        q: 'Pot înscrie echipa sau compania mea?',
+        a: 'Da. La checkout poți cumpăra mai multe locuri pe aceeași ediție — fiecare cu participantul lui nominal — și poți plăti ca firmă, cu datele de facturare pe factură. De la 3 locuri, reducerea de grup de 10% se aplică automat. Iar pentru o sesiune privată livrată doar pentru echipa ta, online sau la sediu, intră pe pagina Corporate și spune-ne ce ai nevoie.',
+      },
+      {
+        category: 'access',
         q: 'Pot plăti în RON sau EUR?',
         a: 'Ambele: prețurile sunt în RON pentru participanții din România și în EUR pentru participanții internaționali. Toate prețurile sunt finale — isad.academy nu este plătitoare de TVA, deci nu se adaugă TVA la checkout.',
       },
       {
-        category: 'paymentsPractical',
+        category: 'access',
         q: 'Se cumulează reducerile — de grup, de membru, codurile promoționale?',
         a: 'Da, reducerile se cumulează. Reducerea de grup de 10% se aplică automat de la 3 locuri pe aceeași ediție, membrii APCF primesc reducerea de membru cu codul lor, iar codurile promoționale se aplică peste — toate combinate în sumarul comenzii, înainte de plată.',
       },
       {
-        category: 'paymentsPractical',
+        category: 'access',
         q: 'Care este politica de anulare și rambursare?',
         a: 'Dacă nu mai poți participa, poți solicita o rambursare (în funcție de cât de aproape de data de început anulezi) sau, unde e posibil, transferul la o ediție viitoare. Dacă noi anulăm sau reprogramăm o ediție, alegi între rambursare integrală, transfer gratuit la o ediție viitoare sau un voucher pentru întreaga sumă. Locurile rambursate se eliberează automat. Detaliile complete sunt în Termeni și condiții.',
-      },
-      {
-        category: 'paymentsPractical',
-        q: 'Poate compania mea să rezerve training in-house?',
-        a: 'Da — orice curs din catalog poate fi livrat ca sesiune privată de grup pentru echipa ta, online sau la sediu. Intră pe pagina Corporate și spune-ne despre echipa ta; revenim cu o propunere.',
       },
     ],
   },
@@ -942,6 +1084,7 @@ const ro: Dictionary = {
     notSure: 'Nu știi de unde să începi?',
     quizCta: 'Care curs mi se potrivește?',
     gridAria: 'Catalogul de cursuri',
+    dotsAria: 'Cursuri',
     upcomingCount: (n: number) =>
       n === 1 ? '1 curs viitor' : n < 20 ? `${n} cursuri viitoare` : `${n} de cursuri viitoare`,
     sortLabel: 'Sortare: Data de început',
@@ -967,6 +1110,7 @@ const ro: Dictionary = {
   courseDetail: {
     metaNotFound: 'Cursul nu a fost găsit',
     metaFallbackDescription: 'Training live, susținut de un expert, predat unu-la-unu pe Google Meet.',
+    backToCourses: 'Înapoi la cursuri',
     pillPecb: 'PECB ISO/IEC 42001 · Traseu oficial de certificare',
     pillOwn: 'ISAD Academy · Curs propriu',
     share: 'Distribuie',
@@ -1116,6 +1260,57 @@ const ro: Dictionary = {
     metaTitle: 'Despre noi',
     metaDescription:
       'isad.academy este instrumentul tău de navigație pentru o lume în schimbare — o platformă de cursuri construită de International Security and Defence (ISAD), partener oficial PECB.',
+    // v3 redesign (owner Figma 3873-94 desktop / 3977-571 mobil) — traducerea RO a copy-ului 1:1.
+    heroPill: 'Despre noi',
+    heroTitlePlain: 'Instrumentul tău de navigație pentru o ',
+    heroTitleGradient: 'lume în schimbare',
+    heroIntro1:
+      'Lumea se învârte mai repede ca oricând. Apar tehnologii noi, prind contur competențe noi, iar perspectivele proaspete și flexibile devin esențiale.',
+    heroIntro2:
+      'isad.academy este, înainte de toate, instrumentul tău curatoriat de navigație pentru această lume în schimbare — o platformă de cursuri concepută să te ajute să îți înnoiești cunoștințele, să îți consolidezi competențele și să ții pasul cu politicile globale și standardele ISO în continuă evoluție.',
+    heroBuiltBy: 'Construită de International Security and Defence (ISAD) — partener oficial PECB.',
+    beliefsHeading: 'Ce ne ghidează',
+    beliefs: [
+      {
+        lead: 'Credem în ',
+        tail: 'inovație.',
+        infoTitle: 'Selectăm cu un scop. ',
+        infoBody:
+          'Prețuim inovația și progresul; acestea apar rareori fără intenție. La isad.academy, proiectăm parcursuri de învățare pornind de la obiectivele tale și de la nivelul tău de start.',
+      },
+      {
+        lead: 'Ne ghidăm după ',
+        tail: 'structură.',
+        infoTitle: 'Predăm cu claritate. ',
+        infoBody:
+          'Subiectele complexe au nevoie de parcursuri clare și coerente. Tot ce găsești în parcursurile noastre de învățare a fost gândit cu grijă pentru a-ți îmbogăți experiența de învățare.',
+      },
+      {
+        lead: 'Te ajutăm să rămâi pregătit pentru ',
+        tail: 'ce urmează.',
+        infoTitle: 'Evoluăm odată cu lumea. ',
+        infoBody:
+          'Suntem conectați constant la mișcarea și pulsul lumii. Analizăm tendințele; știm ce urmează și ne pregătim pentru asta.',
+      },
+    ],
+    valuesTitlePlain: 'Valorile ',
+    valuesTitleGradient: 'noastre',
+    values: [
+      {
+        title: 'Selectăm cu un scop.',
+        body: 'Prețuim inovația și progresul; acestea apar rareori fără intenție. La isad.academy, proiectăm parcursuri de învățare pornind de la obiectivele tale și de la nivelul tău de start.',
+      },
+      {
+        title: 'Predăm cu claritate.',
+        body: 'Subiectele complexe au nevoie de parcursuri clare și coerente. Tot ce găsești în parcursurile noastre de învățare a fost gândit cu grijă pentru a-ți îmbogăți experiența de învățare.',
+      },
+      {
+        title: 'Evoluăm odată cu lumea.',
+        body: 'Suntem conectați constant la mișcarea și pulsul lumii. Analizăm tendințele; știm ce urmează și ne pregătim pentru asta.',
+      },
+    ],
+    ctaLine: 'Gata să ții pasul cu ce urmează?',
+    ctaLabel: 'Explorează cursurile noastre →',
     heroTitle: 'Training serios pentru oamenii care fac AI-ul demn de încredere',
     heroSubtitle:
       'isad.academy este o academie online independentă pentru guvernanța, riscul și conformitatea AI — fiecare curs predat live, unu-la-unu, de un practician.',
@@ -1151,7 +1346,10 @@ const ro: Dictionary = {
       'Întreabă-ne despre un curs, training corporate sau certificare — trimite-ne un mesaj și îți răspundem pe email.',
     title: 'Contact',
     intro: 'Ai întrebări despre un curs, training corporate sau certificare? Trimite-ne un mesaj.',
+    headerTitlePlain: 'Întrebări?',
+    headerTitleGradient: 'Hai să vorbim.',
     form: {
+      title: 'Trimite-ne un mesaj',
       name: 'Nume complet',
       email: 'Email',
       phone: 'Telefon (opțional)',
@@ -1175,12 +1373,17 @@ const ro: Dictionary = {
       submitting: 'Se trimite…',
       successTitle: 'Mulțumim — revenim noi către tine.',
       successMessage: 'Mesajul tău a fost trimis. De obicei răspundem pe email, așa că fii cu ochii pe inbox.',
+      privacyPrefix: 'Prin trimitere, ești de acord cu ',
+      privacyLinkLabel: 'Politica de confidențialitate',
+      privacySuffix: '.',
     },
     details: {
       aria: 'Date de contact directe',
       title: 'Contactează-ne direct',
       email: 'Email',
       phone: 'Telefon',
+      responseTime: 'Timp de răspuns',
+      responseTimeValue: 'În cel mult o zi lucrătoare',
       linkedin: 'LinkedIn',
       linkedinCta: 'Conectează-te pe LinkedIn',
       fallback: 'Formularul e cel mai rapid mod de a ajunge la noi — răspundem pe email.',
@@ -1206,6 +1409,12 @@ const ro: Dictionary = {
     newBadge: 'Nou',
     readArticle: 'Citește articolul',
     emailPlaceholder: 'Adresa ta de email',
+    // Mobile list layout (Figma 3977-612)
+    backToBlog: 'Înapoi la blog',
+    latestLabel: 'Cel mai recent articol',
+    swipeLabel: 'Mai multe articole — glisează',
+    mobileNewsTitle: 'Primești articolele noi pe email.',
+    mobileNewsSub: 'Un email când publicăm — fără spam, te dezabonezi oricând.',
     listTitle: 'Blog',
     metaDescription:
       'Articole despre guvernanța AI, ISO/IEC 42001, anti-fraudă și managementul riscului, de la Dr. Silviu Gresoi.',
@@ -1237,6 +1446,8 @@ const ro: Dictionary = {
       emailPlaceholder: 'tu@companie.ro',
       sending: 'Se trimite…',
       submit: 'Trimite-mi linkul',
+      // Article redesign (Figma 3977-687 / 3977-718) — black pill button label
+      submitFile: 'Trimite-mi fișierul',
       success: 'Verifică-ți inboxul — linkul de descărcare e pe drum.',
       genericError: 'Ceva nu a mers. Te rugăm să încerci din nou mai târziu.',
     },
@@ -1402,6 +1613,7 @@ const ro: Dictionary = {
     codeExpired: 'Acest cod a expirat.',
     codeInactive: 'Acest cod nu mai este activ.',
     codeUsageLimitReached: 'Acest cod a atins limita de utilizări.',
+    codeDuplicate: 'Acest cod este deja aplicat.',
     errorCheckDetails: 'Te rugăm să verifici datele și să încerci din nou.',
     errorPaymentDeclined: 'Plata a fost refuzată — te rugăm să încerci din nou.',
     errorEditionNotFound: 'Această ediție nu a putut fi găsită. Este posibil să fi fost ștearsă.',

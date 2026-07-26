@@ -49,7 +49,7 @@ describe('computeOrderPricing — discount code validation', () => {
 
   it('inactive code: rejected with reason invalidCode / detail inactive', () => {
     const result = computeOrderPricing({ ...base, code: validGeneralCode({ isActive: false }) })
-    expect(result).toEqual({ ok: false, reason: 'invalidCode', detail: 'inactive' })
+    expect(result).toEqual({ ok: false, reason: 'invalidCode', detail: 'inactive', codeValue: 'GEN20' })
   })
 
   it('expired code (expiresAt strictly before now): rejected, detail expired', () => {
@@ -57,7 +57,7 @@ describe('computeOrderPricing — discount code validation', () => {
       ...base,
       code: validGeneralCode({ expiresAt: '2026-01-01T00:00:00.000Z' }), // ACTIVE_NOW is 2026-01-15
     })
-    expect(result).toEqual({ ok: false, reason: 'invalidCode', detail: 'expired' })
+    expect(result).toEqual({ ok: false, reason: 'invalidCode', detail: 'expired', codeValue: 'GEN20' })
   })
 
   it('boundary: expiresAt exactly equal to now is still VALID (inclusive, like price windows)', () => {
@@ -71,12 +71,12 @@ describe('computeOrderPricing — discount code validation', () => {
   it('boundary: expiresAt 1ms before now is INVALID', () => {
     const oneMsBefore = new Date(ACTIVE_NOW.getTime() - 1).toISOString()
     const result = computeOrderPricing({ ...base, code: validGeneralCode({ expiresAt: oneMsBefore }) })
-    expect(result).toEqual({ ok: false, reason: 'invalidCode', detail: 'expired' })
+    expect(result).toEqual({ ok: false, reason: 'invalidCode', detail: 'expired', codeValue: 'GEN20' })
   })
 
   it('usage limit reached (usageCount === usageLimit): rejected, detail usageLimitReached', () => {
     const result = computeOrderPricing({ ...base, code: validGeneralCode({ usageLimit: 5, usageCount: 5 }) })
-    expect(result).toEqual({ ok: false, reason: 'invalidCode', detail: 'usageLimitReached' })
+    expect(result).toEqual({ ok: false, reason: 'invalidCode', detail: 'usageLimitReached', codeValue: 'GEN20' })
   })
 
   it('boundary: usageCount one below usageLimit is still VALID (last allowed use)', () => {
@@ -94,7 +94,7 @@ describe('computeOrderPricing — discount code validation', () => {
       ...base,
       code: validGeneralCode({ isActive: false, expiresAt: '2020-01-01T00:00:00.000Z' }),
     })
-    expect(result).toEqual({ ok: false, reason: 'invalidCode', detail: 'inactive' })
+    expect(result).toEqual({ ok: false, reason: 'invalidCode', detail: 'inactive', codeValue: 'GEN20' })
   })
 
   it('both expired AND usage-limit-reached: fixed check order reports "expired" before usage limit', () => {
@@ -102,6 +102,6 @@ describe('computeOrderPricing — discount code validation', () => {
       ...base,
       code: validGeneralCode({ expiresAt: '2020-01-01T00:00:00.000Z', usageLimit: 1, usageCount: 1 }),
     })
-    expect(result).toEqual({ ok: false, reason: 'invalidCode', detail: 'expired' })
+    expect(result).toEqual({ ok: false, reason: 'invalidCode', detail: 'expired', codeValue: 'GEN20' })
   })
 })

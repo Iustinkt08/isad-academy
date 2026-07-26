@@ -19,8 +19,9 @@ export type LoadPricedSessionArgs = {
   payload: Payload
   sessionId: number | string
   quantity: number
-  /** Normalized (trimmed) discount code, or null when none was supplied. */
-  code: string | null
+  /** Normalized (trimmed) discount codes IN APPLICATION ORDER — empty array = no code.
+   * Codes stack, max 2 (owner 2026-07-25); the engine enforces the cap + duplicates. */
+  codes: string[]
   /** Visitor country code (geo header), resolved by the API route — never client-sent. */
   country: string | null
   now: Date
@@ -31,8 +32,8 @@ export type PricedSession = {
   session: CourseSession
   /** Display slice both endpoints return verbatim in their 200 bodies. */
   sessionView: { id: number; courseTitle: string; startDate: string }
-  /** The looked-up code doc (order snapshot + usage accounting need it), or null. */
-  codeDoc: DiscountCode | null
+  /** The looked-up code docs, in application order (order snapshot + usage accounting). */
+  codeDocs: DiscountCode[]
   siteSettings: SiteSetting
   pricing: PricingSnapshot
   /** Currency the pricing above is denominated in (B1 — RON for RO visitors, else EUR). */
@@ -61,7 +62,7 @@ export const loadPricedSession = async ({
   payload,
   sessionId,
   quantity,
-  code,
+  codes,
   country,
   now,
 }: LoadPricedSessionArgs): Promise<LoadPricedSessionResult> => {
@@ -86,23 +87,27 @@ export const loadPricedSession = async ({
     return { ok: false, status: 409, body: { error: 'This edition is sold out.', soldOut: true } }
   }
 
-  let codeDoc: DiscountCode | null = null
-  if (code) {
+  const codeDocs: DiscountCode[] = []
+  if (codes.length > 0) {
     const found = await payload.find({
       collection: 'discountCodes',
-      where: { code: { equals: code } },
+      where: { code: { in: codes } },
       overrideAccess: true,
-      limit: 1,
+      limit: codes.length,
     })
-    const [firstMatch] = found.docs
-    if (!firstMatch) {
-      return {
-        ok: false,
-        status: 400,
-        body: { error: 'Invalid or expired discount code.', detail: 'notFound' },
+    // Preserve APPLICATION order (the order the buyer applied the codes in) and report
+    // the FIRST code that doesn't exist — `codeValue` lets the UI attribute the error.
+    for (const value of codes) {
+      const match = found.docs.find((doc) => doc.code === value)
+      if (!match) {
+        return {
+          ok: false,
+          status: 400,
+          body: { error: 'Invalid or expired discount code.', detail: 'notFound', codeValue: value },
+        }
       }
+      codeDocs.push(match)
     }
-    codeDoc = firstMatch
   }
 
   // c. Recompute pricing server-side — the ONLY source of truth for the amount charged ----
@@ -118,18 +123,16 @@ export const loadPricedSession = async ({
       standard: windowForCurrency(session.standard, currency),
     },
     quantity,
-    code: codeDoc
-      ? {
-          id: codeDoc.id,
-          code: codeDoc.code,
-          percentage: codeDoc.percentage,
-          expiresAt: codeDoc.expiresAt,
-          usageLimit: codeDoc.usageLimit,
-          usageCount: codeDoc.usageCount ?? 0,
-          type: codeDoc.type,
-          isActive: codeDoc.isActive ?? true,
-        }
-      : null,
+    codes: codeDocs.map((doc) => ({
+      id: doc.id,
+      code: doc.code,
+      percentage: doc.percentage,
+      expiresAt: doc.expiresAt,
+      usageLimit: doc.usageLimit,
+      usageCount: doc.usageCount ?? 0,
+      type: doc.type,
+      isActive: doc.isActive ?? true,
+    })),
     // Never trust a client-asserted membership claim (CLAUDE.md §13) — the only path to
     // member pricing is a valid `type: 'member'` discount code, handled inside the engine.
     isMember: false,
@@ -146,7 +149,18 @@ export const loadPricedSession = async ({
       return {
         ok: false,
         status: 400,
-        body: { error: 'Invalid or expired discount code.', detail: pricingResult.detail },
+        body: {
+          error: 'Invalid or expired discount code.',
+          detail: pricingResult.detail,
+          codeValue: pricingResult.codeValue,
+        },
+      }
+    }
+    if (pricingResult.reason === 'tooManyCodes') {
+      return {
+        ok: false,
+        status: 400,
+        body: { error: 'At most 2 discount codes can be applied per order.' },
       }
     }
     // 'invalidQuantity' — already guarded by both callers' input validation; kept
@@ -162,7 +176,7 @@ export const loadPricedSession = async ({
       courseTitle: courseTitleOf(session.course),
       startDate: String(session.startDate),
     },
-    codeDoc,
+    codeDocs,
     siteSettings,
     pricing: pricingResult.pricing,
     currency,

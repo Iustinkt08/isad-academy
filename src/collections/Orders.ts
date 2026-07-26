@@ -15,9 +15,12 @@ export const Orders: CollectionConfig = {
   slug: 'orders',
   admin: {
     useAsTitle: 'id',
-    defaultColumns: ['session', 'quantity', 'paymentStatus', 'createdAt'],
+    group: 'Sales',
+    defaultColumns: ['paymentStatus', 'session', 'quantity', 'createdAt'],
+    listSearchableFields: ['buyer.email', 'buyer.name'],
     description: 'Checkout orders. Server-side only — never exposed to the public API.',
   },
+  defaultSort: '-createdAt',
   access: {
     read: isAdmin,
     create: isAdmin,
@@ -96,7 +99,11 @@ export const Orders: CollectionConfig = {
       name: 'pricing',
       type: 'group',
       admin: {
-        description: 'Snapshot of the pricing engine output at the moment of purchase (CLAUDE.md §8) — never recomputed after the fact.',
+        // UI-only lock (admin.readOnly never affects the Local API the checkout writes
+        // through with overrideAccess) — the fiscal snapshot must not be hand-edited.
+        readOnly: true,
+        description:
+          'Snapshot of the pricing engine output at the moment of purchase (CLAUDE.md §8) — never recomputed after the fact. Read-only: not hand-editable.',
       },
       fields: [
         { name: 'basePrice', type: 'number' },
@@ -116,7 +123,10 @@ export const Orders: CollectionConfig = {
         },
         { name: 'groupDiscount', type: 'number', defaultValue: 0 },
         { name: 'memberDiscount', type: 'number', defaultValue: 0 },
+        // Legacy single-code field (= first applied code) — kept for admin continuity.
         { name: 'code', type: 'relationship', relationTo: 'discountCodes', hasMany: false },
+        // Codes stack, max 2 per order (owner 2026-07-25) — full list, application order.
+        { name: 'codes', type: 'relationship', relationTo: 'discountCodes', hasMany: true },
         { name: 'codeDiscount', type: 'number', defaultValue: 0 },
         { name: 'total', type: 'number' },
       ],
@@ -136,12 +146,18 @@ export const Orders: CollectionConfig = {
     {
       name: 'provider',
       type: 'text',
-      admin: { description: 'Payment provider that handled this order, e.g. "mock", "stripe".' },
+      admin: {
+        readOnly: true,
+        description: 'Payment provider that handled this order, e.g. "mock", "stripe". Set by checkout — read-only.',
+      },
     },
     {
       name: 'providerRef',
       type: 'text',
-      admin: { description: "Provider's transaction/session reference." },
+      admin: {
+        readOnly: true,
+        description: "Provider's transaction/session reference. Set by checkout — read-only.",
+      },
     },
   ],
   // T5 — atomic seat consumption (CLAUDE.md §3.4, §8; src/lib/seats). `afterChange` acts on

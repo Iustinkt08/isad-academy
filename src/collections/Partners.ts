@@ -8,6 +8,7 @@ export const Partners: CollectionConfig = {
   slug: 'partners',
   admin: {
     useAsTitle: 'name',
+    group: 'Content',
     defaultColumns: ['name', 'type', 'order'],
     description: 'Logos shown on the homepage partners strip.',
   },

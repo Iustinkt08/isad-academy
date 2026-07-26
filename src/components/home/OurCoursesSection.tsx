@@ -311,12 +311,21 @@ export function OurCoursesSection({
                     aria-label={`Go to course ${i + 1}`}
                     aria-current={i === activeIndex ? 'true' : undefined}
                     className={cn(
-                      'h-2 rounded-full transition-all duration-300',
-                      i === activeIndex
-                        ? 'w-[22px] bg-gradient-to-r from-steel to-blue'
-                        : 'w-2 bg-[#d1d1d1]',
+                      // Tranziție SMOOTH (owner 2026-07-26): lățimea se animă, iar
+                      // gradientul (ne-interpolabil cu o culoare plată) face crossfade
+                      // printr-un strat interior cu opacity animat.
+                      'relative h-2 overflow-hidden rounded-full bg-[#d1d1d1] transition-[width] duration-300 ease-out',
+                      i === activeIndex ? 'w-[22px]' : 'w-2',
                     )}
-                  />
+                  >
+                    <span
+                      aria-hidden="true"
+                      className={cn(
+                        'absolute inset-0 rounded-full bg-gradient-to-r from-steel to-blue transition-opacity duration-300',
+                        i === activeIndex ? 'opacity-100' : 'opacity-0',
+                      )}
+                    />
+                  </button>
                 ))}
               </div>
             )}

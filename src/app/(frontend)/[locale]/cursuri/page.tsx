@@ -10,6 +10,7 @@ import {
 } from '@/components/courses/helpers'
 import CatalogGrid from '@/components/cursuri/CatalogGrid'
 import CatalogHeader from '@/components/cursuri/CatalogHeader'
+import { Reveal } from '@/components/ui/Reveal'
 import type { CatalogCourse } from '@/components/cursuri/CourseCard'
 import PastEditions, { type PastEdition } from '@/components/cursuri/PastEditions'
 import { getDictionary, localePath, resolveLocale, type Locale } from '@/lib/i18n'
@@ -136,9 +137,16 @@ export default async function CoursesPage({ params }: Args) {
 
   return (
     <div className="bg-[#f8f9fa]">
-      <CatalogHeader quizHref={localePath(locale, '/quiz')} />
-      <CatalogGrid courses={catalog} />
-      <PastEditions editions={past} />
+      {/* Fade-in on scroll per secțiune (owner 2026-07-25) — același Reveal ca pe homepage */}
+      <Reveal>
+        <CatalogHeader locale={locale} quizHref={localePath(locale, '/quiz')} />
+      </Reveal>
+      <Reveal>
+        <CatalogGrid locale={locale} courses={catalog} />
+      </Reveal>
+      <Reveal>
+        <PastEditions locale={locale} editions={past} />
+      </Reveal>
     </div>
   )
 }

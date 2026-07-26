@@ -42,14 +42,19 @@ export type PricingCodeInput = {
 
 export type StackingPolicy = 'stackAll' | 'bestOf' | 'groupMemberStack_codeExclusive'
 
-export type InvalidCodeDetail = 'inactive' | 'expired' | 'usageLimitReached'
+export type InvalidCodeDetail = 'inactive' | 'expired' | 'usageLimitReached' | 'duplicate'
 
 export type ComputeOrderPricingInput = {
   windows: PricingWindows
   /** Seats being purchased. Must be a positive integer — anything else is `invalidQuantity`. */
   quantity: number
-  /** A customer-submitted discount code, if any. `undefined`/`null` = no code entered. */
+  /** A customer-submitted discount code, if any. `undefined`/`null` = no code entered.
+   * Legacy single-code shape — equivalent to `codes: [code]`. Ignored when `codes` is set. */
   code?: PricingCodeInput | null
+  /** Customer-submitted discount codes IN APPLICATION ORDER — codes stack (owner,
+   * 2026-07-25), capped at `MAX_DISCOUNT_CODES` (2); more is `tooManyCodes`, the same code
+   * twice is `invalidCode`/`duplicate`. Takes precedence over the legacy `code` field. */
+  codes?: PricingCodeInput[] | null
   /** Whether the buyer independently qualifies for member pricing (allowlist / manual flag
    * — CLAUDE.md §13, no real auth). A valid `type: 'member'` code ALSO grants this even
    * when `isMember` is false (CLAUDE.md §4). */
@@ -65,15 +70,24 @@ export type ComputeOrderPricingInput = {
   now: Date
 }
 
-/** Matches `orders.pricing` (CLAUDE.md §4) field-for-field. `code` holds whatever
- * identifier `PricingCodeInput` carried (see `computeOrderPricing.ts` for the exact
- * fallback rule), or `null` when no code was applied. */
+/** One applied code in the snapshot: the identifier `PricingCodeInput` carried (doc id,
+ * falling back to the code string) + that code's own discount amount, in application
+ * order. */
+export type PricingSnapshotCodeLine = {
+  code: string | number
+  discount: number
+}
+
+/** Matches `orders.pricing` (CLAUDE.md §4) field-for-field. `code`/`codeDiscount` stay
+ * for back-compat (`code` = FIRST applied code or `null`; `codeDiscount` = TOTAL across
+ * codes); `codes` carries the full per-code breakdown (max `MAX_DISCOUNT_CODES`). */
 export type PricingSnapshot = {
   basePrice: number
   appliedWindow: AppliedWindow
   groupDiscount: number
   memberDiscount: number
   code: string | number | null
+  codes: PricingSnapshotCodeLine[]
   codeDiscount: number
   total: number
 }
@@ -82,4 +96,7 @@ export type ComputeOrderPricingResult =
   | { ok: true; pricing: PricingSnapshot }
   | { ok: false; reason: 'noActiveWindow' }
   | { ok: false; reason: 'invalidQuantity' }
-  | { ok: false; reason: 'invalidCode'; detail: InvalidCodeDetail }
+  /** `codeValue` = the human-entered code string of the failing code, so a two-code
+   * checkout can attribute the error to the right chip. */
+  | { ok: false; reason: 'invalidCode'; detail: InvalidCodeDetail; codeValue?: string }
+  | { ok: false; reason: 'tooManyCodes' }

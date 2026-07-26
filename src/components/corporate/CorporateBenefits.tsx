@@ -46,10 +46,10 @@ export default function CorporateBenefits({ locale }: { locale: Locale }) {
           the 3×347px Figma row goes fluid inside it (3-up desktop, stacked mobile). */}
       <Container className="pb-10 pt-[60px]">
         <Reveal className="flex flex-col items-center gap-9">
-          {/* Two-tone title — 40 SemiBold, period inside the gradient (extract) */}
+          {/* Two-tone title — 40 SemiBold, period in INK, outside the gradient (owner 2026-07-26) */}
           <h2 className="text-center text-[clamp(28px,3.4vw,40px)] font-semibold leading-normal tracking-[-1.2px] text-ink">
             {t.titlePlain}{' '}
-            <span className="text-gradient-brand tracking-[-1.6px]">{t.titleHighlight}.</span>
+            <span className="text-gradient-brand tracking-[-1.6px]">{t.titleHighlight}</span>{'.'}
           </h2>
 
           {/* Benefit cards (v3, owner 2026-07-14): BORDERLESS, plain white + soft shadow;

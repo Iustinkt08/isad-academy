@@ -3,9 +3,9 @@
  * Owner Figma redesign, node 3790:4382 (checkout redesign 3790:4379). Style v3: step
  * chips are BORDERLESS white pills lifted by a drop shadow — never a stroke. Active
  * step: gradient-FILL circle + ink text; inactive: grey circle + muted text.
- * v2 RESPONSIVE (Figma 3932-118): pe mobil titlu 28/34, subtitlu 13/19 și stepper
- * COMPACT (cercuri 24, text 11, gap 6) ca să încapă pe UN rând în 350px; pașii
- * inactivi au chip alb cu STROKE GRI pe mobil (decizie owner — fără albastru).
+ * v3 RESPONSIVE (Figma 3977-251): pe mobil titlu 28/34, subtitlu 13/19 #4d5b6a și
+ * stepper pe UN rând — cercuri 28 (size-7), text 11, chip alb FĂRĂ bordură (fără stroke
+ * pe mobil), pașii inactivi #4d5b6a pe #f0f2f4, separatoare „—" 11 #cccccc.
  * Bilingual site (RO under /ro): all copy comes from the `checkout` dictionary section.
  */
 
@@ -34,19 +34,15 @@ export default function CheckoutHeader({
         {t.headerSubtitle}
       </p>
 
-      <ol className="flex items-center gap-1.5 pt-1 lg:gap-3 lg:pt-2">
+      <ol className="flex items-center gap-1.5 pt-2 lg:gap-3">
         {steps.map((label, i) => {
           const num = i + 1
           const active = num === currentStep
           return (
             <li key={label} className="flex items-center gap-1.5 lg:gap-3">
-              <span
-                className={`flex items-center gap-1.5 rounded-full bg-white py-1 pl-1 pr-2.5 lg:gap-2 lg:py-1.5 lg:pl-1.5 lg:pr-3.5 lg:shadow-[0_2px_10px_rgba(77,77,77,0.06)] ${
-                  active ? '' : 'border border-[#e6e6e6] lg:border-0'
-                }`}
-              >
+              <span className="flex items-center gap-1.5 rounded-full bg-white py-1.5 pl-1.5 pr-2 lg:gap-2 lg:pr-3.5 lg:shadow-[0_2px_10px_rgba(77,77,77,0.06)]">
                 <span
-                  className={`flex size-6 items-center justify-center rounded-full text-[11px] font-semibold lg:size-7 lg:text-[13px] ${
+                  className={`flex size-7 items-center justify-center rounded-full text-[11px] font-semibold lg:text-[13px] ${
                     active
                       ? 'bg-gradient-to-b from-steel to-blue to-[80%] text-white'
                       : 'bg-[#f0f2f4] text-grey-600'
@@ -61,7 +57,7 @@ export default function CheckoutHeader({
                 </span>
               </span>
               {num < 3 && (
-                <span aria-hidden className="text-[12px] text-[#cccccc] lg:text-[14px]">
+                <span aria-hidden className="text-[11px] text-[#cccccc] lg:text-[14px]">
                   —
                 </span>
               )}

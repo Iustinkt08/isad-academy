@@ -15,7 +15,7 @@ import type { Locale } from '@/lib/i18n/config'
  */
 
 const cardCls =
-  'flex w-full flex-col gap-4 rounded-[24px] border-[6px] border-line-soft bg-white px-6 pb-8 pt-[30px] shadow-[3px_9px_20px_rgba(77,77,77,0.03)] sm:px-10'
+  'flex w-full flex-col gap-4 rounded-[24px] border-[6px] border-line-soft bg-white px-10 pb-8 pt-[30px] shadow-[3px_9px_20px_rgba(77,77,77,0.03)]'
 const headingCls =
   'text-[18px] font-medium leading-[26px] tracking-[-0.5px] text-ink lg:text-[24px] lg:leading-normal lg:tracking-[-0.8px]'
 const bodyText = 'text-[15.5px] leading-[26px] text-grey-600'
@@ -29,7 +29,7 @@ function CheckIcon() {
       height="13"
       viewBox="0 0 13 13"
       fill="none"
-      className="mt-[5px] shrink-0"
+      className="shrink-0"
     >
       <path
         d="M2 6.8L5 9.8L11 2.5"
@@ -72,7 +72,7 @@ export function CourseAudience({ locale, audience }: { locale: Locale; audience:
     <section className={cardCls}>
       <h2 className={headingCls}>{t.audienceTitle}</h2>
       {audience.map((a) => (
-        <div key={a} className="flex items-start gap-3">
+        <div key={a} className="flex items-center gap-3 px-0.5">
           <CheckIcon />
           <span className="text-[15px] leading-[23px] text-grey-600">{a}</span>
         </div>
@@ -143,12 +143,13 @@ export function CourseCertification({
   const copy = `${track === 'pecb' ? t.certPecbCopy : t.certOwnCopy}${cpdLine}`
   const steps = track === 'pecb' ? t.certPecbSteps : t.certOwnSteps
 
+  // Mobil (Figma 3925-115): py-8 (pt 32) + spațieri interne 12; desktop: pt 30 / gap 16
   return (
-    <section className={cardCls}>
+    <section className="flex w-full flex-col gap-3 rounded-[24px] border-[6px] border-line-soft bg-white px-10 py-8 shadow-[3px_9px_20px_rgba(77,77,77,0.03)] lg:gap-4 lg:pt-[30px]">
       <h2 className={headingCls}>{t.certificationTitle}</h2>
       <p className="text-[15px] leading-6 text-grey-600">{copy}</p>
       {steps.map((s: string, i: number) => (
-        <div key={s} className="flex items-start gap-2.5 lg:items-center">
+        <div key={s} className="flex items-center gap-2.5">
           <span className="flex size-[26px] shrink-0 items-center justify-center rounded-full bg-line-soft text-[12px] font-semibold text-blue">
             {i + 1}
           </span>

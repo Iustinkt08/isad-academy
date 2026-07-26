@@ -1,5 +1,8 @@
 import Link from 'next/link';
 
+import type { Locale } from '@/lib/i18n/config';
+import { getDictionary } from '@/lib/i18n/dictionaries';
+
 /**
  * CourseCard — cardul de curs din catalog, v2 RESPONSIVE.
  * ÎNLOCUIEȘTE vechiul CourseCard.tsx. 1:1 cu Figma 3732-7 (desktop) și
@@ -29,13 +32,16 @@ export type CatalogCourse = {
 };
 
 export default function CourseCard({
+  locale,
   course,
   active = false,
 }: {
+  locale: Locale;
   course: CatalogCourse;
   /** true pe mobil pentru cardul snapped — aprinde glow-ul (echivalentul hover-ului) */
   active?: boolean;
 }) {
+  const t = getDictionary(locale).catalog;
   return (
     <article
       data-testid="course-card"
@@ -69,7 +75,7 @@ export default function CourseCard({
         href={course.href}
         className="absolute left-[40px] top-[348px] rounded-[20px] bg-black px-4 py-2 text-[14px] font-semibold leading-normal text-white shadow-[0_0_0_1px_rgba(255,255,255,0.2),4px_6px_25px_rgba(0,0,0,0.25),8px_10px_45px_rgba(0,0,0,0.2),12px_15px_70px_rgba(0,0,0,0.15)] transition-transform hover:scale-[1.03]"
       >
-        View course
+        {t.viewCourse}
       </Link>
     </article>
   );

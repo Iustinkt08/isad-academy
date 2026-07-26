@@ -17,6 +17,8 @@
 'use client';
 
 import { useRef, useState } from 'react';
+import type { Locale } from '@/lib/i18n/config';
+import { getDictionary } from '@/lib/i18n/dictionaries';
 import CourseCard, { type CatalogCourse } from './CourseCard';
 
 const LAUNCH_COURSES: CatalogCourse[] = [
@@ -59,10 +61,13 @@ const CARD_W = 347.52;
 const MOBILE_GAP = 12;
 
 export default function CatalogGrid({
+  locale,
   courses = LAUNCH_COURSES,
 }: {
+  locale: Locale;
   courses?: CatalogCourse[];
 }) {
+  const t = getDictionary(locale).catalog;
   const [asc, setAsc] = useState(true);
   const scrollerRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -93,14 +98,14 @@ export default function CatalogGrid({
           site-ului (max-w-6xl + px-8 = linia navbar/landing) */}
       <div className="flex w-full max-w-[350px] items-center justify-between pb-8 lg:max-w-6xl lg:px-8 lg:pb-5">
         <p className="text-[14px] font-medium tracking-[-0.3px] text-[#959595]">
-          {courses.length} upcoming courses
+          {t.upcomingCount(courses.length)}
         </p>
         <button
           onClick={() => setAsc(!asc)}
           className="rounded-[999px] border border-[#e6e6e6] bg-white px-4 py-2 text-[14px] font-medium tracking-[-0.3px] text-[#222222] transition-colors hover:border-[#bdbdbd]"
         >
           {/* pe mobil fără săgeată (designul owner-ului); pe desktop cu direcție */}
-          Sort: Start date<span className="hidden lg:inline"> {asc ? '↓' : '↑'}</span>
+          {t.sortLabel}<span className="hidden lg:inline"> {asc ? '↓' : '↑'}</span>
         </button>
       </div>
 
@@ -114,7 +119,12 @@ export default function CatalogGrid({
             vizual cu linia containerului standard (1152 − 2×32 padding) */}
         <div className="flex w-max gap-3 pl-[21px] pr-[10px] lg:mx-auto lg:w-auto lg:max-w-[1103px] lg:flex-wrap lg:justify-center lg:gap-[30px] lg:p-0">
           {sorted.map((course, i) => (
-            <CourseCard key={course.title} course={course} active={i === activeIndex} />
+            <CourseCard
+              key={course.title}
+              locale={locale}
+              course={course}
+              active={i === activeIndex}
+            />
           ))}
         </div>
       </div>
@@ -123,7 +133,7 @@ export default function CatalogGrid({
       <div
         className="mt-4 flex items-center justify-center gap-[7px] lg:hidden"
         role="tablist"
-        aria-label="Courses"
+        aria-label={t.dotsAria}
       >
         {sorted.map((course, i) => (
           <button
@@ -132,12 +142,18 @@ export default function CatalogGrid({
             aria-selected={i === activeIndex}
             aria-label={course.title}
             onClick={() => scrollTo(i)}
-            className={`h-2 rounded-full transition-all duration-300 ${
-              i === activeIndex
-                ? 'w-[22px] bg-gradient-to-r from-[#407ea2] to-[#1c5d99]'
-                : 'w-2 bg-[#d1d1d1] hover:bg-[#b5b5b5]'
+            className={`relative h-2 overflow-hidden rounded-full bg-[#d1d1d1] transition-[width] duration-300 ease-out ${
+              i === activeIndex ? 'w-[22px]' : 'w-2 hover:bg-[#b5b5b5]'
             }`}
-          />
+          >
+            {/* Crossfade-ul gradientului — strat interior cu opacity animat (smooth) */}
+            <span
+              aria-hidden="true"
+              className={`absolute inset-0 rounded-full bg-gradient-to-r from-[#407ea2] to-[#1c5d99] transition-opacity duration-300 ${
+                i === activeIndex ? 'opacity-100' : 'opacity-0'
+              }`}
+            />
+          </button>
         ))}
       </div>
     </section>

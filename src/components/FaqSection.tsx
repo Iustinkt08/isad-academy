@@ -12,10 +12,9 @@ import { Reveal } from './ui/Reveal'
  * 1:1 from the owner's Figma extract (node 3742:22). Mounted on the homepage AFTER
  * TestimonialsSection. Client component: category tabs + single-open accordion.
  *
- * Content = the 12 Q&A written for the dashboard (faq-content.md), included as defaults —
- * no CMS wiring yet (owner, 2026-07-13). When the Payload `faqItems` collection gains a
- * `category` select (Getting started / Courses & certification / Payments & practical
- * details), pass the items in as props.
+ * Content = CMS-driven via the Payload `faqItems` collection (passed in as `items`), with
+ * the dictionary Q&A as fallback. Category tabs (owner 2026-07-25): Discover / Learn /
+ * Validate / Access — the same keys as the collection's `category` select.
  *
  * Tokens mapped to globals.css (blue/steel/ink/grey-600/ice/line-soft/surface-subtle,
  * rounded-full, text-gradient-brand) — no new hex values; the title clamps below desktop
@@ -28,20 +27,21 @@ export default function FaqSection({ items, locale }: { items?: FaqEntry[]; loca
   const dict = getDictionary(locale)
   const t = dict.faqSection
   const categoryLabels = dict.home.faqCategories
-  // The 12 fallback Q&A live in the dictionary (RO/EN site); category keys map to the same
+  // The fallback Q&A live in the dictionary (RO/EN site); category keys map to the same
   // tab labels the page uses for CMS items, so filtering stays consistent either way.
   const fallback: FaqEntry[] = t.items.map((item: { q: string; a: string; category: string }) => ({
     q: item.q,
     a: item.a,
     category:
-      categoryLabels[item.category as keyof typeof categoryLabels] ??
-      categoryLabels.gettingStarted,
+      categoryLabels[item.category as keyof typeof categoryLabels] ?? categoryLabels.discover,
   }))
+  // Journey-shaped tabs (owner 2026-07-25): Discover → Learn → Validate → Access.
   const categories = [
     t.allQuestions,
-    categoryLabels.gettingStarted,
-    categoryLabels.coursesCertification,
-    categoryLabels.paymentsPractical,
+    categoryLabels.discover,
+    categoryLabels.learn,
+    categoryLabels.validate,
+    categoryLabels.access,
   ]
 
   const list = items && items.length > 0 ? items : fallback
@@ -64,7 +64,7 @@ export default function FaqSection({ items, locale }: { items?: FaqEntry[]; loca
         id="faq-heading"
         className="text-center text-[clamp(32px,4vw,48px)] font-semibold leading-normal tracking-[-1.4px] text-ink"
       >
-        {t.headingLead} <span className="text-gradient-brand">{t.headingHighlight}</span>
+        {t.headingLead} <span className="text-gradient-brand">{t.headingHighlight}</span>{'.'}
       </h2>
       <p className="text-center text-[16px] text-grey-600">{t.sub}</p>
 
@@ -93,8 +93,10 @@ export default function FaqSection({ items, locale }: { items?: FaqEntry[]; loca
         })}
       </div>
 
-      {/* Accordion — 800px, one item open at a time */}
-      <div className="flex w-[800px] max-w-full flex-col gap-3 pt-3">
+      {/* Accordion — 800px, one item open at a time. `key={category}` remontează lista la
+          schimbarea tabului, iar animate-rise (fade + ridicare) îndulcește tranziția
+          (owner 2026-07-26); reduced-motion e tratat global în tokens.css. */}
+      <div key={category} className="animate-rise flex w-[800px] max-w-full flex-col gap-3 pt-3">
         {visible.map((item, index) => {
           const open = index === openIndex
           return (

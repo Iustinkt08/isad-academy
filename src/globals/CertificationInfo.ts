@@ -13,6 +13,7 @@ import { revalidateSiteHook } from '../lib/revalidateSite'
 export const CertificationInfo: GlobalConfig = {
   slug: 'certificationInfo',
   admin: {
+    group: 'Site',
     description: 'Certification page content. Keep wording conservative (CLAUDE.md §9 R2) — never imply accreditation isad/APCF does not hold.',
   },
   access: {

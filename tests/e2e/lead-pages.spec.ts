@@ -35,7 +35,7 @@ test.describe('contact page', () => {
 
     await expect(page.getByText('Please enter your name.')).toBeVisible()
     await expect(page.getByText('Please enter a valid email address.')).toBeVisible()
-    await expect(page.getByText('Please choose a subject.')).toBeVisible()
+    // Subject became OPTIONAL with the 3977-489 redesign (falls back to "other" server-side)
     await expect(page.getByText('Please enter a message.')).toBeVisible()
     // Focus lands on the first invalid field; aria-invalid marks it for AT
     await expect(page.getByLabel('Full name')).toBeFocused()

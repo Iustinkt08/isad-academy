@@ -342,11 +342,9 @@ export default async function CourseDetailPage({ params }: Args) {
       <Reveal>
         <CourseHeader
           data={{
-            breadcrumb: [
-              dict.nav.courses,
-              isPecbTrack ? 'PECB ISO/IEC 42001' : 'ISAD Academy',
-              course.title,
-            ],
+            // Back la catalog (owner 2026-07-26) — a înlocuit breadcrumb-ul
+            backLabel: t.backToCourses,
+            backHref: localePath(locale, '/cursuri'),
             pillLabel: isPecbTrack ? t.pillPecb : t.pillOwn,
             titlePlain,
             titleGradient,
@@ -359,7 +357,8 @@ export default async function CourseDetailPage({ params }: Args) {
           at lg (max-w-6xl − px-8) — the extract's gap-11 would wrap the aside below. */}
       {/* Mobil (<lg): coloana de înscriere PRIMA (order-1), apoi conținutul — un singur DOM,
           ordinea prin clase (Figma 3925-115). Desktop: neschimbat, aside sticky în dreapta. */}
-      <Container className="flex w-full flex-col gap-5 pb-[60px] lg:flex-row lg:flex-wrap lg:gap-8">
+      {/* px-5: marginile de 20 ale designului mobil (390 → conținut 350; -mx-5 = full-bleed) */}
+      <Container className="flex w-full flex-col gap-5 px-5 pb-[60px] sm:px-5 lg:flex-row lg:flex-wrap lg:gap-8 lg:px-8">
         {/* Content column */}
         <div className="order-2 flex min-w-0 flex-col gap-5 lg:order-1 lg:min-w-[300px] lg:flex-1 lg:basis-[600px] lg:gap-6">
           <Reveal>

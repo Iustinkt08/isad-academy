@@ -13,6 +13,7 @@ export const LegalPages: CollectionConfig = {
   slug: 'legalPages',
   admin: {
     useAsTitle: 'title',
+    group: 'Content',
     defaultColumns: ['title', 'page', 'updatedAt'],
     description:
       'Legal page content (Privacy / Cookie Policy / Delivery Policy / Terms). The "Last updated" tag on the site updates automatically when you save.',

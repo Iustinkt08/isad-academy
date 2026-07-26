@@ -84,18 +84,21 @@ export function HomeHero({
           under the certificate fan and melts to white, smoothing the seam into the next
           section. Ported from Figma (1920 frame) as vw so the arc scales with viewport width;
           painted ABOVE the cards (z-20) so their bases fog into the wash. */}
+      {/* Ancorat de BAZA secțiunii (= baza viewportului, secțiunea are min-h ecran).
+          Porțiunea vizibilă (translateY negativ) e ținută PESTE punctul în care gradientul
+          se topește în alb (20.46% din înălțimea elipsei) — altfel tăietura secțiunii
+          se vede ca o muchie pe albastru (owner 2026-07-26): mobil 26%, desktop 22%. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute left-1/2 top-[75%] z-20 aspect-[2245/1308] w-[min(1500px,140vw)] rounded-[50%] blur-[20px]"
+        className="pointer-events-none absolute left-1/2 top-full z-20 aspect-[2245/1308] w-[220vw] sm:w-[min(1500px,140vw)] -translate-x-1/2 -translate-y-[26%] rotate-[-0.16deg] rounded-[50%] blur-[20px] lg:-translate-y-[22%] xl:[@media(min-height:950px)_and_(max-height:1199px)]:w-[min(1900px,150vw)] xl:[@media(min-height:950px)_and_(max-height:1199px)]:-translate-y-[24%] xl:[@media(min-height:1200px)]:w-[min(2300px,160vw)] xl:[@media(min-height:1200px)]:-translate-y-[26%]"
         style={{
           background:
             'linear-gradient(180.71deg, #1C5D99 -5.99%, #407EA2 6.09%, #FFFFFF 20.46%)',
-          transform: 'translateX(-50%) rotate(-0.16deg)',
         }}
       />
 
       <Container className="flex flex-1 flex-col pt-16 sm:pt-20">
-        <div className="animate-rise mx-auto flex max-w-[800px] flex-col items-center gap-5 text-center">
+        <div className="animate-rise mx-auto mb-10 flex max-w-[800px] flex-col items-center gap-5 text-center">
           {/* Poppins SemiBold, capped at 48px (owner 2026-07-13: scale titles to the
               container, not the 1920 Figma frame); tracking −0.04em scales with the clamp */}
           <h1 className="text-[clamp(2.125rem,4vw+1rem,48px)] font-semibold leading-[1.1] tracking-[-0.04em] text-ink">
@@ -115,11 +118,17 @@ export function HomeHero({
             1920px stage, scaled per breakpoint so the WHOLE fan (1493px of certificates) fits
             inside the content container (owner 2026-07-13: everything within the navbar-logo
             line, nothing bleeding off). The outer div reserves the scaled height. */}
+        {/* mt-auto împinge fan-ul la BAZA viewportului (secțiunea = min-h ecran); gap-ul
+            minim față de CTA vine din mb-10 al blocului de text, iar mb-[max(...)] lasă
+            arcul albastru să se vadă sub cardul central (owner 2026-07-26). */}
         <div
-          className="animate-rise pointer-events-none relative mt-10 h-[230px] w-full sm:h-[255px] md:h-[200px] lg:h-[265px] xl:h-[300px]"
+          className="animate-rise pointer-events-none relative mt-auto h-[230px] w-full mb-[max(24px,9svh)] sm:h-[255px] md:h-[200px] lg:h-[265px] xl:h-[300px] xl:[@media(min-height:950px)_and_(max-height:1199px)]:h-[360px] xl:[@media(min-height:950px)_and_(max-height:1199px)]:mb-[13svh] xl:[@media(min-height:1200px)]:h-[430px] xl:[@media(min-height:1200px)]:mb-[18svh]"
           style={{ animationDelay: '150ms' }}
         >
-          <div className="absolute left-1/2 top-0 origin-top -translate-x-1/2 scale-[0.55] sm:scale-[0.62] md:scale-[0.48] lg:scale-[0.64] xl:scale-[0.72]">
+          {/* Trepte pe ÎNĂLȚIMEA viewportului (owner 2026-07-26, monitoare înalte/ultrawide):
+              certificatele cresc odată cu ecranul — 0.85 de la 950px înălțime, 1:1 de la
+              1200px (doar pe xl, ca fan-ul de 1493px să nu dea pe-afară pe tablete). */}
+          <div className="absolute left-1/2 top-0 origin-top -translate-x-1/2 scale-[0.55] sm:scale-[0.62] md:scale-[0.48] lg:scale-[0.64] xl:scale-[0.72] xl:[@media(min-height:950px)_and_(max-height:1199px)]:scale-[0.85] xl:[@media(min-height:1200px)]:scale-100">
             <div className="relative h-[600px] w-[1920px]">
               {/* Left certificate — fans out from behind the centre card (fade + blur) */}
               <div className="animate-fan-left absolute left-1/2 top-[41px] hidden -translate-x-[calc(50%+488px)] scale-[0.834] blur-[4px] [animation-delay:500ms] md:block">

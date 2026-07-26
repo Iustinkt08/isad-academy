@@ -21,6 +21,7 @@ export const Reviews: CollectionConfig = {
   slug: 'reviews',
   admin: {
     useAsTitle: 'authorName',
+    group: 'Content',
     defaultColumns: ['authorName', 'course', 'source', 'showOnHome'],
     description: 'Testimonials. No rating — curate homepage placement with "Show on home" (max 5 shown).',
   },

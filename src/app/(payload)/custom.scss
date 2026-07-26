@@ -177,3 +177,208 @@ html[data-theme='dark'] {
     }
   }
 }
+
+/* ---- Sidebar brand lockup (admin.components.beforeNavLinks — NavLogo.tsx). Reuses the
+   .isad-admin-logo--light/--dark theme-swap classes; the global `--dark { display: none }`
+   rule above hides the white icon on light, and the scoped override below flips it. ---- */
+.isad-nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+  text-decoration: none;
+
+  img {
+    width: 22px;
+    height: auto;
+  }
+
+  .isad-nav-logo__wordmark {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+    color: var(--theme-text);
+  }
+}
+
+html[data-theme='dark'] .isad-nav-logo {
+  .isad-admin-logo--light {
+    display: none;
+  }
+
+  .isad-admin-logo--dark {
+    display: inline-block;
+  }
+}
+
+/* ---- Dashboard widgets (admin.components.beforeDashboard — AdminDashboard.tsx).
+   Driven by Payload theme variables so cards read correctly on light AND dark. NOTE:
+   this project rebrands the --theme-success-* ramp to brand blue (accent, top of file),
+   so the "confirmed" chip carries its own literal green; the warning/error ramps are
+   Payload's own (untouched by the brand overlay) and flip automatically on dark. ---- */
+.isad-dash {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-bottom: 2.5rem;
+}
+
+.isad-dash__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.625rem;
+}
+
+.isad-dash__action {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1.05rem;
+  border-radius: 9999px;
+  background: #1c5d99; /* brand Deep Blue — white labels pass contrast (6.83:1) */
+  color: #fff;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.15s ease;
+
+  &:hover,
+  &:focus-visible {
+    background: #407ea2;
+    color: #fff;
+  }
+}
+
+.isad-dash__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.isad-dash__card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding: 1rem 1.15rem;
+  border: 1px solid var(--theme-elevation-100);
+  border-radius: var(--style-radius-m);
+  background: var(--theme-elevation-50);
+}
+
+.isad-dash__card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.isad-dash__card-title {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--theme-text);
+}
+
+.isad-dash__count {
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: var(--theme-elevation-600);
+}
+
+.isad-dash__view-all {
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  color: var(--theme-elevation-600);
+  text-decoration: none;
+
+  &:hover,
+  &:focus-visible {
+    color: var(--theme-text);
+    text-decoration: underline;
+  }
+}
+
+.isad-dash__rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.isad-dash__row {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.45rem 0;
+  border-top: 1px solid var(--theme-elevation-100);
+  font-size: 0.8125rem;
+  color: var(--theme-text);
+
+  &:first-child {
+    border-top: 0;
+  }
+}
+
+.isad-dash__row-main {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.isad-dash__row-meta {
+  flex-shrink: 0;
+  color: var(--theme-elevation-600);
+  font-variant-numeric: tabular-nums;
+}
+
+.isad-dash__empty {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--theme-elevation-600);
+}
+
+.isad-dash__big {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--theme-text);
+}
+
+.isad-dash__chip {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  padding: 0.14rem 0.55rem;
+  border-radius: 9999px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.isad-dash__chip--neutral {
+  background: var(--theme-elevation-100);
+  color: var(--theme-elevation-700);
+}
+
+.isad-dash__chip--warning {
+  background: var(--theme-warning-100);
+  color: var(--theme-warning-700);
+}
+
+.isad-dash__chip--error {
+  background: var(--theme-error-100);
+  color: var(--theme-error-700);
+}
+
+/* success = literal green — the --theme-success ramp is the brand-blue accent here */
+.isad-dash__chip--success {
+  background: #e2f3e8;
+  color: #1d7a3d;
+}
+
+html[data-theme='dark'] .isad-dash__chip--success {
+  background: #123222;
+  color: #6bd695;
+}

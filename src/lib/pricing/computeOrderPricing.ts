@@ -51,8 +51,11 @@ const validateCode = (code: PricingCodeInput, now: Date): InvalidCodeDetail | nu
  * results the caller (checkout API / UI, T6) must handle explicitly; checkout must never
  * silently ignore a bad code (CLAUDE.md instruction).
  */
+/** Owner decision (2026-07-25): codes stack, capped at TWO per order. */
+export const MAX_DISCOUNT_CODES = 2
+
 export const computeOrderPricing = (input: ComputeOrderPricingInput): ComputeOrderPricingResult => {
-  const { windows, quantity, code, isMember = false, policy, now } = input
+  const { windows, quantity, code, codes, isMember = false, policy, now } = input
   const memberDiscountPercent = input.memberDiscountPercent ?? DEFAULT_MEMBER_DISCOUNT_PERCENT
 
   if (!Number.isFinite(quantity) || !Number.isInteger(quantity) || quantity < 1) {
@@ -64,17 +67,30 @@ export const computeOrderPricing = (input: ComputeOrderPricingInput): ComputeOrd
     return { ok: false, reason: 'noActiveWindow' }
   }
 
-  const validCode = code ?? null
-  if (validCode) {
-    const invalidDetail = validateCode(validCode, now)
+  // `codes` (new, ordered list) takes precedence; the legacy single `code` keeps working.
+  const validCodes = codes ?? (code ? [code] : [])
+
+  if (validCodes.length > MAX_DISCOUNT_CODES) {
+    return { ok: false, reason: 'tooManyCodes' }
+  }
+
+  const seenCodes = new Set<string>()
+  for (const candidate of validCodes) {
+    const normalized = candidate.code.trim().toUpperCase()
+    if (seenCodes.has(normalized)) {
+      return { ok: false, reason: 'invalidCode', detail: 'duplicate', codeValue: candidate.code }
+    }
+    seenCodes.add(normalized)
+
+    const invalidDetail = validateCode(candidate, now)
     if (invalidDetail) {
-      return { ok: false, reason: 'invalidCode', detail: invalidDetail }
+      return { ok: false, reason: 'invalidCode', detail: invalidDetail, codeValue: candidate.code }
     }
   }
 
   // A valid `type: 'member'` code grants member pricing even when the buyer didn't
   // otherwise qualify (CLAUDE.md §4: "codul de tip member acordă și prețul de membru").
-  const effectiveMember = isMember || validCode?.type === 'member'
+  const effectiveMember = isMember || validCodes.some((c) => c.type === 'member')
 
   const subtotal = selected.price * quantity
 
@@ -83,8 +99,16 @@ export const computeOrderPricing = (input: ComputeOrderPricingInput): ComputeOrd
     subtotal,
     group: { applicable: quantity >= GROUP_MIN_QUANTITY, percent: clampPercent(GROUP_DISCOUNT_PERCENT) },
     member: { applicable: effectiveMember, percent: clampPercent(memberDiscountPercent) },
-    code: { applicable: Boolean(validCode), percent: clampPercent(validCode?.percentage ?? 0) },
+    codes: validCodes.map((c) => ({ applicable: true, percent: clampPercent(c.percentage) })),
   })
+
+  // Prefer the Payload doc id (T6 persists this as the `discountCodes` relationship
+  // and increments `usageCount` off it); fall back to the human-readable code string
+  // so an ad-hoc/test input without an `id` never silently drops the applied code.
+  const codeLines = validCodes.map((c, index) => ({
+    code: c.id ?? c.code,
+    discount: breakdown.codeDiscounts[index] ?? 0,
+  }))
 
   return {
     ok: true,
@@ -93,10 +117,8 @@ export const computeOrderPricing = (input: ComputeOrderPricingInput): ComputeOrd
       appliedWindow: selected.appliedWindow,
       groupDiscount: breakdown.groupDiscount,
       memberDiscount: breakdown.memberDiscount,
-      // Prefer the Payload doc id (T6 persists this as the `discountCodes` relationship
-      // and increments `usageCount` off it); fall back to the human-readable code string
-      // so an ad-hoc/test input without an `id` never silently drops the applied code.
-      code: validCode ? (validCode.id ?? validCode.code) : null,
+      code: codeLines[0]?.code ?? null,
+      codes: codeLines,
       codeDiscount: breakdown.codeDiscount,
       total: breakdown.total,
     },

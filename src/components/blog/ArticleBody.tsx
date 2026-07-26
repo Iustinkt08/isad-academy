@@ -10,7 +10,8 @@ import { resolveTextStateStyle } from '@/lib/richtext/textState'
 import type { DownloadableResourceBlock, LinkChipBlock } from '@/payload-types'
 
 /**
- * Article-body render targets + Lexical renderer — Figma 3838:64 (blog article redesign).
+ * Article-body render targets + Lexical renderer — Figma 3977-687 (desktop ≥lg) /
+ * 3977-718 (mobile <lg), single DOM with responsive classes.
  * A converter set SPECIFIC to the article page: paragraph → ArticleParagraph,
  * h2 → ArticleH2, quote → ArticleBlockquote, linkChip → ArticleLinkChip (external pill,
  * NEVER a video embed), downloadableResource → ArticleResourceCard. Colored text runs
@@ -40,33 +41,34 @@ const fileTypeLabel = (mimeType: string | null | undefined): string | null => {
   return base ? base.toUpperCase() : null
 }
 
-/** Body paragraph — Figma 3839:65: 15.5/27 in #595959. */
+/** Body paragraph — Figma 3977-718 / 3977-687: 14.5/24 mobile → 15.5/27 desktop, #595959. */
 export function ArticleParagraph({ children }: { children: React.ReactNode }) {
   return (
-    <p className="w-full text-[15.5px] leading-[27px] text-[#595959] [word-break:break-word]">
+    <p className="w-full text-[14.5px] leading-6 text-[#595959] [word-break:break-word] lg:text-[15.5px] lg:leading-[27px]">
       {children}
     </p>
   )
 }
 
-/** Section heading — Figma 3839:67: 26/34 Medium, -0.8px tracking, ink. */
+/** Section heading — 20/28 (−0.5) mobile → 26/34 (−0.8) desktop, Medium #222222. */
 export function ArticleH2({ children }: { children: React.ReactNode }) {
   return (
-    <h2 className="w-full text-[26px] font-medium leading-[34px] tracking-[-0.8px] text-[#222222] [word-break:break-word]">
+    <h2 className="w-full text-[20px] font-medium leading-7 tracking-[-0.5px] text-[#222222] [word-break:break-word] lg:text-[26px] lg:leading-[34px] lg:tracking-[-0.8px]">
       {children}
     </h2>
   )
 }
 
-/** Highlighted blockquote — Figma 3839:69: #f6f6f6 panel with a 4px gradient bar. */
+/** Highlighted blockquote — #f6f6f6 panel radius 16, 4px vertical gradient bar
+ * (#407ea2 → #1c5d99, self-stretch), text Medium #222: 14/22 mobile → 17/27 desktop. */
 export function ArticleBlockquote({ children }: { children: React.ReactNode }) {
   return (
-    <blockquote className="flex w-full gap-[20px] rounded-[16px] bg-[#f6f6f6] py-[22px] pl-[24px] pr-[28px]">
+    <blockquote className="flex w-full gap-5 rounded-[16px] bg-[#f6f6f6] py-[22px] pl-6 pr-7">
       <span
         aria-hidden="true"
-        className="w-[4px] shrink-0 self-stretch rounded-[4px] bg-gradient-to-b from-[#407ea2] to-[#1c5d99]"
+        className="w-1 shrink-0 self-stretch rounded-[2px] bg-[linear-gradient(180deg,#407ea2_0%,#1c5d99_100%)]"
       />
-      <p className="flex-1 text-[17px] font-medium leading-[27px] tracking-[-0.3px] text-[#222222] [word-break:break-word]">
+      <p className="flex-1 text-[14px] font-medium leading-[22px] text-[#222222] [word-break:break-word] lg:text-[17px] lg:leading-[27px]">
         {children}
       </p>
     </blockquote>
@@ -210,10 +212,11 @@ export function ArticleRichText({
       data={data as never}
       converters={articleConverters(locale)}
       className={cn(
-        'flex w-full flex-col gap-[20px]',
+        // Column rhythm from the delivered page: 24px between blocks on mobile, 20px ≥lg.
+        'flex w-full flex-col gap-6 lg:gap-5',
         // Prose links are underlined blue accents; pill chips/buttons (data-chip) style themselves.
         '[&_a:not([data-chip])]:font-medium [&_a:not([data-chip])]:text-[#1c5d99] [&_a:not([data-chip])]:underline',
-        '[&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6 [&_li]:mt-1 [&_li]:text-[15.5px] [&_li]:leading-[27px] [&_li]:text-[#595959]',
+        '[&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6 [&_li]:mt-1 [&_li]:text-[14.5px] [&_li]:leading-6 [&_li]:text-[#595959] lg:[&_li]:text-[15.5px] lg:[&_li]:leading-[27px]',
         '[&_h3]:text-[20px] [&_h3]:font-medium [&_h3]:tracking-[-0.5px] [&_h3]:text-[#222222]',
         '[&_img]:h-auto [&_img]:max-w-full [&_img]:rounded-[24px]',
         className,

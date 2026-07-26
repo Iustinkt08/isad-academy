@@ -24,12 +24,13 @@ import type { Locale } from '@/lib/i18n/config'
 import { CODE_INPUT_ID, MAX_SEATS } from './constants'
 
 export const inputCls =
-  'w-full rounded-[14px] border bg-white px-[16px] py-[12px] text-[14px] text-ink placeholder:text-grey-600 focus:border-[#bdbdbd] focus:outline-none lg:px-[18px] lg:py-[13px] lg:text-[15px]'
+  'w-full rounded-[12px] border bg-white px-3.5 py-3 text-[13.5px] leading-[19px] text-ink placeholder:text-[#959595] focus:border-[#bdbdbd] focus:outline-none lg:rounded-[14px] lg:px-[18px] lg:py-[13px] lg:text-[15px] lg:leading-normal lg:placeholder:text-grey-600'
 
 /** Borderless card lifted by drop shadow only — no stroke anywhere (style v3).
- *  v2 responsive: padding 24 + gap 16 pe mobil (Figma 3932-118), desktop neschimbat. */
+ *  v3 responsive (Figma 3977-251): pe mobil padding 24 + gap 12, umbră
+ *  3px 9px 24px rgba(77,77,77,0.04); desktop (≥lg) neschimbat. */
 const cardCls =
-  'flex w-full flex-col gap-4 rounded-[24px] bg-white px-6 py-6 shadow-[0_10px_40px_rgba(77,77,77,0.06),0_2px_8px_rgba(77,77,77,0.03)] lg:gap-5 lg:px-[46px] lg:py-10'
+  'flex w-full flex-col gap-3 rounded-[24px] bg-white p-6 shadow-[3px_9px_24px_rgba(77,77,77,0.04)] lg:gap-5 lg:px-[46px] lg:py-10 lg:shadow-[0_10px_40px_rgba(77,77,77,0.06),0_2px_8px_rgba(77,77,77,0.03)]'
 
 const textLinkCls =
   'text-[14px] font-medium text-grey-600 underline underline-offset-2 hover:text-ink'
@@ -73,7 +74,7 @@ function TextField({
         autoComplete={autoComplete}
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? `${id}-error` : undefined}
-        className={`${inputCls} ${error ? 'border-red-400' : 'border-line'}`}
+        className={`${inputCls} ${error ? 'border-red-400' : 'border-[#e6e6e6] lg:border-line'}`}
       />
       {error && (
         <p id={`${id}-error`} role="alert" className="mt-1.5 text-[13px] font-medium text-red-700">
@@ -106,39 +107,48 @@ export function EditionSummaryCard({
   const t = getDictionary(locale).checkout
   return (
     <section className={cardCls}>
-      <div className="flex flex-col gap-1">
-        <p className="text-[12px] font-medium tracking-[0.2px] text-grey-600 lg:text-[14px] lg:font-normal lg:tracking-normal">
+      <div className="flex flex-col gap-3 lg:gap-1">
+        <p className="text-[12px] font-medium tracking-[0.2px] text-[#959595] lg:text-[14px] lg:font-normal lg:tracking-normal lg:text-grey-600">
           {t.yourEdition}
         </p>
         <h2 className="text-[20px] font-medium leading-[28px] tracking-[-0.5px] text-ink lg:text-[24px] lg:leading-normal lg:tracking-[-0.8px]">
           {course}
         </h2>
-        <p className="text-[14px] leading-[21px] text-ink lg:text-[16px] lg:leading-normal">
+        <p className="text-[14px] leading-[21px] text-[#595959] lg:text-[16px] lg:leading-normal lg:text-ink">
           {track}
         </p>
       </div>
 
-      {/* Start-date chip — white pill lifted by drop shadow, no stroke (style v3) */}
       {startDateLabel && (
-        <span className="flex w-fit items-center gap-2 rounded-full bg-white px-4 py-1.5 shadow-[0_2px_10px_rgba(77,77,77,0.10)]">
-          <span aria-hidden className="size-2.5 rounded-full bg-gradient-to-b from-blue to-steel" />
-          <span className="text-[14px] font-medium tracking-[-0.56px] text-ink">
-            {t.startDateChip(startDateLabel)}
+        <>
+          {/* Mobil (Figma 3977-251): UN pill cu inel gradient — interior px-4 py-1, text 14 Medium */}
+          <span className="w-fit shrink-0 rounded-[999px] bg-[linear-gradient(90deg,#1c5d99_0%,#46d3f6_25%,#1c5d99_50%,#46d3f6_75%,#1c5d99_100%)] p-[3px] lg:hidden">
+            <span className="flex items-center whitespace-nowrap rounded-[999px] bg-white px-4 py-1 text-[14px] font-medium leading-[21px] text-[#222222]">
+              {t.startDateChip(startDateLabel)}
+            </span>
           </span>
-        </span>
+          {/* Desktop — chip-ul alb existent (drop shadow, fără stroke — style v3), neschimbat */}
+          <span className="hidden w-fit items-center gap-2 rounded-full bg-white px-4 py-1.5 shadow-[0_2px_10px_rgba(77,77,77,0.10)] lg:flex">
+            <span aria-hidden className="size-2.5 rounded-full bg-gradient-to-b from-blue to-steel" />
+            <span className="text-[14px] font-medium tracking-[-0.56px] text-ink">
+              {t.startDateChip(startDateLabel)}
+            </span>
+          </span>
+        </>
       )}
 
-      <hr className="border-line" />
+      <hr className="border-[#ececec] lg:border-line" />
 
       <div className="flex flex-wrap items-center justify-between gap-2">
+        {/* Textul de seats — DOAR pe desktop (scos de owner din designul mobil) */}
         {seatsLeft != null && seatsLeft < seatsThreshold && (
-          <p className="text-[13px] font-medium tracking-[-0.4px] text-blue lg:text-[14px] lg:tracking-[-0.56px]">
+          <p className="hidden text-[14px] font-medium tracking-[-0.56px] text-blue lg:block">
             {t.seatsLeft(seatsLeft)}
           </p>
         )}
         <Link
           href={courseHref}
-          className="ml-auto text-[13.5px] font-medium text-grey-600 hover:text-blue lg:text-[14px]"
+          className="ml-auto text-[13.5px] font-medium text-[#1c5d99] hover:text-[#407ea2] lg:text-[14px] lg:text-grey-600 lg:hover:text-blue"
         >
           {t.changeEdition}
         </Link>
@@ -213,8 +223,8 @@ export function ParticipantsCard({
         </div>
       </div>
 
-      {/* Textul de discount — pe MOBIL sub titlu, full-width (nod separat, Figma 3932-118) */}
-      <p className="-mt-1 text-[13px] leading-[19px] text-[#595959] lg:hidden">
+      {/* Textul de discount — pe MOBIL sub titlu, full-width (nod separat, Figma 3977-251) */}
+      <p className="text-[13px] leading-[19px] text-[#595959] lg:hidden">
         <span className="font-medium text-[#2e8c57]">{t.groupDiscountNoteAccent}</span>{' '}
         {t.groupDiscountNoteRest}
       </p>
@@ -236,10 +246,10 @@ export function ParticipantsCard({
             data-testid="participant-fields"
             className="flex items-start gap-2.5 lg:gap-3"
           >
-            {/* Bulina numerotată — pe mobil lângă COLOANA de input-uri (albastră, 26px) */}
+            {/* Bulina numerotată — pe mobil aliniată SUS, lângă COLOANA de input-uri (albastră, 26px) */}
             <span
               aria-hidden
-              className="mt-2 flex size-[26px] shrink-0 items-center justify-center rounded-full bg-line-soft text-[12px] font-semibold text-[#1c5d99] lg:mt-[9px] lg:size-8 lg:text-[13px] lg:text-ink"
+              className="flex size-[26px] shrink-0 items-center justify-center rounded-full bg-line-soft text-[12px] font-semibold text-[#1c5d99] lg:mt-[9px] lg:size-8 lg:text-[13px] lg:text-ink"
             >
               {index + 1}
             </span>
@@ -327,12 +337,12 @@ export function BillingCard({
           <h2 className="text-[18px] font-medium leading-[26px] tracking-[-0.5px] text-ink lg:text-[20px] lg:leading-normal lg:tracking-[-0.8px]">
             {t.billingTitle}
           </h2>
-          <p className="pt-1 text-[13px] leading-[19px] text-grey-600 lg:text-[14px] lg:leading-normal">
+          <p className="pt-1 text-[13px] leading-[19px] text-[#595959] lg:text-[14px] lg:leading-normal lg:text-grey-600">
             {t.billingNote}
           </p>
         </div>
-        {/* Segmented toggle — the active option has a gradient FILL, never a stroke */}
-        <div className="flex rounded-full bg-line-soft p-1 lg:p-1.5">
+        {/* Segmented toggle — mobil: activ ALBASTRU PLIN #1c5d99; desktop: gradient FILL (neschimbat) */}
+        <div className="flex rounded-full bg-line-soft p-[3px] lg:p-1.5">
           {[
             { label: t.individual, company: false },
             { label: t.company, company: true },
@@ -346,8 +356,8 @@ export function BillingCard({
                 onClick={() => onTypeChange(company)}
                 className={`rounded-full px-4 py-1.5 text-[13px] font-medium lg:py-[7px] lg:text-[14px] ${
                   active
-                    ? 'bg-gradient-to-b from-steel to-blue to-[80%] text-white'
-                    : 'text-grey-600'
+                    ? 'bg-[#1c5d99] text-white lg:bg-gradient-to-b lg:from-steel lg:to-blue lg:to-[80%]'
+                    : 'text-[#595959] lg:text-grey-600'
                 }`}
               >
                 {label}
@@ -358,7 +368,7 @@ export function BillingCard({
       </div>
 
       {/* Mobil: input-urile stivuite; desktop: alături */}
-      <div className="flex flex-col gap-2.5 lg:flex-row lg:gap-3">
+      <div className="flex flex-col gap-3 lg:flex-row">
         <TextField
           id="checkout-buyer-name"
           label={t.fullNameLabel}
@@ -382,7 +392,7 @@ export function BillingCard({
 
       {isCompany ? (
         <>
-          <div className="flex flex-col gap-2.5 lg:flex-row lg:gap-3">
+          <div className="flex flex-col gap-3 lg:flex-row">
             <TextField
               id="checkout-buyer-phone"
               label={t.phoneLabel}
@@ -444,7 +454,8 @@ export function DiscountCodeCard({
   onCodeInputChange,
   onApply,
   applying,
-  appliedCode,
+  appliedCodes,
+  maxCodes,
   codeError,
   onRemoveCode,
   showStackNote,
@@ -454,27 +465,42 @@ export function DiscountCodeCard({
   onCodeInputChange: (value: string) => void
   onApply: () => void
   applying: boolean
-  appliedCode: string | null
+  /** Applied codes in application order — codes stack, max `maxCodes` (owner 2026-07-25). */
+  appliedCodes: string[]
+  maxCodes: number
   codeError: string | null
-  onRemoveCode: () => void
+  onRemoveCode: (code: string) => void
   /** True only under `stackingPolicy: stackAll` (§13, config-driven copy). */
   showStackNote: boolean
 }) {
   const t = getDictionary(locale).checkout
+  const hasApplied = appliedCodes.length > 0
+  const canAddMore = appliedCodes.length < maxCodes
   return (
-    <section className={cardCls}>
-      {appliedCode ? (
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="text-[15px] text-ink">
-            {t.codeAppliedPrefix} <span className="font-semibold">{appliedCode}</span>{' '}
+    <section
+      className={
+        hasApplied
+          ? 'flex w-full flex-col gap-2.5 rounded-[24px] bg-white px-6 py-[22px] shadow-[3px_9px_24px_rgba(77,77,77,0.04)] lg:gap-5 lg:px-[46px] lg:py-10 lg:shadow-[0_10px_40px_rgba(77,77,77,0.06),0_2px_8px_rgba(77,77,77,0.03)]'
+          : cardCls
+      }
+    >
+      {appliedCodes.map((code) => (
+        <div key={code} className="flex flex-wrap items-center justify-between gap-3">
+          <p className="text-[14px] leading-[21px] text-ink lg:text-[15px] lg:leading-normal">
+            {t.codeAppliedPrefix} <span className="font-semibold">{code}</span>{' '}
             {t.codeAppliedSuffix}
           </p>
-          <button type="button" onClick={onRemoveCode} className={textLinkCls}>
+          <button
+            type="button"
+            onClick={() => onRemoveCode(code)}
+            className="shrink-0 text-[13px] font-medium text-[#595959] hover:text-ink lg:text-[14px] lg:text-grey-600 lg:underline lg:underline-offset-2"
+          >
             {t.removeCode}
           </button>
         </div>
-      ) : (
-        <div className="flex items-start gap-3">
+      ))}
+      {canAddMore && (
+        <div className="flex items-start gap-2.5 lg:gap-3">
           <TextField
             id={CODE_INPUT_ID}
             label={t.discountCodeLabel}
@@ -482,7 +508,7 @@ export function DiscountCodeCard({
             onChange={onCodeInputChange}
             placeholder={t.codePlaceholder}
             autoComplete="off"
-            error={codeError ?? undefined}
+            error={!hasApplied ? (codeError ?? undefined) : undefined}
             onKeyDown={(event) => {
               if (event.key === 'Enter') {
                 event.preventDefault()
@@ -494,18 +520,22 @@ export function DiscountCodeCard({
             type="button"
             onClick={onApply}
             disabled={applying}
-            className="shrink-0 rounded-[20px] bg-black px-5 py-[13px] text-[14px] font-semibold text-white transition-transform hover:scale-[1.03] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
+            className="shrink-0 rounded-[20px] bg-black px-4 py-2.5 text-[14px] font-semibold text-white transition-transform hover:scale-[1.03] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100 lg:px-5 lg:py-[13px]"
           >
             {applying ? t.checking : t.apply}
           </button>
         </div>
       )}
-      {appliedCode && codeError && (
+      {hasApplied && codeError && (
         <p role="alert" className="text-[13px] font-medium text-red-700">
           {codeError}
         </p>
       )}
-      {showStackNote && <p className="text-[14px] text-grey-600">{t.stackNote}</p>}
+      {showStackNote && (
+        <p className="text-[13px] leading-[19px] text-[#595959] lg:text-[14px] lg:leading-normal lg:text-grey-600">
+          {t.stackNote}
+        </p>
+      )}
     </section>
   )
 }

@@ -12,6 +12,7 @@ export const CorporateClients: CollectionConfig = {
   slug: 'corporateClients',
   admin: {
     useAsTitle: 'name',
+    group: 'Content',
     defaultColumns: ['name', 'order'],
     description: 'Client logos shown in the /corporate page hero strip.',
   },

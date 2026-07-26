@@ -12,6 +12,7 @@ import { leadMagnetFields } from '../fields/leadMagnet'
 export const Homepage: GlobalConfig = {
   slug: 'homepage',
   admin: {
+    group: 'Site',
     description: 'Homepage content: hero, featured courses, trust stats and newsletter block.',
   },
   access: {

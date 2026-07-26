@@ -146,7 +146,7 @@ async function getHomeData(locale: Locale): Promise<HomeData> {
         a: lexicalToPlainText(item.answer),
         category:
           faqCategoryLabels[(item.category ?? '') as keyof typeof faqCategoryLabels] ??
-          faqCategoryLabels.gettingStarted,
+          faqCategoryLabels.discover,
       }))
 
     return {
@@ -204,7 +204,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       />
       {/* Mobile counterpart — same section, Figma-exact card carousel (lg:hidden;
           desktop showcase above is hidden lg:block). Owner Figma 3858-2991 / 3781-19 */}
-      <WhySectionMobile />
+      <WhySectionMobile locale={locale} />
 
       {/* 2 — Explore our upcoming courses (curated via homepage.featuredCourses; owner
           Figma design 2026-07-12, node 3690-2902 — replaces the old FeaturedCoursesSection) */}

@@ -9,7 +9,7 @@ export default function BlogHeader({ locale }: { locale: Locale }) {
   const t = getDictionary(locale).blog
 
   return (
-    <header className="flex flex-col items-center gap-5 px-4 pb-12 pt-[150px] text-center">
+    <header className="flex flex-col items-center gap-5 px-4 pb-12 pt-20 text-center">
       <h1 className="text-[clamp(34px,4.2vw,56px)] font-semibold leading-tight tracking-[-1.7px] text-ink">
         {t.headerTitlePlain}{' '}
         <span className="text-gradient-brand tracking-[-2px]">{t.headerTitleGradient}</span>

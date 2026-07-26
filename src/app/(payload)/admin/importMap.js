@@ -30,6 +30,8 @@ import { BlocksFeatureClient as BlocksFeatureClient_e70f5e05f09f93e00b997edb1ef0
 import { TextStateFeatureClient as TextStateFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { Icon as Icon_dfe4008080d895d460898c3a6155e9ba } from '../../../components/admin/Icon'
 import { Logo as Logo_91a09b539d3c86b0aebf520e7564ce08 } from '../../../components/admin/Logo'
+import { AdminDashboard as AdminDashboard_0171ae121c3d9523aafb7bdbec1300c5 } from '../../../components/admin/AdminDashboard'
+import { NavLogo as NavLogo_62fd1b684515cecb7439e1dd363f1096 } from '../../../components/admin/NavLogo'
 import { LoginView as LoginView_249db7119b96b4d9f8230bf9c6fe37f4 } from '../../../components/admin/views/LoginView'
 import { CreateFirstUserView as CreateFirstUserView_8e03725038cc339ee8882db66ef1ce1c } from '../../../components/admin/views/CreateFirstUserView'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
@@ -68,6 +70,8 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#TextStateFeatureClient": TextStateFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "/components/admin/Icon#Icon": Icon_dfe4008080d895d460898c3a6155e9ba,
   "/components/admin/Logo#Logo": Logo_91a09b539d3c86b0aebf520e7564ce08,
+  "/components/admin/AdminDashboard#AdminDashboard": AdminDashboard_0171ae121c3d9523aafb7bdbec1300c5,
+  "/components/admin/NavLogo#NavLogo": NavLogo_62fd1b684515cecb7439e1dd363f1096,
   "/components/admin/views/LoginView#LoginView": LoginView_249db7119b96b4d9f8230bf9c6fe37f4,
   "/components/admin/views/CreateFirstUserView#CreateFirstUserView": CreateFirstUserView_8e03725038cc339ee8882db66ef1ce1c,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1

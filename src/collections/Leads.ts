@@ -12,9 +12,11 @@ export const Leads: CollectionConfig = {
   slug: 'leads',
   admin: {
     useAsTitle: 'name',
+    group: 'Sales',
     defaultColumns: ['type', 'name', 'email', 'createdAt'],
     description: 'Contact + Corporate form submissions. Public create only — read/update/delete are admin-only.',
   },
+  defaultSort: '-createdAt',
   access: {
     read: isAdmin,
     create: () => true,

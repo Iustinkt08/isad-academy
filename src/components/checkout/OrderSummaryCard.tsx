@@ -61,13 +61,18 @@ function SummaryLine({
 }) {
   return (
     <div className="flex items-center justify-between gap-3">
-      <span className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-0.5 text-[14px] leading-[21px] text-ink lg:text-[15px]">
+      {/* Rândul de cod (are onRemove): pe mobil etichetă 13/20 + „Remove code" inline 12 Medium #595959 */}
+      <span
+        className={`flex min-w-0 flex-wrap items-center gap-x-2 gap-y-0.5 text-ink lg:text-[15px] ${
+          onRemove ? 'text-[13px] leading-5 lg:leading-[21px]' : 'text-[14px] leading-[21px]'
+        }`}
+      >
         {label}
         {onRemove && (
           <button
             type="button"
             onClick={onRemove}
-            className="text-[12px] font-semibold text-grey-600 underline underline-offset-2 hover:text-ink"
+            className="text-[12px] font-medium leading-[18px] text-[#595959] hover:text-ink lg:font-semibold lg:leading-normal lg:text-grey-600 lg:underline lg:underline-offset-2"
           >
             {removeLabel}
           </button>
@@ -93,7 +98,7 @@ export default function OrderSummaryCard({
   vatDisplay,
   updating,
   fallback,
-  codeLabel,
+  codes,
   onRemoveCode,
   generalError,
   soldOut,
@@ -111,8 +116,9 @@ export default function OrderSummaryCard({
   updating: boolean
   /** True when the quote endpoint failed and the snapshot is a client-side, code-less estimate. */
   fallback: boolean
-  codeLabel: string | null
-  onRemoveCode?: () => void
+  /** One row per applied code (max 2, application order) — label + that code's discount. */
+  codes: { label: string; discount: number }[]
+  onRemoveCode?: (code: string) => void
   generalError: string | null
   soldOut: boolean
   courseHref: string
@@ -124,7 +130,7 @@ export default function OrderSummaryCard({
   return (
     <div
       data-testid="order-summary"
-      className="flex w-full flex-col gap-3.5 rounded-[24px] bg-white px-6 py-[26px] shadow-[0_10px_44px_rgba(77,77,77,0.07),0_2px_8px_rgba(77,77,77,0.03)] lg:gap-4 lg:px-[42px] lg:py-10"
+      className="flex w-full flex-col gap-3.5 rounded-[24px] bg-white px-6 py-[26px] shadow-[3px_9px_24px_rgba(77,77,77,0.04)] lg:gap-4 lg:px-[42px] lg:py-10 lg:shadow-[0_10px_44px_rgba(77,77,77,0.07),0_2px_8px_rgba(77,77,77,0.03)]"
     >
       <h2 className="text-[18px] font-medium leading-[26px] tracking-[-0.5px] text-ink lg:text-[20px] lg:leading-normal lg:tracking-[-0.8px]">
         {t.orderSummary}
@@ -134,10 +140,12 @@ export default function OrderSummaryCard({
         <p className="text-[15px] font-medium leading-[22px] tracking-[-0.3px] text-ink">
           {course}
         </p>
-        <p className="pt-0.5 text-[13px] leading-[19px] text-grey-600">{editionLabel}</p>
+        <p className="pt-0.5 text-[13px] leading-[19px] text-[#959595] lg:text-grey-600">
+          {editionLabel}
+        </p>
       </div>
 
-      <hr className="border-line" />
+      <hr className="border-[#ececec] lg:border-line" />
 
       <p aria-live="polite" className="sr-only">
         {updating ? t.updatingPrice : ''}
@@ -146,7 +154,7 @@ export default function OrderSummaryCard({
       {pricing ? (
         <div
           data-testid="pricing-breakdown"
-          className={`flex flex-col gap-4 ${updating ? 'opacity-60' : ''}`}
+          className={`flex flex-col gap-3.5 lg:gap-4 ${updating ? 'opacity-60' : ''}`}
         >
           <SummaryLine
             label={t.seatsLine(quantity, t.windowNames[pricing.appliedWindow])}
@@ -166,14 +174,18 @@ export default function OrderSummaryCard({
               value={`−${formatPrice(pricing.memberDiscount, currency)}`}
             />
           )}
-          {pricing.codeDiscount > 0 && (
-            <SummaryLine
-              discount
-              label={codeLabel ? t.codeLine(codeLabel) : t.discountCode}
-              value={`−${formatPrice(pricing.codeDiscount, currency)}`}
-              onRemove={onRemoveCode}
-              removeLabel={t.removeCode}
-            />
+          {/* One row per applied code — codes stack, max 2 (owner 2026-07-25) */}
+          {codes.map((code) =>
+            code.discount > 0 ? (
+              <SummaryLine
+                key={code.label}
+                discount
+                label={t.codeLine(code.label)}
+                value={`−${formatPrice(code.discount, currency)}`}
+                onRemove={onRemoveCode ? () => onRemoveCode(code.label) : undefined}
+                removeLabel={t.removeCode}
+              />
+            ) : null,
           )}
         </div>
       ) : (
@@ -186,17 +198,17 @@ export default function OrderSummaryCard({
         </p>
       )}
 
-      <hr className="border-line" />
+      <hr className="border-[#ececec] lg:border-line" />
 
       <div className="flex items-center justify-between gap-3">
-        <span className="text-[17px] font-semibold tracking-[-0.4px] text-ink lg:text-[18px]">
+        <span className="text-[17px] font-semibold leading-[25px] tracking-[-0.4px] text-ink lg:text-[18px] lg:leading-normal">
           {t.total}
         </span>
-        <span className="shrink-0 text-[20px] font-semibold tracking-[-0.5px] text-ink lg:text-[22px]">
+        <span className="shrink-0 text-[20px] font-semibold leading-[28px] tracking-[-0.5px] text-ink lg:text-[22px] lg:leading-normal">
           {pricing ? formatPrice(pricing.total, currency) : '—'}
         </span>
       </div>
-      <p className="text-[12px] text-grey-600">
+      <p className="text-[12px] leading-[18px] text-[#959595] lg:leading-normal lg:text-grey-600">
         {vatDisplay === 'excl' ? t.vatNotRegistered : t.vatIncluded}
       </p>
 
@@ -223,7 +235,7 @@ export default function OrderSummaryCard({
       <button
         type="submit"
         disabled={submitting || soldOut || !pricing}
-        className="rounded-full bg-gradient-to-b from-steel to-blue to-[80%] pb-3.5 pt-[13px] text-center text-[16px] font-medium text-white shadow-[0_4px_4px_-2px_rgba(0,0,0,0.21)] transition-transform hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
+        className="w-full rounded-full bg-gradient-to-b from-steel to-blue to-[80%] pb-3.5 pt-[13px] text-center text-[16px] font-medium text-white shadow-[0_4px_4px_-2px_rgba(0,0,0,0.21)] transition-transform hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
       >
         {submitting ? t.processing : t.paySecurely}
       </button>
@@ -244,11 +256,14 @@ export default function OrderSummaryCard({
           </linearGradient>
         </defs>
       </svg>
-      <ul className="flex flex-col gap-2 pt-1">
+      {/* Bifele gradient aliniate SUS — pe mobil la 14px una de alta (Figma 3977-251) */}
+      <ul className="flex flex-col gap-3.5 lg:gap-2 lg:pt-1">
         {trustNotes.map((note) => (
           <li key={note} className="flex items-start gap-2">
             <Check />
-            <span className="text-[13px] leading-[19px] text-grey-600">{note}</span>
+            <span className="flex-1 text-[13px] leading-[19px] text-[#595959] lg:text-grey-600">
+              {note}
+            </span>
           </li>
         ))}
       </ul>
@@ -267,10 +282,10 @@ export function WhatHappensNext({ locale }: { locale: Locale }) {
       {/* Numerele pe coloana lor + textul cu hanging indent (Figma 3932-118) */}
       {[t.nextStepPay, t.nextStepInvoice, t.nextStepJoin].map((step, index) => (
         <div key={step} className="flex items-start gap-2.5">
-          <span className="w-3 shrink-0 text-[13px] font-medium leading-5 text-grey-600">
+          <span className="w-3 shrink-0 text-[13px] font-medium leading-5 text-[#959595] lg:text-grey-600">
             {index + 1}
           </span>
-          <span className="flex-1 text-[13.5px] leading-5 text-grey-600 lg:text-[14px]">
+          <span className="flex-1 text-[13.5px] leading-5 text-[#595959] lg:text-[14px] lg:text-grey-600">
             {step}
           </span>
         </div>

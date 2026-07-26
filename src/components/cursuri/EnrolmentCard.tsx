@@ -46,13 +46,15 @@ export type Edition = {
 }
 
 const MAX_SEATS = 8
-const EB_GREEN = 'text-[#2e8c57]'
+// Verdele Early Bird PE ACEASTĂ PAGINĂ (owner, Figma 3925-115): #009E56.
+const EB_GREEN = 'text-[#009e56]'
 
 function editionSummary(e: Edition, t: Dictionary['courseDetail']) {
   if (e.earlyBird) {
     return (
       <>
-        <span className={`font-medium ${EB_GREEN}`}>
+        {/* Segmentul EB din varianta neselectată: Regular, nu Medium (Figma 3925-115) */}
+        <span className={EB_GREEN}>
           {t.summaryEarlyBird(e.earlyBird.price, e.earlyBird.until)}
         </span>
         {e.standard ? ` · ${t.summaryStandard(e.standard.price)}` : ''}
@@ -81,12 +83,13 @@ export default function EnrolmentCard({
   const showChip = !!selected && !selected.soldOut && selected.seatsLeft < selected.seatsThreshold
 
   return (
-    <div className="relative flex w-full flex-col gap-4 rounded-[24px] border-[6px] border-line-soft bg-white p-6 shadow-[3px_9px_24px_rgba(77,77,77,0.05)] lg:px-9 lg:py-8">
-      {/* Floating chip — "Only X seats left", overlapping the top-right corner */}
+    <div className="relative flex w-full flex-col gap-4 rounded-[24px] border-[6px] border-line-soft bg-white px-9 py-8 shadow-[3px_9px_24px_rgba(77,77,77,0.05)]">
+      {/* Floating chip — "Only X seats left", overlapping the top-right corner.
+          Pe mobil scad DOAR dimensiunile; ancorele -right-4/-top-[18px] NU se schimbă. */}
       {showChip && (
-        <div className="absolute -right-4 -top-[18px] z-20 flex items-center gap-2 rounded-full bg-white px-4 py-2 shadow-[0_6px_18px_rgba(0,0,0,0.12)]">
+        <div className="absolute -right-4 -top-[18px] z-20 flex items-center gap-2 rounded-full bg-white px-3.5 py-[9px] shadow-[0_6px_18px_rgba(0,0,0,0.12)] lg:px-4 lg:py-2">
           <span aria-hidden="true" className="size-2.5 rounded-full bg-[#8b1a1a]" />
-          <span className="text-seats-alert text-[13px] font-semibold">
+          <span className="text-seats-alert text-[12.5px] font-medium lg:text-[13px] lg:font-semibold">
             {t.onlySeatsLeft(selected.seatsLeft)}
           </span>
         </div>
@@ -104,12 +107,12 @@ export default function EnrolmentCard({
             disabled={e.soldOut}
             aria-pressed={active}
             data-testid="edition"
-            className={`flex w-full flex-col gap-1.5 rounded-2xl border border-line px-5 py-4 text-left transition-shadow ${
+            className={`flex w-full flex-col rounded-2xl px-5 py-4 text-left transition-shadow ${
               e.soldOut
-                ? 'cursor-not-allowed bg-line-soft/60 opacity-60'
+                ? 'cursor-not-allowed gap-1.5 border border-[#e6e6e6] bg-line-soft/60 opacity-60'
                 : active
-                  ? 'bg-[#f0f5f9] shadow-[0_8px_24px_rgba(77,77,77,0.10)]'
-                  : 'bg-white hover:shadow-[0_4px_14px_rgba(77,77,77,0.06)]'
+                  ? 'gap-2 border-[1.5px] border-[#e6e6e6] bg-[#f0f5f9]'
+                  : 'gap-1.5 border border-[#e6e6e6] bg-white hover:shadow-[0_4px_14px_rgba(77,77,77,0.06)]'
             }`}
           >
             <span className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
@@ -131,7 +134,7 @@ export default function EnrolmentCard({
                     {e.earlyBird.price}
                   </span>
                   <span
-                    className={`rounded-[20px] bg-white px-2.5 py-1 text-[11.5px] font-medium shadow-[0_1px_4px_rgba(0,0,0,0.08)] ${EB_GREEN}`}
+                    className={`rounded-[20px] bg-white px-2.5 py-1 text-[11.5px] font-medium ${EB_GREEN}`}
                   >
                     {t.ebBadge(e.earlyBird.until)}
                   </span>
@@ -202,7 +205,7 @@ export default function EnrolmentCard({
             {selected && selected.hasActiveWindow && !selected.soldOut ? (
               <Link
                 href={`${localePath(locale, '/checkout')}?edition=${selected.id}&qty=${qty}`}
-                className="flex-1 rounded-full bg-gradient-to-b from-steel to-blue to-[80%] pb-[13px] pt-3 text-center text-[16px] font-medium text-white shadow-[0_4px_4px_-2px_rgba(0,0,0,0.21)] transition-transform hover:scale-[1.02]"
+                className="flex-1 rounded-full border border-[#1c5d99] bg-gradient-to-b from-steel to-blue to-[80%] pb-[13px] pt-3 text-center text-[16px] font-medium text-white shadow-[0_4px_4px_-2px_rgba(0,0,0,0.21)] transition-transform hover:scale-[1.02]"
               >
                 {t.enrolNow} →
               </Link>
@@ -242,14 +245,19 @@ export function ExpertMiniCard({
 }) {
   const t = getDictionary(locale).courseDetail
   return (
-    <div className="flex w-full items-center gap-3.5 rounded-[24px] bg-line-soft px-6 py-5 lg:px-7 lg:py-[22px]">
+    /* Mobil: FULL-BLEED (-mx-5 anulează marginea de 20 a paginii); desktop: în coloană */
+    <div className="-mx-5 flex items-center gap-3.5 rounded-[24px] bg-[#f6f6f6] px-7 py-[22px] lg:mx-0 lg:w-full">
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={photo} alt="Dr. Silviu Gresoi" className="size-14 rounded-full object-cover" />
-      <div className="min-w-0">
+      <img
+        src={photo}
+        alt="Dr. Silviu Gresoi"
+        className="size-14 rounded-full bg-white object-cover shadow-[0_0_5.3px_rgba(0,0,0,0.28)]"
+      />
+      <div className="flex min-w-0 flex-col gap-0.5">
         <p className="text-[15px] font-medium tracking-[-0.3px] text-ink">
           Dr. Silviu Gresoi, PhD, CFE
         </p>
-        <p className="text-[12.5px] text-grey-600">{t.expertRole}</p>
+        <p className="text-[12.5px] leading-[19px] text-grey-600">{t.expertRole}</p>
       </div>
     </div>
   )

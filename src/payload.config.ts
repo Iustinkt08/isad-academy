@@ -3,6 +3,7 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 
 import { postgresAdapter } from '@payloadcms/db-postgres'
+import { migrations } from './migrations'
 import { seoPlugin } from '@payloadcms/plugin-seo'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { en } from '@payloadcms/translations/languages/en'
@@ -65,6 +66,12 @@ export default buildConfig({
       icons: [{ rel: 'icon', type: 'image/svg+xml', url: '/brand/icon-gradient.svg' }],
     },
     components: {
+      // Quick actions + status cards above the native dashboard (server component,
+      // queries via Local API) — src/components/admin/AdminDashboard.tsx.
+      beforeDashboard: ['/components/admin/AdminDashboard#AdminDashboard'],
+      // Brand lockup at the top of the nav sidebar (owner request) —
+      // src/components/admin/NavLogo.tsx.
+      beforeNavLinks: ['/components/admin/NavLogo#NavLogo'],
       graphics: {
         Logo: '/components/admin/Logo#Logo',
         Icon: '/components/admin/Icon#Icon',
@@ -177,6 +184,13 @@ export default buildConfig({
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
   db: postgresAdapter({
+    // Producție (owner 2026-07-26): migrațiile din src/migrations rulează AUTOMAT la
+    // pornirea aplicației, DOAR când RUN_MIGRATIONS=true (setat în env-ul aplicației de
+    // pe cPanel). Gate-ul e necesar pentru că `next build` rulează tot cu
+    // NODE_ENV=production — fără el, workerii de build ar aplica migrațiile concurent
+    // peste DB-ul local (lock-uri + timeout la generarea paginilor statice).
+    // În dev rămâne push-ul drizzle; migrații noi: `npx payload migrate:create <nume>`.
+    prodMigrations: process.env.RUN_MIGRATIONS === 'true' ? migrations : undefined,
     pool: {
       connectionString: process.env.DATABASE_URI || '',
     },

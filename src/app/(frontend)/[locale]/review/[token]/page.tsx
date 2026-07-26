@@ -4,6 +4,7 @@ import { getPayload } from 'payload'
 import config from '@payload-config'
 import { Badge } from '@/components/ui/Badge'
 import { Container } from '@/components/ui/Container'
+import { Reveal } from '@/components/ui/Reveal'
 import { getDictionary, resolveLocale } from '@/lib/i18n'
 import { verifyReviewToken } from '@/lib/reviews/token'
 
@@ -41,12 +42,15 @@ export default async function ReviewTokenPage({ params }: Args) {
   if (!verified.ok) {
     return (
       <section className="bg-radial-wash">
-        <Container className="flex max-w-xl flex-col items-start gap-4 py-20 sm:py-28">
-          <Badge variant="accent">{dict.review.invalidBadge}</Badge>
-          <h1 className="text-h1 text-ink">{dict.review.invalidTitle}</h1>
-          <p className="text-body-lg text-ink/70">
-            {dict.review.invalidBody}
-          </p>
+        <Container className="max-w-xl py-20 sm:py-28">
+          {/* Fade-in (owner 2026-07-25) — același Reveal ca pe homepage */}
+          <Reveal className="flex flex-col items-start gap-4">
+            <Badge variant="accent">{dict.review.invalidBadge}</Badge>
+            <h1 className="text-h1 text-ink">{dict.review.invalidTitle}</h1>
+            <p className="text-body-lg text-ink/70">
+              {dict.review.invalidBody}
+            </p>
+          </Reveal>
         </Container>
       </section>
     )
@@ -69,15 +73,18 @@ export default async function ReviewTokenPage({ params }: Args) {
 
   return (
     <section className="bg-radial-wash">
-      <Container className="flex max-w-xl flex-col items-start gap-6 py-20 sm:py-28">
-        <Badge variant="accent">{dict.review.badge}</Badge>
-        <h1 className="text-h1 text-ink">
-          {courseTitle ? dict.review.howWas(courseTitle) : dict.review.title}
-        </h1>
-        <p className="text-body-lg text-ink/70">
-          {dict.review.subtitle}
-        </p>
-        <ReviewSubmitForm token={token} locale={locale} />
+      <Container className="max-w-xl py-20 sm:py-28">
+        {/* Fade-in (owner 2026-07-25) — același Reveal ca pe homepage */}
+        <Reveal className="flex flex-col items-start gap-6">
+          <Badge variant="accent">{dict.review.badge}</Badge>
+          <h1 className="text-h1 text-ink">
+            {courseTitle ? dict.review.howWas(courseTitle) : dict.review.title}
+          </h1>
+          <p className="text-body-lg text-ink/70">
+            {dict.review.subtitle}
+          </p>
+          <ReviewSubmitForm token={token} locale={locale} />
+        </Reveal>
       </Container>
     </section>
   )

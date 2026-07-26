@@ -7,10 +7,11 @@ import { cache } from 'react'
 import config from '@payload-config'
 import { asMedia, excerpt, lexicalToPlainText } from '@/components/courses/helpers'
 import { ArticleRichText } from '@/components/blog/ArticleBody'
-import { ArticleNewsletterCta, RelatedCourseCard } from '@/components/blog/ArticleFooterCtas'
+import { RelatedCourseCard } from '@/components/blog/ArticleFooterCtas'
 import { ArticleHeader } from '@/components/blog/ArticleHeader'
 import { LeadMagnetCard } from '@/components/blog/LeadMagnetCard'
 import { JsonLd } from '@/components/seo/JsonLd'
+import { Reveal } from '@/components/ui/Reveal'
 import { getDictionary, localePath, resolveLocale, type Locale } from '@/lib/i18n'
 import { DEFAULT_OG_IMAGE, SITE_NAME, getSiteUrl } from '@/lib/seo/site'
 import type { BlogPost, Course } from '@/payload-types'
@@ -38,6 +39,26 @@ const getPost = cache(async (slug: string, isDraftMode: boolean, locale: Locale)
     fallbackLocale: 'en',
   })
   return result.docs[0] ?? null
+})
+
+/**
+ * Author photo for the header's 44px avatar — the expertBio global's photo, used ONLY
+ * when the post's author text matches the expert's name (single-expert site; the author
+ * field is editable). Any failure degrades to null → initials-avatar fallback.
+ */
+const getAuthorPhotoUrl = cache(async (author: string | null | undefined) => {
+  if (!author) return null
+  try {
+    const payload = await getPayload({ config })
+    const expert = await payload.findGlobal({
+      slug: 'expertBio',
+      depth: 1,
+      overrideAccess: false,
+    })
+    return expert?.name === author ? (asMedia(expert.photo)?.url ?? null) : null
+  } catch {
+    return null
+  }
 })
 
 type Args = { params: Promise<{ locale: string; slug: string }> }
@@ -113,11 +134,14 @@ const asPublishedCourse = (value: Course | number | null | undefined): Course | 
   value != null && typeof value === 'object' && value._status === 'published' ? value : null
 
 /**
- * Blog article — Figma 3838:64 redesign: a single centered 760px column on the subtle
- * surface (#f8f9fa), uniform 20px gap: ArticleHeader (breadcrumb → meta → title → author
- * row → optional cover) → ArticleRichText body → LeadMagnetCard (only when enabled with a
- * file) → 1px #E6E6E6 divider → RelatedCourseCard (only when set + published) →
- * ArticleNewsletterCta (always). No comments (§4).
+ * Blog article — Figma 3977-687 (desktop ≥lg) / 3977-718 (mobile <lg), single DOM with
+ * responsive classes: a single centered column (350px mobile / 760px desktop) on #f8f9fa,
+ * gap 24px mobile / 20px desktop, top padding 48px mobile / 130px desktop. Order: title →
+ * author row → cover (image or branded placeholder) → ArticleRichText body →
+ * LeadMagnetCard (only when enabled with a file) → [divider + RelatedCourseCard, only
+ * when a published related course is set] → the design's 90px end space (+21px extra
+ * before it on desktop). No comments (§4). Newsletter-ul de după articol a fost SCOS
+ * (owner 2026-07-26) — abonarea rămâne doar în footerul global.
  */
 export default async function BlogArticlePage({ params }: Args) {
   const { locale: localeParam, slug } = await params
@@ -129,6 +153,7 @@ export default async function BlogArticlePage({ params }: Args) {
 
   const relatedCourse = asPublishedCourse(post.relatedCourse)
   const hasLeadMagnet = Boolean(post.leadMagnet?.enabled && post.leadMagnet?.file)
+  const authorPhotoUrl = await getAuthorPhotoUrl(post.author)
 
   return (
     <>
@@ -149,28 +174,43 @@ export default async function BlogArticlePage({ params }: Args) {
         </div>
       )}
 
-      <article className="bg-surface-subtle">
-        <div className="animate-rise mx-auto flex w-full max-w-[760px] flex-col gap-[20px] px-4 pb-[90px] pt-[130px] min-[800px]:px-0">
-          <ArticleHeader post={post} locale={locale} />
+      <article className="bg-[#f8f9fa]">
+        <div className="animate-rise mx-auto flex w-full max-w-[350px] flex-col gap-6 pt-12 lg:max-w-[760px] lg:gap-5 lg:pt-20">
+          <ArticleHeader post={post} locale={locale} authorPhotoUrl={authorPhotoUrl} />
 
           {/* ——— Body (article-specific Lexical converters) ——— */}
           <ArticleRichText data={post.body} locale={locale} />
 
           {/* ——— Lead magnet (only when enabled AND a file is attached) ——— */}
-          {hasLeadMagnet && <LeadMagnetCard slug={post.slug ?? slug} locale={locale} />}
+          {/* Fade-in on scroll pe blocurile de sub articol (owner 2026-07-25) — Reveal;
+              headerul + body-ul păstrează animate-rise la încărcare (fără dublare). */}
+          {hasLeadMagnet && (
+            <Reveal>
+              <LeadMagnetCard slug={post.slug ?? slug} locale={locale} />
+            </Reveal>
+          )}
 
-          {/* ——— Divider — the single permitted grey line ——— */}
-          <div aria-hidden="true" className="h-px w-full bg-[#e6e6e6]" />
+          {/* ——— Bottom CTA: related course only (owner 2026-07-26 — newsletter-ul de
+              după articol a fost SCOS; abonarea trăiește doar în footerul global) ——— */}
+          {relatedCourse && (
+            <>
+              {/* Divider — the single permitted grey line */}
+              <div aria-hidden="true" className="h-px w-full bg-[#e6e6e6]" />
+              <Reveal>
+                <section
+                  aria-label={dict.blog.nextStepsAria}
+                  className="flex w-full flex-col gap-[20px]"
+                >
+                  <RelatedCourseCard course={relatedCourse} locale={locale} />
+                </section>
+              </Reveal>
+            </>
+          )}
 
-          {/* ——— Bottom CTAs: related course when set + newsletter always (§6) ——— */}
-          <section
-            aria-label={dict.blog.nextStepsAria}
-            className="flex w-full flex-col gap-[20px]"
-          >
-            {relatedCourse && <RelatedCourseCard course={relatedCourse} locale={locale} />}
-            <ArticleNewsletterCta locale={locale} />
-          </section>
+          {/* End space from the design: 90px (+21px extra on desktop before it) */}
+          <div aria-hidden="true" className="h-[90px] lg:mt-[21px]" />
         </div>
+        <div aria-hidden="true" className="h-16 lg:h-0" />
       </article>
     </>
   )

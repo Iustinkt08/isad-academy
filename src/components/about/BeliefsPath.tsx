@@ -1,22 +1,29 @@
-import type { ReactNode } from 'react';
-
 /**
- * About / Beliefs Path — cele 3 crezuri ca WAYPOINTS pe o linie gradient
- * („traseul de navigație"), cu un waypoint GOL la capăt = „what comes next".
- * 1:1 cu Figma 3873-94 → „Section / Beliefs". Valori EXPLICITE (px/hex).
- * Server component. Layout de DESKTOP (lățime fixă 1160) — varianta mobilă
- * se face separat, după design; sub lg secțiunea își taie overflow-ul orizontal.
+ * About / Beliefs — „What guides us". v3 RESPONSIVE. ÎNLOCUIEȘTE BeliefsPath.tsx.
  *
- * Geometrie (din Figma): 3 coloane de 360px cu gap 40 → canvas 1160;
- * linia 920×3 pornește din centrul primului cerc (x=180, y=20.5) și continuă
- * până la waypoint-ul gol (x=1092, y=14, 16px). Cercurile 44px acoperă linia.
+ * Desktop (≥lg): 1:1 cu Figma 3873-94 — traseul ORIZONTAL: subtitlu 24 #407EA2,
+ *   3 waypoints (cerc 44 cu inel gradient + număr) pe linia gradient 920×3,
+ *   crezurile sub puncte, waypoint GOL la capătul liniei. (Neschimbat.)
+ *
+ * Mobil (<lg): 1:1 cu Figma 3977-571 — traseul VERTICAL cu INFORMAȚIA LA PUNCTE:
+ *   subtitlu 20 aliniat stânga; linia gradient verticală prin centrul cercurilor;
+ *   fiecare punct = crezul (17/26, finalul în gradient) + paragraful valorii
+ *   (titlul valorii Medium #222 + restul #595959, 13.5/20); waypoint gol jos.
+ *   REVEAL LA SCROLL (spec-ul owner-ului, nota de pe canvas): fiecare punct
+ *   pornește la opacity 15% și crește la 100% când intră în viewport (~60% din
+ *   ecran); linia se „umple" progresiv cu scroll-ul; punctul gol se aprinde
+ *   ultimul; prefers-reduced-motion → totul static la 100%.
+ *
+ * Client component (IntersectionObserver + progresul liniei).
+ * TOATE valorile sunt EXPLICITE (px/hex). NIMIC adăugat față de design.
  */
 
-const BELIEFS: { num: string; lead: string; tail: string }[] = [
-  { num: '1', lead: 'We believe in ', tail: 'innovation.' },
-  { num: '2', lead: 'We are guided by ', tail: 'structure.' },
-  { num: '3', lead: 'We help you stay ready for ', tail: 'what comes next.' },
-];
+'use client';
+
+import { useEffect, useRef, useState } from 'react';
+
+import type { Locale } from '@/lib/i18n/config';
+import { getDictionary } from '@/lib/i18n/dictionaries';
 
 /** Inelul gradient al brandului, în formă de cerc (construcția PillTag) */
 function RingCircle({
@@ -26,7 +33,7 @@ function RingCircle({
 }: {
   size: number;
   ring: number;
-  children?: ReactNode;
+  children?: React.ReactNode;
 }) {
   return (
     <span
@@ -40,45 +47,158 @@ function RingCircle({
   );
 }
 
-export default function BeliefsPath() {
+const GRAD_TEXT =
+  'bg-[linear-gradient(90deg,#407ea2_0%,#1c5d99_100%)] bg-clip-text text-transparent';
+
+export default function BeliefsPath({ locale }: { locale: Locale }) {
+  const t = getDictionary(locale).about;
+  // Crezurile vin din dicționar (site bilingv EN/RO); numărul waypoint-ului = indexul.
+  const beliefs = t.beliefs;
+  const pathRef = useRef<HTMLDivElement>(null);
+  const itemRefs = useRef<(HTMLElement | null)[]>([]);
+  const [revealed, setRevealed] = useState<boolean[]>(
+    Array(beliefs.length + 1).fill(false), // +1 = waypoint-ul gol
+  );
+  const [lineProgress, setLineProgress] = useState(0);
+
+  /* Reveal per punct: intră în viewport (~60% din ecran) → opacity 100% */
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setRevealed(Array(beliefs.length + 1).fill(true));
+      setLineProgress(1);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (!e.isIntersecting) continue;
+          const idx = Number((e.target as HTMLElement).dataset.idx);
+          setRevealed((prev) => {
+            if (prev[idx]) return prev;
+            const next = [...prev];
+            next[idx] = true;
+            return next;
+          });
+          observer.unobserve(e.target);
+        }
+      },
+      { rootMargin: '0px 0px -40% 0px' }, // pragul ≈ 60% din înălțimea ecranului
+    );
+    itemRefs.current.forEach((el) => el && observer.observe(el));
+
+    /* Linia se umple progresiv cu scroll-ul */
+    let raf = 0;
+    function onScroll() {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const el = pathRef.current;
+        if (!el) return;
+        const rect = el.getBoundingClientRect();
+        const trigger = window.innerHeight * 0.6;
+        const progress = (trigger - rect.top) / rect.height;
+        setLineProgress(Math.max(0, Math.min(1, progress)));
+      });
+    }
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('scroll', onScroll);
+      cancelAnimationFrame(raf);
+    };
+  }, [beliefs.length]);
+
   return (
-    <section className="flex flex-col items-center gap-9 overflow-x-clip bg-[#f8f9fa] pb-11 pt-10">
-      {/* Subtitlu — Poppins SemiBold 24, #407EA2 (v2: înlocuiește micro-kicker-ul uppercase) */}
-      <h2 className="text-center text-[24px] font-semibold leading-9 text-[#407ea2]">
-        What guides us
-      </h2>
+    <section className="bg-[#f8f9fa]">
+      {/* ============ DESKTOP (≥lg) — traseul ORIZONTAL, neschimbat ============ */}
+      <div className="hidden flex-col items-center gap-9 pb-11 pt-10 lg:flex">
+        <h2 className="text-center text-[24px] font-semibold leading-9 text-[#407ea2]">
+          {t.beliefsHeading}
+        </h2>
+        <div className="relative flex w-[1160px] gap-10">
+          <div
+            aria-hidden
+            className="absolute left-[180px] top-[20.5px] h-[3px] w-[920px] rounded-[2px] bg-[linear-gradient(90deg,#407ea2_0%,#1c5d99_55%,#46d3f6_100%)]"
+          />
+          <span aria-hidden className="absolute left-[1092px] top-[14px]">
+            <RingCircle size={16} ring={3} />
+          </span>
+          {beliefs.map((b, i) => (
+            <div
+              key={b.tail}
+              className="relative flex w-[360px] flex-col items-center gap-[18px]"
+            >
+              <RingCircle size={44} ring={3}>
+                <span className={`text-[15px] font-semibold ${GRAD_TEXT}`}>{i + 1}</span>
+              </RingCircle>
+              <p className="text-center text-[21px] font-medium leading-[30px] tracking-[-0.6px] text-[#222222]">
+                {b.lead}
+                <span className={GRAD_TEXT}>{b.tail}</span>
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
 
-      {/* Traseul: linia gradient în spate + 3 coloane cu waypoints */}
-      <div className="relative flex w-[1160px] gap-10">
-        {/* Linia gradient — pornește din centrul cercului 1, continuă după cercul 3 */}
-        <div
-          aria-hidden
-          className="absolute left-[180px] top-[20.5px] h-[3px] w-[920px] rounded-[2px] bg-[linear-gradient(90deg,#407ea2_0%,#1c5d99_55%,#46d3f6_100%)]"
-        />
-        {/* Waypoint GOL la capătul liniei — următorul punct, încă neatins.
-            Inel SOLID #46D3F6 = culoarea de la finalul liniei (nu gradientul de brand). */}
-        <span
-          aria-hidden
-          className="absolute left-[1092px] top-[14px] flex size-4 items-center justify-center rounded-full bg-[#46d3f6] p-[3px]"
-        >
-          <span className="size-full rounded-full bg-white" />
-        </span>
+      {/* ============ MOBIL (<lg) — traseul VERTICAL cu informația la puncte ============ */}
+      <div className="mx-auto flex w-[350px] flex-col gap-7 pb-0 pt-0 lg:hidden">
+        <h2 className="text-[20px] font-semibold leading-[28px] text-[#407ea2]">
+          {t.beliefsHeading}
+        </h2>
 
-        {BELIEFS.map((b) => (
-          <div key={b.num} className="relative flex w-[360px] flex-col items-center gap-[18px]">
-            <RingCircle size={44} ring={3}>
-              <span className="bg-[linear-gradient(90deg,#407ea2_0%,#1c5d99_100%)] bg-clip-text text-[15px] font-semibold text-transparent">
-                {b.num}
-              </span>
-            </RingCircle>
-            <p className="text-center text-[21px] font-medium leading-[30px] tracking-[-0.6px] text-[#222222]">
-              {b.lead}
-              <span className="bg-[linear-gradient(90deg,#407ea2_0%,#1c5d99_100%)] bg-clip-text text-transparent">
-                {b.tail}
-              </span>
-            </p>
+        <div ref={pathRef} className="relative flex flex-col gap-11">
+          {/* Șina liniei (statică, estompată) + umplerea progresivă */}
+          <div
+            aria-hidden
+            className="absolute left-[20.5px] top-[22px] w-[3px] rounded-[2px] bg-[linear-gradient(180deg,#407ea2_0%,#1c5d99_55%,#46d3f6_100%)] opacity-[0.15]"
+            style={{ height: 'calc(100% - 30px)' }}
+          />
+          <div
+            aria-hidden
+            className="absolute left-[20.5px] top-[22px] w-[3px] origin-top rounded-[2px] bg-[linear-gradient(180deg,#407ea2_0%,#1c5d99_55%,#46d3f6_100%)] transition-transform duration-150 ease-out motion-reduce:transition-none"
+            style={{ height: 'calc(100% - 30px)', transform: `scaleY(${lineProgress})` }}
+          />
+
+          {beliefs.map((b, i) => (
+            <div
+              key={b.tail}
+              ref={(el) => {
+                itemRefs.current[i] = el;
+              }}
+              data-idx={i}
+              className={`relative flex items-start gap-4 transition-opacity duration-500 ease-out motion-reduce:transition-none ${
+                revealed[i] ? 'opacity-100' : 'opacity-[0.15]'
+              }`}
+            >
+              <RingCircle size={44} ring={3}>
+                <span className={`text-[15px] font-semibold ${GRAD_TEXT}`}>{i + 1}</span>
+              </RingCircle>
+              <div className="flex min-w-0 flex-1 flex-col gap-2">
+                <p className="text-[17px] font-medium leading-[26px] tracking-[-0.5px] text-[#222222]">
+                  {b.lead}
+                  <span className={GRAD_TEXT}>{b.tail}</span>
+                </p>
+                <p className="text-[13.5px] leading-5 text-[#595959]">
+                  <span className="font-medium text-[#222222]">{b.infoTitle}</span>
+                  {b.infoBody}
+                </p>
+              </div>
+            </div>
+          ))}
+
+          {/* Waypoint-ul GOL de la capăt — se aprinde ultimul */}
+          <div
+            ref={(el) => {
+              itemRefs.current[beliefs.length] = el;
+            }}
+            data-idx={beliefs.length}
+            className={`relative flex pl-3.5 transition-opacity duration-500 ease-out motion-reduce:transition-none ${
+              revealed[beliefs.length] ? 'opacity-100' : 'opacity-[0.15]'
+            }`}
+          >
+            <RingCircle size={16} ring={3} />
           </div>
-        ))}
+        </div>
       </div>
     </section>
   );

@@ -2,10 +2,15 @@ import type { Metadata } from 'next'
 import { getPayload } from 'payload'
 
 import config from '@payload-config'
-import { ContactForm } from '@/components/forms/ContactForm'
-import { Container } from '@/components/ui/Container'
-import { GlassPanel } from '@/components/ui/GlassPanel'
-import { getDictionary, resolveLocale, type Locale } from '@/lib/i18n'
+import ContactDetails, {
+  DEFAULT_EMAIL,
+  DEFAULT_PHONE,
+  type ContactDetail,
+} from '@/components/contact/ContactDetails'
+import ContactForm from '@/components/contact/ContactForm'
+import ContactHeader from '@/components/contact/ContactHeader'
+import { Reveal } from '@/components/ui/Reveal'
+import { getDictionary, localePath, resolveLocale, type Locale } from '@/lib/i18n'
 import type { SiteSetting } from '@/payload-types'
 
 export async function generateMetadata({
@@ -35,9 +40,12 @@ async function getContactDetails(locale: Locale): Promise<SiteSetting['contact']
 }
 
 /**
- * /contact (§6): title → form + direct details side by side. Deliberately NO map, NO
- * address, NO WhatsApp. Direct details render only what is set in siteSettings.contact
- * (TBD-friendly — the panel shows a fallback line while everything is unset).
+ * /contact (§6) — redesign Figma 3977-489 (desktop) / 3977-531 (mobil): header centrat
+ * (pill + titlu două-tonuri + subtitlu) → rând 1164 = card formular 700 + card detalii
+ * 420 la gap 44 (mobil: stivuit, gap 24, conținut 350/margini 20). Fundal #F8F9FA.
+ * Deliberately NO map, NO address, NO WhatsApp. Email/telefon vin din
+ * siteSettings.contact cu fallback pe default-urile din ContactDetails.
+ * Layout-ul global randează deja <main id="main-content"> — aici doar <div>.
  */
 export default async function ContactPage({
   params,
@@ -48,72 +56,45 @@ export default async function ContactPage({
   const dict = getDictionary(locale)
   const t = dict.contact
   const contact = await getContactDetails(locale)
-  const hasDetails = Boolean(contact?.email || contact?.phone || contact?.linkedin)
+
+  const email = contact?.email || DEFAULT_EMAIL
+  const phone = contact?.phone || DEFAULT_PHONE
+  const details: ContactDetail[] = [
+    { label: t.details.email, value: email, href: `mailto:${email}` },
+    { label: t.details.phone, value: phone, href: `tel:${phone.replace(/\s+/g, '')}` },
+    { label: t.details.responseTime, value: t.details.responseTimeValue },
+  ]
 
   return (
-    <section className="bg-radial-wash">
-      <Container className="animate-rise py-20 sm:py-28">
-        <h1 className="text-h1 text-ink">
-          {t.title}
-        </h1>
-        <p className="mt-3 max-w-2xl text-body-lg text-ink/70">{t.intro}</p>
+    <div className="bg-[#f8f9fa] pb-16 lg:pb-[120px]">
+      {/* Fade-in on scroll per secțiune (owner 2026-07-25) — Reveal, ca pe homepage.
+          Aside-ul sticky rămâne ÎN AFARA Reveal-ului (transformul ar strica sticky). */}
+      <Reveal>
+        <ContactHeader
+          pill={t.title}
+          titlePlain={t.headerTitlePlain}
+          titleGradient={t.headerTitleGradient}
+          subtitle={t.intro}
+        />
+      </Reveal>
 
-        <div className="mt-10 grid gap-10 lg:grid-cols-[1.5fr_1fr]">
-          <div className="max-w-xl">
-            <ContactForm locale={locale} />
-          </div>
-
-          <aside aria-label={t.details.aria}>
-            <GlassPanel className="p-7">
-              <h2 className="text-h4 text-ink">{t.details.title}</h2>
-              {hasDetails ? (
-                <ul className="mt-4 space-y-3 text-body">
-                  {contact?.email && (
-                    <li>
-                      <span className="block text-small font-semibold uppercase tracking-wider text-grey-500">
-                        {t.details.email}
-                      </span>
-                      <a href={`mailto:${contact.email}`} className="font-medium text-blue underline">
-                        {contact.email}
-                      </a>
-                    </li>
-                  )}
-                  {contact?.phone && (
-                    <li>
-                      <span className="block text-small font-semibold uppercase tracking-wider text-grey-500">
-                        {t.details.phone}
-                      </span>
-                      <a
-                        href={`tel:${contact.phone.replace(/\s+/g, '')}`}
-                        className="font-medium text-blue underline"
-                      >
-                        {contact.phone}
-                      </a>
-                    </li>
-                  )}
-                  {contact?.linkedin && (
-                    <li>
-                      <span className="block text-small font-semibold uppercase tracking-wider text-grey-500">
-                        {t.details.linkedin}
-                      </span>
-                      <a
-                        href={contact.linkedin}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="font-medium text-blue underline"
-                      >
-                        {t.details.linkedinCta}
-                      </a>
-                    </li>
-                  )}
-                </ul>
-              ) : (
-                <p className="mt-3 text-body text-ink/70">{t.details.fallback}</p>
-              )}
-            </GlassPanel>
-          </aside>
+      <div className="mx-auto flex w-full max-w-[1164px] flex-col gap-6 px-5 pt-6 lg:flex-row lg:items-start lg:gap-11 lg:px-4 lg:pt-9">
+        <div className="min-w-0 flex-1">
+          <Reveal>
+            <ContactForm locale={locale} privacyHref={localePath(locale, '/privacy')} />
+          </Reveal>
         </div>
-      </Container>
-    </section>
+        {/* Sticky la scroll pe desktop (owner 2026-07-25) — același offset ca aside-urile
+            de pe curs/checkout (header h-20 → top-24). */}
+        <aside
+          aria-label={t.details.aria}
+          className="w-full self-start lg:sticky lg:top-24 lg:w-[420px] lg:shrink-0"
+        >
+          <Reveal>
+            <ContactDetails title={t.details.title} details={details} />
+          </Reveal>
+        </aside>
+      </div>
+    </div>
   )
 }
