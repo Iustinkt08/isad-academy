@@ -34,22 +34,31 @@ jobs:
       - name: Unit tests (quality gate)
         run: npx vitest run tests/unit
 
+      # O SINGURĂ conexiune TCP pe tot deploy-ul (ControlMaster): tunelul DB, scp-ul
+      # și restart-ul se multiplexează prin ea. Firewall-ul Hosterion (Imunify/CSF)
+      # a blocat temporar SSH-ul când fiecare run deschidea 4-5 conexiuni separate.
       - name: Load SSH deploy key
         run: |
           mkdir -p ~/.ssh
           printf '%s\n' "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -p "${{ secrets.SSH_PORT }}" "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null
+          cat >> ~/.ssh/config <<EOF
+          Host deploy
+            HostName ${{ secrets.SSH_HOST }}
+            Port ${{ secrets.SSH_PORT }}
+            User ${{ secrets.SSH_USER }}
+            IdentityFile ~/.ssh/deploy_key
+            StrictHostKeyChecking accept-new
+            ControlMaster auto
+            ControlPath ~/.ssh/cm-%r@%h-%p
+            ControlPersist 20m
+            ServerAliveInterval 15
+            ServerAliveCountMax 8
+            TCPKeepAlive yes
+          EOF
 
       - name: Open DB tunnel (prerender from the production DB)
-        run: |
-          ssh -i ~/.ssh/deploy_key -p "${{ secrets.SSH_PORT }}" -f -N \
-            -o ExitOnForwardFailure=yes \
-            -o ServerAliveInterval=15 \
-            -o ServerAliveCountMax=8 \
-            -o TCPKeepAlive=yes \
-            -L 5432:127.0.0.1:5432 \
-            "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}"
+        run: ssh -f -N -o ExitOnForwardFailure=yes -L 5432:127.0.0.1:5432 deploy
 
       - name: Build (standalone)
         env:
@@ -71,14 +80,9 @@ jobs:
       - name: Upload bundle (tar prin SSH; media/ și tmp/ rămân neatinse)
         run: |
           tar czf bundle.tar.gz -C deploy .
-          scp -i ~/.ssh/deploy_key -P "${{ secrets.SSH_PORT }}" bundle.tar.gz \
-            "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/bundle.tar.gz"
-          ssh -i ~/.ssh/deploy_key -p "${{ secrets.SSH_PORT }}" \
-            "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
+          scp bundle.tar.gz deploy:~/bundle.tar.gz
+          ssh deploy \
             "cd '${{ secrets.APP_DIR }}' && rm -rf .next node_modules public server.js package.json && tar xzf ~/bundle.tar.gz && rm ~/bundle.tar.gz"
 
       - name: Restart Passenger app
-        run: |
-          ssh -i ~/.ssh/deploy_key -p "${{ secrets.SSH_PORT }}" \
-            "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
-            "mkdir -p '${{ secrets.APP_DIR }}/tmp' && touch '${{ secrets.APP_DIR }}/tmp/restart.txt'"
+        run: ssh deploy "mkdir -p '${{ secrets.APP_DIR }}/tmp' && touch '${{ secrets.APP_DIR }}/tmp/restart.txt'"
