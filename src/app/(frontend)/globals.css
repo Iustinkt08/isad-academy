@@ -103,6 +103,10 @@
 
   html {
     scroll-behavior: smooth;
+    /* Fundal explicit pe rădăcină (owner 2026-07-26): Safari iOS pictează zonele
+       de overscroll și safe-area (sub toolbarul Liquid Glass) cu background-ul
+       lui <html>; fără el, bara primea un panou alb opac cu seam vizibil. */
+    background-color: #ffffff;
   }
 
   /* Respect prefers-reduced-motion everywhere (§15) */

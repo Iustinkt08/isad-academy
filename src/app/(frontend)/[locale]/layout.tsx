@@ -24,6 +24,9 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
+  // Alb explicit pentru chrome-ul browserului (toolbarul Safari iOS / bara Android)
+  // — site-ul are o singură temă, deci o singură valoare ajunge.
+  themeColor: '#ffffff',
 }
 
 /** Both languages are fully static — EN at the bare URLs, RO under /ro (middleware). */
