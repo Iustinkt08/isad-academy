@@ -73,6 +73,20 @@ jobs:
             TCPKeepAlive yes
           EOF
 
+      # DIAGNOSTIC TEMPORAR (2026-07-27, de șters după fix): conexiunea mux moare cu
+      # "Broken pipe" imediat după KEX, iar masterul demonizat înghite eroarea reală.
+      # A izolează transportul (fără mux), B reproduce config-ul curent, verbose.
+      # IP-urile se maschează — repo public, iar IP-ul rezolvat nu e mascat de Actions.
+      - name: SSH diagnostic (temporar)
+        run: |
+          set +e
+          mask() { sed -E 's/([0-9]{1,3}\.){3}[0-9]{1,3}/x.x.x.x/g'; }
+          echo "=== A: ssh simplu, fara mux ==="
+          ssh -vv -S none -o ControlMaster=no deploy 'echo SSH_OK' 2>&1 | mask | tail -60
+          echo "=== B: ssh cu mux (config curent) ==="
+          ssh -vv deploy 'echo MUX_OK' 2>&1 | mask | tail -40
+          true
+
       # Snapshot-ul DB de producție într-o comandă ssh de câteva secunde (sesiunile
       # scurte trec de firewall-ul hostului; cele persistente sunt omorâte).
       - name: Snapshot production DB into runner Postgres
