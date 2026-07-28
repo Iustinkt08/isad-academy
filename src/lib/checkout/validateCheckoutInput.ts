@@ -121,7 +121,7 @@ export const validateCheckoutInput = (raw: unknown): CheckoutValidationResult =>
     return { ok: false, error: '"buyer.name" is required.' }
   }
   if (!isValidEmail(buyer.email)) {
-    return { ok: false, error: '"buyer.email" must be a valid email address.' }
+    return { ok: false, error: '"buyer.email" must be a valid e-mail address.' }
   }
   if (buyer.phone !== undefined && !isNonEmptyString(buyer.phone, MAX_TEXT_LENGTH)) {
     return { ok: false, error: '"buyer.phone" must be a non-empty string.' }
@@ -200,7 +200,7 @@ export const validateCheckoutInput = (raw: unknown): CheckoutValidationResult =>
       return { ok: false, error: `participants[${index}].name is required.` }
     }
     if (!isValidEmail(participant.email)) {
-      return { ok: false, error: `participants[${index}].email must be a valid email address.` }
+      return { ok: false, error: `participants[${index}].email must be a valid e-mail address.` }
     }
 
     normalizedParticipants.push({ name: participant.name, email: participant.email })

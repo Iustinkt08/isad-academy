@@ -14,7 +14,7 @@ test.describe('contact page', () => {
     await page.goto('/contact')
 
     await page.getByLabel('Full name').fill('E2E Contact')
-    await page.getByLabel('Email', { exact: true }).fill(`e2e-contact-${RUN_ID}@example.com`)
+    await page.getByLabel('E-mail', { exact: true }).fill(`e2e-contact-${RUN_ID}@example.com`)
     await page.getByLabel('Subject').selectOption('course')
     await page.getByLabel('Message').fill('I would like to know more about the ISO course.')
     await page.getByRole('button', { name: 'Send message' }).click()
@@ -34,7 +34,7 @@ test.describe('contact page', () => {
     await page.getByRole('button', { name: 'Send message' }).click()
 
     await expect(page.getByText('Please enter your name.')).toBeVisible()
-    await expect(page.getByText('Please enter a valid email address.')).toBeVisible()
+    await expect(page.getByText('Please enter a valid e-mail address.')).toBeVisible()
     // Subject became OPTIONAL with the 3977-489 redesign (falls back to "other" server-side)
     await expect(page.getByText('Please enter a message.')).toBeVisible()
     // Focus lands on the first invalid field; aria-invalid marks it for AT
@@ -76,7 +76,7 @@ test.describe('corporate page', () => {
 
     await page.getByLabel('Company name').fill('E2E Corp SRL')
     await page.getByLabel('Contact person').fill('E2E Person')
-    await page.getByLabel('Work email').fill(`e2e-corporate-${RUN_ID}@example.com`)
+    await page.getByLabel('E-mail').fill(`e2e-corporate-${RUN_ID}@example.com`)
     // Free-text range since the 3790:3624 redesign (was a select of fixed ranges)
     await page.getByLabel('How many participants?').fill('6–10')
 

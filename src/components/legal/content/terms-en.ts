@@ -34,7 +34,7 @@ export const termsEn: LegalDocContent = {
           "kind": "list",
           "items": [
             "website: https://isad.academy;",
-            "email: contact@isad.academy;",
+            "e-mail: contact@isad.academy;",
             "phone: 40727 392 392;",
             "mailing address: One Cotroceni Park, 44 Sergent Nutu Ion Street, Building CT3, Apartment 322.",
             "By accessing the Site, creating an account, registering for a course or event, purchasing a subscription, or using any other service offered through the Platform, the User confirms that they have read, understood, and accepted these Terms and Conditions."
@@ -308,7 +308,7 @@ export const termsEn: LegalDocContent = {
           "kind": "list",
           "items": [
             "first and last name;",
-            "email address;",
+            "e-mail address;",
             "phone number;",
             "billing information;",
             "the name and details of the legal entity, if applicable;",
@@ -370,7 +370,7 @@ export const termsEn: LegalDocContent = {
             "creating a personal Account;",
             "purchasing a Service directly;",
             "accepting a commercial offer;",
-            "submitting a request via email;",
+            "submitting a request via e-mail;",
             "registering through a partner;",
             "any other procedure indicated by the Provider."
           ]
@@ -483,7 +483,7 @@ export const termsEn: LegalDocContent = {
             "in a hybrid format;",
             "through an LMS;",
             "via videoconferencing platforms;",
-            "via email;",
+            "via e-mail;",
             "through Communities;",
             "through other means communicated to the User."
           ]
@@ -497,7 +497,7 @@ export const termsEn: LegalDocContent = {
           "items": [
             "a compatible computer, tablet, or phone;",
             "a stable internet connection;",
-            "a working email address;",
+            "a working e-mail address;",
             "an up-to-date browser;",
             "necessary software and applications;",
             "camera and microphone, if required;",
@@ -1890,7 +1890,7 @@ export const termsEn: LegalDocContent = {
         {
           "kind": "list",
           "items": [
-            "email;",
+            "e-mail;",
             "phone;",
             "text message;",
             "WhatsApp;",
@@ -1914,7 +1914,7 @@ export const termsEn: LegalDocContent = {
       "blocks": [
         {
           "kind": "p",
-          "text": "Any complaint regarding the services offered through the Platform may be sent to the following email address: support@isad.academy"
+          "text": "Any complaint regarding the services offered through the Platform may be sent to the following e-mail address: support@isad.academy"
         },
         {
           "kind": "p",
@@ -1924,7 +1924,7 @@ export const termsEn: LegalDocContent = {
           "kind": "list",
           "items": [
             "the Customer’s name;",
-            "the email address used to place the order;",
+            "the e-mail address used to place the order;",
             "the Service purchased;",
             "the invoice or order number;",
             "a description of the situation;",
@@ -2100,7 +2100,7 @@ export const termsEn: LegalDocContent = {
         {
           "kind": "entity",
           "line1": "Service Provider: INTERNATIONAL SECURITY AND DEFENCE S.R.L. · Trade Name/Platform: ISAD.academy · Unique Registration Code: 44849076",
-          "line2": "General email: contact@isad.academy · Email for complaints and withdrawals: support@isad.academy · Phone: +40727 392 392 · Website: https://isad.academy"
+          "line2": "General e-mail: contact@isad.academy · E-mail for complaints and withdrawals: support@isad.academy · Phone: +40727 392 392 · Website: https://isad.academy"
         },
         {
           "kind": "p",

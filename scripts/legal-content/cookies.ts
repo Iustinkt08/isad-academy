@@ -217,7 +217,7 @@ const cookies: { en: Content; ro: Content } = {
           { type: 'p', text: 'For any questions regarding the use of cookies or the exercise of your rights under applicable law, please contact us at:' },
           { type: 'p', text: 'INTERNATIONAL SECURITY AND DEFENCE S.R.L.' },
           { type: 'p', text: 'Website: https://isad.academy' },
-          { type: 'p', text: 'Email: support@isad.academy' },
+          { type: 'p', text: 'E-mail: support@isad.academy' },
         ],
       },
     ],

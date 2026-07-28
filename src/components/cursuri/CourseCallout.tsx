@@ -26,7 +26,7 @@ export default function CourseCallout({ locale }: { locale: Locale }) {
             {t.calloutTeamTitle}
           </h2>
           <p className="text-[13.5px] leading-5 text-[#e0edf7] lg:text-[15px] lg:leading-normal">
-            {t.calloutTeamBody} →
+            {t.calloutTeamBody}
           </p>
         </Link>
         <Link
@@ -37,7 +37,7 @@ export default function CourseCallout({ locale }: { locale: Locale }) {
             {t.calloutQuestionsTitle}
           </h2>
           <p className="text-[13.5px] leading-5 text-grey-600 lg:text-[15px] lg:leading-normal">
-            {t.calloutQuestionsBody} →
+            {t.calloutQuestionsBody}
           </p>
         </Link>
       </Container>

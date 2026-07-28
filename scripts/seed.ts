@@ -397,7 +397,7 @@ async function seed() {
   // --- Discount codes (T15 — E2E valid-code purchase flow) -------------------------------
   // `WELCOME10`: general 10% code, active, no expiry, plenty of headroom under its usage
   // limit — tests/e2e/critical-flows.spec.ts applies it on a real checkout twice per run
-  // (two different buyer emails) and asserts the observable discount + seat decrement.
+  // (two different buyer e-mails) and asserts the observable discount + seat decrement.
   // Natural key = `code` (DB-unique). Only created once: `usageCount` is intentionally left
   // alone on re-seed (idempotent create, never reset) so accumulating e2e runs never
   // silently "un-use" a code that a previous run already exercised — usageLimit (100) is far
@@ -486,11 +486,11 @@ async function seed() {
     },
     {
       question: 'How are the courses delivered?',
-      answer: richText(['All courses are delivered live, 1:1, on Google Meet — never pre-recorded.']),
+      answer: richText(['All courses are delivered live, 1:1, on Zoom — never pre-recorded.']),
       order: 2,
       ro: {
         question: 'Cum sunt livrate cursurile?',
-        answer: richText(['Toate cursurile sunt livrate live, 1:1, pe Google Meet — niciodată preînregistrate.']),
+        answer: richText(['Toate cursurile sunt livrate live, 1:1, pe Zoom — niciodată preînregistrate.']),
       },
     },
     {
@@ -784,7 +784,7 @@ async function seed() {
       ]),
       process: [
         { title: 'Enrol', description: 'Reserve your seat in a live, 1:1 session with Dr. Silviu Gresoi.' },
-        { title: 'Attend', description: 'Join the scheduled live sessions on Google Meet and complete the course.' },
+        { title: 'Attend', description: 'Join the scheduled live sessions on Zoom and complete the course.' },
         { title: 'Receive your certificate', description: 'Obtain your certification directly through PECB, plus CPD credits — one per training hour.' },
       ],
     },
@@ -801,7 +801,7 @@ async function seed() {
       ]),
       process: [
         { title: 'Înscrie-te', description: 'Rezervă-ți locul într-o sesiune live, 1:1, cu Dr. Silviu Gresoi.' },
-        { title: 'Participă', description: 'Alătură-te sesiunilor live programate pe Google Meet și finalizează cursul.' },
+        { title: 'Participă', description: 'Alătură-te sesiunilor live programate pe Zoom și finalizează cursul.' },
         { title: 'Primește-ți certificatul', description: 'Obții certificarea direct prin PECB, plus credite CPD — unul pentru fiecare oră de curs.' },
       ],
     },
@@ -832,7 +832,7 @@ async function seed() {
         differentiators: [
           {
             title: 'Live, not recorded',
-            text: 'Every session is taught live, 1:1, on Google Meet — no pre-recorded videos.',
+            text: 'Every session is taught live, 1:1, on Zoom — no pre-recorded videos.',
           },
           {
             title: 'Real-world expertise',
@@ -868,7 +868,7 @@ async function seed() {
         differentiators: [
           {
             title: 'Live, nu înregistrat',
-            text: 'Fiecare sesiune este predată live, 1:1, pe Google Meet — fără videoclipuri preînregistrate.',
+            text: 'Fiecare sesiune este predată live, 1:1, pe Zoom — fără videoclipuri preînregistrate.',
           },
           {
             title: 'Expertiză din practică',
@@ -941,7 +941,7 @@ async function seed() {
           'Technical data: country-level location derived from your IP (used only to display prices in RON for Romania and EUR elsewhere), plus cookie and consent preferences described in the Cookie Policy.',
         ]) },
         { heading: '4. Purposes and legal bases', body: richText([
-          'Contract performance: processing orders, delivering live sessions, sending the Google Meet invitation and enrolling participants in the PECB platform for PECB courses.',
+          'Contract performance: processing orders, delivering live sessions, sending the Zoom invitation and enrolling participants in the PECB platform for PECB courses.',
           'Legal obligation: issuing and keeping invoices and accounting records.',
           'Consent: newsletter and analytics cookies (Google Analytics 4, only after you accept).',
           'Legitimate interest: site security, fraud prevention and answering your requests.',
@@ -979,7 +979,7 @@ async function seed() {
             'Date tehnice: localizarea la nivel de țară derivată din adresa IP (folosită doar pentru a afișa prețurile în RON pentru România și în EUR în rest), plus preferințele privind cookie-urile și consimțământul, descrise în Politica de cookie-uri.',
           ]) },
           { heading: '4. Scopuri și temeiuri legale', body: richText([
-            'Executarea contractului: procesarea comenzilor, livrarea sesiunilor live, trimiterea invitației Google Meet și înrolarea participanților în platforma PECB pentru cursurile PECB.',
+            'Executarea contractului: procesarea comenzilor, livrarea sesiunilor live, trimiterea invitației Zoom și înrolarea participanților în platforma PECB pentru cursurile PECB.',
             'Obligație legală: emiterea și păstrarea facturilor și a evidențelor contabile.',
             'Consimțământ: newsletterul și cookie-urile de analiză (Google Analytics 4, doar după ce accepți).',
             'Interes legitim: securitatea site-ului, prevenirea fraudelor și răspunsul la solicitările tale.',
@@ -1060,7 +1060,7 @@ async function seed() {
           'Course — a live training programme listed in the catalog. Edition — a scheduled run of a course, with its own dates, capacity and price windows. Seat — a place in an edition, tied to a named participant (name + e-mail); no user accounts are created. Order — the purchase of one or more seats in a single edition.',
         ]) },
         { heading: '3. Services', body: richText([
-          'isad.academy delivers live, one-to-one online training on Google Meet. For PECB courses, certification is obtained directly through PECB — participants are enrolled in the PECB platform after payment. Every course carries CPD credits (one credit per training hour).',
+          'isad.academy delivers live, one-to-one online training on Zoom. For PECB courses, certification is obtained directly through PECB — participants are enrolled in the PECB platform after payment. Every course carries CPD credits (one credit per training hour).',
         ]) },
         { heading: '4. Ordering and payment', body: richText([
           'Orders cover a single edition, with the name and e-mail of each participant. Prices are shown without VAT — ISAD is not VAT-registered. Prices are displayed and charged in RON for visitors from Romania and EUR otherwise.',
@@ -1092,7 +1092,7 @@ async function seed() {
             'Curs — un program de instruire live listat în catalog. Ediție — o desfășurare programată a unui curs, cu propriile date, propria capacitate și propriile ferestre de preț. Loc — un loc într-o ediție, asociat unui participant nominalizat (nume + e-mail); nu se creează conturi de utilizator. Comandă — achiziția unuia sau mai multor locuri într-o singură ediție.',
           ]) },
           { heading: '3. Servicii', body: richText([
-            'isad.academy livrează instruire online live, unu-la-unu, pe Google Meet. Pentru cursurile PECB, certificarea se obține direct prin PECB — participanții sunt înrolați în platforma PECB după plată. Fiecare curs oferă credite CPD (un credit pentru fiecare oră de curs).',
+            'isad.academy livrează instruire online live, unu-la-unu, pe Zoom. Pentru cursurile PECB, certificarea se obține direct prin PECB — participanții sunt înrolați în platforma PECB după plată. Fiecare curs oferă credite CPD (un credit pentru fiecare oră de curs).',
           ]) },
           { heading: '4. Comandă și plată', body: richText([
             'Comenzile acoperă o singură ediție și includ numele și e-mailul fiecărui participant. Prețurile sunt afișate fără TVA — ISAD nu este plătitoare de TVA. Prețurile sunt afișate și încasate în RON pentru vizitatorii din România și în EUR în rest.',

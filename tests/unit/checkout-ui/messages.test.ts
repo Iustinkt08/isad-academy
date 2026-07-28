@@ -25,9 +25,9 @@ describe('checkoutSubmitError — maps every T6 status/body to a UI surface', ()
   })
 
   it('400 without detail surfaces the server validation message in the general panel', () => {
-    expect(checkoutSubmitError(400, { error: '"buyer.email" must be a valid email address.' })).toEqual({
+    expect(checkoutSubmitError(400, { error: '"buyer.email" must be a valid e-mail address.' })).toEqual({
       kind: 'general',
-      message: '"buyer.email" must be a valid email address.',
+      message: '"buyer.email" must be a valid e-mail address.',
     })
   })
 

@@ -23,7 +23,9 @@ const RUN_ID = `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`
 async function enrolSessionId(page: Page): Promise<string> {
   await page.goto(COURSE_URL)
   const href = await page.getByRole('link', { name: /^Enrol now/ }).getAttribute('href')
-  const match = href?.match(/session=(\d+)/)
+  // EnrolForm links with the Figma-extract aliases (?edition=&qty=) — same contract as
+  // the checkout page's SearchParams.
+  const match = href?.match(/(?:session|edition)=(\d+)/)
   expect(match, `Enrol href should carry a session id (got "${href}")`).toBeTruthy()
   return match![1]!
 }
@@ -35,7 +37,9 @@ test.describe('checkout', () => {
     await page.goto(COURSE_URL)
     await page.getByRole('link', { name: /^Enrol now/ }).click()
 
-    await expect(page).toHaveURL(/\/checkout\?session=\d+&quantity=1/)
+    // EnrolForm links with the Figma-extract aliases (?edition=&qty=) — the checkout page
+    // accepts both spellings (see CheckoutPage's SearchParams contract).
+    await expect(page).toHaveURL(/\/checkout\?(session|edition)=\d+&(quantity|qty)=1/)
     await expect(page.getByRole('heading', { name: 'Complete your enrolment.' })).toBeVisible()
     await expect(page.getByText('Lead Implementer').first()).toBeVisible()
 
@@ -51,24 +55,21 @@ test.describe('checkout', () => {
     await expect(page.getByText('Final price — isad.academy is not VAT registered.')).toBeVisible()
 
     await page.getByLabel('Full name').fill('Happy Buyer')
-    await page.getByLabel('Email', { exact: true }).fill(`happy-${RUN_ID}@example.com`)
+    await page.getByLabel('E-mail', { exact: true }).fill(`happy-${RUN_ID}@example.com`)
     await page.getByRole('button', { name: /Pay securely/ }).click()
 
     // Confirmation renders from the sessionStorage'd checkout response (orders have no public read)
     await expect(page).toHaveURL(/\/checkout\/confirmare$/)
-    // NB: the heading uses a typographic apostrophe (You’re), not ASCII.
-    await expect(page.getByRole('heading', { name: 'You’re enrolled!' })).toBeVisible()
+    // Redesign (Figma 4031-156): "Enrolment confirmed." headline, recap card with the
+    // order ref, buyer email in the subtitle, next-steps card + homepage CTA.
+    await expect(page.getByRole('heading', { name: 'Enrolment confirmed.' })).toBeVisible()
     await expect(page.getByText('Lead Implementer', { exact: false }).first()).toBeVisible()
-    await expect(page.getByText(/Order reference:/)).toBeVisible()
-    await expect(page.getByText(/#\d+/)).toBeVisible()
-    await expect(page.getByText('Happy Buyer')).toBeVisible()
-    await expect(page.getByText(`happy-${RUN_ID}@example.com`)).toBeVisible()
+    await expect(page.getByText(/Order #\d+/)).toBeVisible()
+    await expect(page.getByText(`happy-${RUN_ID}@example.com`, { exact: false })).toBeVisible()
     await expect(
-      page.getByText('Your Google Meet invite will follow a few days before the course starts', {
-        exact: false,
-      }),
+      page.getByText('Zoom invite arrives before the start date', { exact: false }),
     ).toBeVisible()
-    await expect(page.getByRole('link', { name: 'Back to courses' })).toBeVisible()
+    await expect(page.getByRole('link', { name: /Back to homepage/ })).toBeVisible()
   })
 
   test('quantity 3 renders three participant pairs + group discount line; stepper reprices live', async ({
@@ -115,7 +116,7 @@ test.describe('checkout', () => {
     await expect(page.getByLabel('Company address')).toBeVisible()
 
     await page.getByLabel('Full name').fill('B2B Buyer')
-    await page.getByLabel('Email', { exact: true }).fill(`b2b-${RUN_ID}@example.com`)
+    await page.getByLabel('E-mail', { exact: true }).fill(`b2b-${RUN_ID}@example.com`)
     await page.getByRole('button', { name: /Pay securely/ }).click()
 
     // Client validation blocks the submit — inline errors, still on /checkout
@@ -144,7 +145,7 @@ test.describe('checkout', () => {
     await page.goto(`/checkout?session=${sessionId}&quantity=1`)
 
     await page.getByLabel('Full name').fill('Declined Buyer')
-    await page.getByLabel('Email', { exact: true }).fill('fail@test.local')
+    await page.getByLabel('E-mail', { exact: true }).fill('fail@test.local')
     await page.getByRole('button', { name: /Pay securely/ }).click()
 
     await expect(page.getByText('Payment was declined — please try again.')).toBeVisible()

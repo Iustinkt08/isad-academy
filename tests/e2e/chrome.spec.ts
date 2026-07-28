@@ -46,7 +46,7 @@ test('newsletter form surfaces the signup confirmation inline', async ({ page })
     .click()
 
   const footer = page.getByRole('contentinfo')
-  await footer.getByLabel('Email address').fill('test@example.com')
+  await footer.getByLabel('E-mail').fill('test@example.com')
   await footer.getByRole('button', { name: 'Subscribe' }).click()
   await expect(
     footer.getByText('Almost there — check your inbox to confirm your subscription.'),

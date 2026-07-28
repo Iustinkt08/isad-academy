@@ -4,6 +4,18 @@ import config from '../../../payload.config'
 import { parseJsonBody } from '../../../lib/api/parseJsonBody'
 import { processCheckout } from '../../../lib/checkout/processCheckout'
 import { getVisitorCountry } from '../../../lib/currency'
+import { LOCALE_COOKIE } from '../../../lib/i18n/config'
+
+/** The `locale` cookie set by the language switcher — display-only (hosted payment page
+ * language); pricing/geo never read it. */
+const getVisitorLocale = (headers: Headers): string | null => {
+  const match = headers
+    .get('cookie')
+    ?.split(';')
+    .map((part) => part.trim())
+    .find((part) => part.startsWith(`${LOCALE_COOKIE}=`))
+  return match ? match.slice(LOCALE_COOKIE.length + 1) : null
+}
 
 /** Guards against parsing an arbitrarily large request body (CLAUDE.md quality floor —
  * "reject oversized payloads"). A real checkout body (buyer + a realistic number of
@@ -29,7 +41,11 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   const payload = await getPayload({ config })
-  const result = await processCheckout(parsed.body, { payload, country: getVisitorCountry(request.headers) })
+  const result = await processCheckout(parsed.body, {
+    payload,
+    country: getVisitorCountry(request.headers),
+    locale: getVisitorLocale(request.headers),
+  })
 
   return Response.json(result.body, { status: result.status })
 }

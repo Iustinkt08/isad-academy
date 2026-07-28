@@ -207,7 +207,7 @@ export default function EnrolmentCard({
                 href={`${localePath(locale, '/checkout')}?edition=${selected.id}&qty=${qty}`}
                 className="flex-1 rounded-full border border-[#1c5d99] bg-gradient-to-b from-steel to-blue to-[80%] pb-[13px] pt-3 text-center text-[16px] font-medium text-white shadow-[0_4px_4px_-2px_rgba(0,0,0,0.21)] transition-transform hover:scale-[1.02]"
               >
-                {t.enrolNow} →
+                {t.enrolNow}
               </Link>
             ) : (
               /* Selected edition has no active price window (§8) → not purchasable */

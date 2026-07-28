@@ -3,7 +3,6 @@ import { getPayload } from 'payload'
 
 import config from '@payload-config'
 import { ConfirmationRecap } from '@/components/checkout/ConfirmationRecap'
-import { Container } from '@/components/ui/Container'
 import { getDictionary, resolveLocale } from '@/lib/i18n'
 
 export async function generateMetadata({
@@ -26,10 +25,19 @@ export async function generateMetadata({
  */
 export default async function ConfirmationPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>
+  searchParams: Promise<{ outcome?: string }>
 }) {
   const locale = resolveLocale((await params).locale)
+  // Set by /api/netopia/return after a hosted-page payment. Display-only hint — the
+  // authoritative status lives on the order (IPN/status poll); absent for the mock flow.
+  const rawOutcome = (await searchParams).outcome
+  const outcome =
+    rawOutcome === 'paid' || rawOutcome === 'pending' || rawOutcome === 'failed'
+      ? rawOutcome
+      : undefined
   const payload = await getPayload({ config })
   const siteSettings = await payload
     .findGlobal({
@@ -40,15 +48,15 @@ export default async function ConfirmationPage({
     })
     .catch(() => null)
 
+  // Figma 4031-156/4031-218: full-page #f8f9fa wash, single centred column (the recap
+  // component owns its paddings/gaps) — no radial wash, no Container.
   return (
-    <div className="bg-radial-wash">
-      <Container className="animate-rise py-14 sm:py-20">
-        <ConfirmationRecap
-          locale={locale}
-          currency={siteSettings?.currency ?? 'EUR'}
-          vatDisplay={siteSettings?.vatDisplay ?? 'incl'}
-        />
-      </Container>
-    </div>
+    <main className="animate-rise bg-surface-subtle">
+      <ConfirmationRecap
+        locale={locale}
+        currency={siteSettings?.currency ?? 'EUR'}
+        outcome={outcome}
+      />
+    </main>
   )
 }

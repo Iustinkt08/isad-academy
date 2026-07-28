@@ -22,6 +22,14 @@ export type CreatePaymentInput = {
   amount: number
   currency: string
   buyerEmail: string
+  /** Optional buyer/context details a hosted-page processor (Netopia) forwards to its
+   * payment form and receipts. Providers that don't need them (mock) ignore them. */
+  buyerName?: string
+  buyerPhone?: string
+  /** Human-readable order description (course title) shown on the processor's page. */
+  description?: string
+  /** ISO 639-1 language for the hosted payment page ('en' | 'ro'). */
+  language?: string
 }
 
 export type CreatePaymentResult = {
@@ -45,9 +53,9 @@ export interface PaymentProvider {
 }
 
 /**
- * Thrown by every not-yet-implemented provider stub (Stripe/Netopia/EuPlătesc — CLAUDE.md
- * §13, "TBD, stub until signed"). Deliberately loud: a checkout must never silently
- * "succeed" against a processor nobody actually wired up.
+ * Thrown by every not-yet-implemented provider stub (Stripe/EuPlătesc — CLAUDE.md §13,
+ * "TBD, stub until signed"; Netopia is implemented, see `netopia.ts`). Deliberately loud:
+ * a checkout must never silently "succeed" against a processor nobody actually wired up.
  */
 export class NotImplementedError extends Error {
   constructor(providerName: string) {

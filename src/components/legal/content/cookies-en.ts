@@ -53,7 +53,7 @@ export const cookiesEn: LegalDocContent = {
         },
         {
           "kind": "p",
-          "text": "Email: support@isad.academy"
+          "text": "E-mail: support@isad.academy"
         }
       ]
     },
@@ -396,7 +396,7 @@ export const cookiesEn: LegalDocContent = {
         {
           "kind": "entity",
           "line1": "INTERNATIONAL SECURITY AND DEFENCE S.R.L.",
-          "line2": "Website: https://isad.academy · Email: support@isad.academy"
+          "line2": "Website: https://isad.academy · E-mail: support@isad.academy"
         }
       ]
     }

@@ -122,7 +122,7 @@ export function NewsletterForm({
           type="email"
           required
           autoComplete="email"
-          placeholder="you@company.com"
+          placeholder="E-mail"
           disabled={status === 'loading'}
           className={cn(
             'w-full min-w-0 rounded-full border px-4 py-2.5 text-sm outline-none transition-colors',

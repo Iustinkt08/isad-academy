@@ -409,7 +409,7 @@ export default function CorporateLeadForm({
                   t.form.submitting
                 ) : (
                   <>
-                    {t.form.submit} <span aria-hidden="true">→</span>
+                    {t.form.submit}
                   </>
                 )}
               </button>

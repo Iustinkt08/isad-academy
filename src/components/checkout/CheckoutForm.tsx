@@ -328,6 +328,13 @@ export function CheckoutForm({
           // Storage unavailable (rare) — still navigate; the confirmation page degrades
           // to its "no recent order found" state rather than blocking the enrolment.
         }
+        // Redirect-based provider (Netopia hosted payment page): hand the buyer to the
+        // processor; they come back via /api/netopia/return → /checkout/confirmare, and
+        // the recap stored above survives the round-trip in this tab's sessionStorage.
+        if (data.status === 'requiresAction' && typeof data.redirectUrl === 'string' && data.redirectUrl) {
+          window.location.assign(data.redirectUrl)
+          return // keep `submitting` true while the browser leaves
+        }
         router.push(localePath(locale, '/checkout/confirmare'))
         return // keep `submitting` true while navigating
       }

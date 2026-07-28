@@ -1,3 +1,5 @@
+export { applyPaymentOutcome } from './applyPaymentOutcome'
+export type { ApplyPaymentOutcomeResult, PaymentOutcome } from './applyPaymentOutcome'
 export { incrementDiscountCodeUsage } from './incrementDiscountCodeUsage'
 export { loadPricedSession } from './loadPricedSession'
 export type {

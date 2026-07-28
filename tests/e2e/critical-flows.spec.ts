@@ -23,7 +23,9 @@ const RUN_ID = `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`
 async function enrolSessionId(page: Page, courseUrl: string): Promise<string> {
   await page.goto(courseUrl)
   const href = await page.getByRole('link', { name: /^Enrol now/ }).getAttribute('href')
-  const match = href?.match(/session=(\d+)/)
+  // EnrolForm links with the Figma-extract aliases (?edition=&qty=); both spellings are
+  // part of the checkout page's SearchParams contract.
+  const match = href?.match(/(?:session|edition)=(\d+)/)
   expect(match, `Enrol href should carry a session id (got "${href}")`).toBeTruthy()
   return match![1]!
 }
@@ -59,16 +61,17 @@ test.describe('discount code purchase — WELCOME10 (T15 gap 1)', () => {
 
     const email = `welcome10-${RUN_ID}@example.com`
     await page.getByLabel('Full name').fill('Discount Buyer')
-    await page.getByLabel('Email', { exact: true }).fill(email)
+    await page.getByLabel('E-mail', { exact: true }).fill(email)
     await page.getByRole('button', { name: /Pay securely/ }).click()
 
     // Confirmation recap shows the discounted total (order.pricing snapshot, not a re-quote).
+    // Redesign (Figma 4031-156): compact recap card — total paid + order ref; the buyer
+    // email moves to the subtitle ("confirmation email is on its way to …").
     await expect(page).toHaveURL(/\/checkout\/confirmare$/)
-    await expect(page.getByRole('heading', { name: 'You’re enrolled!' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Enrolment confirmed.' })).toBeVisible()
     const recap = page.getByTestId('order-recap')
-    await expect(recap.getByText('Discount code', { exact: true })).toBeVisible()
     await expect(recap.getByText('€810')).toBeVisible()
-    await expect(recap.getByText(email)).toBeVisible()
+    await expect(page.getByText(email, { exact: false })).toBeVisible()
 
     // Observable state change: the seat consumed on confirmed payment (§3.4/§8) shows up
     // as a real, atomic decrement on the session (capacity 12 stays above the "seats left"
@@ -91,11 +94,11 @@ test.describe('discount code purchase — WELCOME10 (T15 gap 1)', () => {
 
     const email = `welcome10-second-${RUN_ID}@example.com`
     await page.getByLabel('Full name').fill('Second Discount Buyer')
-    await page.getByLabel('Email', { exact: true }).fill(email)
+    await page.getByLabel('E-mail', { exact: true }).fill(email)
     await page.getByRole('button', { name: /Pay securely/ }).click()
 
     await expect(page).toHaveURL(/\/checkout\/confirmare$/)
-    await expect(page.getByRole('heading', { name: 'You’re enrolled!' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Enrolment confirmed.' })).toBeVisible()
     await expect(page.getByTestId('order-recap').getByText('€810')).toBeVisible()
   })
 })
@@ -116,10 +119,11 @@ test.describe('quiz nav (T15 gap 4)', () => {
     await page.getByRole('link', { name: /Which course is right for me/ }).click()
 
     await expect(page).toHaveURL('/quiz')
+    // Bilingual quiz: the EN wizard renders at /quiz (RO twin under /ro/quiz).
     await expect(
-      page.getByRole('heading', { level: 1, name: 'Ce curs mi se potrivește?' }),
+      page.getByRole('heading', { level: 1, name: /Which course is right for me\?/ }),
     ).toBeVisible()
-    await expect(page.getByText('Întrebarea 1 din 12')).toBeVisible()
+    await expect(page.getByText('Question 1 of 12')).toBeVisible()
   })
 })
 

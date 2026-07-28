@@ -21,6 +21,10 @@ export type CheckoutSuccessBody = {
   pricing: PricingSnapshot
   session: { id: number; courseTitle: string; startDate: string }
   participants: { name: string; email: string }[]
+  /** Buyer's email — the confirmation page's "email on its way to {email}" line. */
+  buyerEmail?: string
+  /** Currency the order was actually priced/charged in (B1 geo resolution). */
+  currency?: string
 }
 
 export type CheckoutFailureBody = {
@@ -39,6 +43,9 @@ export type ProcessCheckoutDeps = {
   payload: Payload
   /** Visitor country code from the geo header (B1) — resolved by the route, never client-sent. */
   country?: string | null
+  /** Page locale ('en' | 'ro') from the locale cookie — hosted payment pages (Netopia)
+   * render in it. Display-only; never affects pricing. */
+  locale?: string | null
   /** Injected clock, mirroring the pricing engine's own contract — lets tests pin "now"
    * deterministically instead of racing the system clock against fixture date windows. */
   now?: Date
@@ -95,7 +102,7 @@ export const processCheckout = async (
     return { status: priced.status, body: priced.body }
   }
 
-  const { session, sessionView, codeDocs, siteSettings, pricing } = priced
+  const { session, sessionView, codeDocs, pricing } = priced
 
   // d. Create the pending order -------------------------------------------------------------
   const order = await payload.create({
@@ -139,8 +146,14 @@ export const processCheckout = async (
   const paymentResult = await provider.createPayment({
     orderId: order.id,
     amount: pricing.total,
-    currency: siteSettings.currency ?? 'EUR',
+    // The currency the engine actually priced in (B1 geo resolution) — matches the
+    // `pricing.currency` snapshot above, NOT the raw siteSettings default.
+    currency: priced.currency,
     buyerEmail: input.buyer.email,
+    buyerName: input.buyer.name,
+    buyerPhone: input.buyer.phone,
+    description: sessionView.courseTitle || undefined,
+    language: deps.locale === 'ro' ? 'ro' : 'en',
   })
 
   if (paymentResult.status === 'failed') {
@@ -174,6 +187,8 @@ export const processCheckout = async (
         pricing,
         session: sessionView,
         participants: input.participants,
+        buyerEmail: input.buyer.email,
+        currency: priced.currency,
       },
     }
   }
@@ -225,6 +240,8 @@ export const processCheckout = async (
       pricing,
       session: sessionView,
       participants: input.participants,
+      buyerEmail: input.buyer.email,
+      currency: priced.currency,
     },
   }
 }

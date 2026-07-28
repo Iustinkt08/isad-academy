@@ -80,6 +80,7 @@ export interface Config {
     faqItems: FaqItem;
     leads: Lead;
     legalPages: LegalPage;
+    eventRegistrations: EventRegistration;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
@@ -105,6 +106,7 @@ export interface Config {
     faqItems: FaqItemsSelect<false> | FaqItemsSelect<true>;
     leads: LeadsSelect<false> | LeadsSelect<true>;
     legalPages: LegalPagesSelect<false> | LegalPagesSelect<true>;
+    eventRegistrations: EventRegistrationsSelect<false> | EventRegistrationsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -120,6 +122,7 @@ export interface Config {
     homepage: Homepage;
     expertBio: ExpertBio;
     certificationInfo: CertificationInfo;
+    eventPopup: EventPopup;
     'payload-jobs-stats': PayloadJobsStat;
   };
   globalsSelect: {
@@ -127,6 +130,7 @@ export interface Config {
     homepage: HomepageSelect<false> | HomepageSelect<true>;
     expertBio: ExpertBioSelect<false> | ExpertBioSelect<true>;
     certificationInfo: CertificationInfoSelect<false> | CertificationInfoSelect<true>;
+    eventPopup: EventPopupSelect<false> | EventPopupSelect<true>;
     'payload-jobs-stats': PayloadJobsStatsSelect<false> | PayloadJobsStatsSelect<true>;
   };
   locale: 'en' | 'ro';
@@ -769,6 +773,28 @@ export interface LegalPage {
   createdAt: string;
 }
 /**
+ * Sign-ups from the event popup. Public create only — read/update/delete are admin-only.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "eventRegistrations".
+ */
+export interface EventRegistration {
+  id: number;
+  /**
+   * Which event this registration belongs to — the popup event's date key (a new event date starts a fresh list).
+   */
+  eventId: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  /**
+   * Picked from the configured list or typed freely.
+   */
+  occupation?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -944,6 +970,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'legalPages';
         value: number | LegalPage;
+      } | null)
+    | ({
+        relationTo: 'eventRegistrations';
+        value: number | EventRegistration;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1297,6 +1327,19 @@ export interface LegalPagesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "eventRegistrations_select".
+ */
+export interface EventRegistrationsSelect<T extends boolean = true> {
+  eventId?: T;
+  firstName?: T;
+  lastName?: T;
+  email?: T;
+  occupation?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv_select".
  */
 export interface PayloadKvSelect<T extends boolean = true> {
@@ -1566,6 +1609,66 @@ export interface CertificationInfo {
   createdAt?: string | null;
 }
 /**
+ * The event popup shown once per visitor when entering the site. Toggle "Active" off to hide it everywhere; a new Event date re-shows it to everyone.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "eventPopup".
+ */
+export interface EventPopup {
+  id: number;
+  /**
+   * Show the popup on the site. It also hides itself automatically once the event date has passed.
+   */
+  active?: boolean | null;
+  /**
+   * Event title — the part rendered in plain ink, e.g. "AI Governance ".
+   */
+  titlePlain?: string | null;
+  /**
+   * Event title — the segment rendered in the brand gradient, e.g. "in Practice.".
+   */
+  titleGradient?: string | null;
+  description?: string | null;
+  /**
+   * Countdown target. After this moment the popup stops showing itself.
+   */
+  eventDate?: string | null;
+  /**
+   * E.g. "Thu 14 Aug 2026 · 18:00 (EEST) · Live on Zoom".
+   */
+  metaLine?: string | null;
+  /**
+   * Shown with photo, or initials when no photo is uploaded.
+   */
+  speakers?:
+    | {
+        name: string;
+        role?: string | null;
+        photo?: (number | null) | Media;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Main button label. Empty = "Secure your spot".
+   */
+  ctaLabel?: string | null;
+  /**
+   * Form submit label. Empty = "Join us".
+   */
+  joinLabel?: string | null;
+  /**
+   * Options offered in the registration form (visitors can also type their own).
+   */
+  occupations?:
+    | {
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-jobs-stats".
  */
@@ -1707,6 +1810,37 @@ export interface CertificationInfoSelect<T extends boolean = true> {
         id?: T;
       };
   certificateSample?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "eventPopup_select".
+ */
+export interface EventPopupSelect<T extends boolean = true> {
+  active?: T;
+  titlePlain?: T;
+  titleGradient?: T;
+  description?: T;
+  eventDate?: T;
+  metaLine?: T;
+  speakers?:
+    | T
+    | {
+        name?: T;
+        role?: T;
+        photo?: T;
+        id?: T;
+      };
+  ctaLabel?: T;
+  joinLabel?: T;
+  occupations?:
+    | T
+    | {
+        label?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

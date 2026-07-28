@@ -36,9 +36,13 @@ BREVO_NEWSLETTER_LIST_ID=...
 # Analytics (consent-gated, lazy)
 NEXT_PUBLIC_GA4_ID=
 NEXT_PUBLIC_GTM_ID=
-# Payment (adăugate la semnare — MockProvider by default)
+# Payment (MockProvider by default; Netopia implementat — API v2 hosted page)
 PAYMENT_PROVIDER=mock        # mock | stripe | netopia | euplatesc
-# STRIPE_SECRET_KEY= / NETOPIA_* / EUPLATESC_* (later)
+NETOPIA_API_KEY=             # din admin Netopia (sandbox: sandbox.netopia-payments.com)
+NETOPIA_POS_SIGNATURE=
+NETOPIA_SANDBOX=true         # default sandbox; EXACT 'false' pentru live
+NETOPIA_PUBLIC_KEY=          # certificat PEM (sau base64) pt. verificarea IPN
+# STRIPE_SECRET_KEY= / EUPLATESC_* (later)
 ```
 
 ---

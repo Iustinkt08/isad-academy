@@ -117,7 +117,7 @@ test.describe('blog article', () => {
     // NB: the microcopy uses a typographic apostrophe (We’ll), not ASCII.
     await expect(gate.getByText('We’ll email you the download link.')).toBeVisible()
 
-    await gate.getByLabel('Email address').fill('reader@example.com')
+    await gate.getByLabel('E-mail address').fill('reader@example.com')
     await gate.getByRole('button', { name: 'Send me the file' }).click()
 
     await expect(

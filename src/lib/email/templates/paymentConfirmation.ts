@@ -46,7 +46,7 @@ export const renderPaymentConfirmationEmail = (data: PaymentConfirmationData): R
       <tr><td style="padding:4px 0;color:#666666;">Participants</td><td style="padding:4px 0;text-align:right;">${escapeHtml(participantsList)}</td></tr>
       <tr><td style="padding:8px 0;color:#666666;font-weight:700;">Total paid</td><td style="padding:8px 0;text-align:right;font-weight:700;">${data.total.toFixed(2)} ${escapeHtml(data.currency)}</td></tr>
     </table>
-    <p style="margin:0 0 8px;line-height:1.6;">A Google Meet invite will follow closer to the start date.</p>
+    <p style="margin:0 0 8px;line-height:1.6;">A Zoom invite will follow closer to the start date.</p>
     <p style="margin:0;font-size:12px;color:#999999;">Order reference: ${escapeHtml(String(data.orderId))}</p>
   `
 
@@ -59,7 +59,7 @@ export const renderPaymentConfirmationEmail = (data: PaymentConfirmationData): R
     `Seats: ${data.quantity}`,
     `Participants: ${participantsList}`,
     `Total paid: ${data.total.toFixed(2)} ${data.currency}`,
-    'A Google Meet invite will follow closer to the start date.',
+    'A Zoom invite will follow closer to the start date.',
     `Order reference: ${data.orderId}`,
   ].join('\n')
 

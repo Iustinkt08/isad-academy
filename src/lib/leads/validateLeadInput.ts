@@ -111,7 +111,7 @@ const validateContact = (raw: Record<string, unknown>): LeadValidationResult => 
     return { ok: false, error: '"name" is required.' }
   }
   if (!isValidEmail(email)) {
-    return { ok: false, error: '"email" must be a valid email address.' }
+    return { ok: false, error: '"email" must be a valid e-mail address.' }
   }
   if (phone !== undefined && !isNonEmptyString(phone, MAX_TEXT_LENGTH)) {
     return { ok: false, error: '"phone" must be a non-empty string.' }
@@ -159,7 +159,7 @@ const validateCorporate = (raw: Record<string, unknown>): LeadValidationResult =
     return { ok: false, error: '"contactPerson" is required.' }
   }
   if (!isValidEmail(email)) {
-    return { ok: false, error: '"email" must be a valid email address.' }
+    return { ok: false, error: '"email" must be a valid e-mail address.' }
   }
   if (phone !== undefined && !isNonEmptyString(phone, MAX_TEXT_LENGTH)) {
     return { ok: false, error: '"phone" must be a non-empty string.' }

@@ -250,7 +250,7 @@ export default function ContactForm({
           disabled={submitting}
           className="rounded-[999px] bg-gradient-to-b from-[#407ea2] to-[#1c5d99] to-[80%] pb-[13px] pt-3 text-center text-[16px] font-medium leading-normal text-white shadow-[0_4px_4px_-2px_rgba(0,0,0,0.21)] transition-transform hover:scale-[1.02] disabled:opacity-60 lg:px-[22px] lg:pb-3 lg:pt-[11px]"
         >
-          {submitting ? t.submitting : `${t.submit} →`}
+          {submitting ? t.submitting : t.submit}
         </button>
         <p className="text-center text-[12px] leading-[18px] text-[#959595] lg:text-left">
           {t.privacyPrefix}

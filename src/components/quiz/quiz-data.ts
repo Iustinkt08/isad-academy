@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Quiz „Ce curs mi se potrivește?" — DATELE (întrebările owner-ului, 1:1) +
  * tipurile de rezultat + logica de recomandare. v3.
  *
@@ -331,8 +331,8 @@ export const QUIZ_UI = {
     sub: '12 short questions — we recommend the right course or learning path in under two minutes.',
     progress: (n: number, total: number) => `Question ${n} of ${total}`,
     back: '← Back',
-    next: 'Continue →',
-    seeResult: 'See your result →',
+    next: 'Continue',
+    seeResult: 'See your result',
     loaderTitle: 'Analyzing your answers…',
     loaderSub: 'Preparing the right recommendation for you.',
     resultPill: 'Your result',
@@ -344,7 +344,7 @@ export const QUIZ_UI = {
     retake: 'Retake the quiz',
     corporateBand:
       'Looking for a course for a team or for your whole organization? We’ll build a custom solution.',
-    corporateBandCta: 'Corporate training →',
+    corporateBandCta: 'Corporate training',
   },
   ro: {
     pill: 'Quiz de curs',
@@ -354,8 +354,8 @@ export const QUIZ_UI = {
     sub: '12 întrebări scurte — îți recomandăm cursul sau parcursul potrivit, în mai puțin de două minute.',
     progress: (n: number, total: number) => `Întrebarea ${n} din ${total}`,
     back: '← Înapoi',
-    next: 'Continuă →',
-    seeResult: 'Vezi rezultatul →',
+    next: 'Continuă',
+    seeResult: 'Vezi rezultatul',
     loaderTitle: 'Îți analizăm răspunsurile…',
     loaderSub: 'Pregătim recomandarea potrivită pentru tine.',
     resultPill: 'Rezultatul tău',
@@ -367,7 +367,7 @@ export const QUIZ_UI = {
     retake: 'Reia quiz-ul',
     corporateBand:
       'Cauți un curs pentru o echipă sau pentru întreaga organizație? Îți construim o soluție personalizată.',
-    corporateBandCta: 'Corporate training →',
+    corporateBandCta: 'Corporate training',
   },
 } as const;
 
@@ -699,7 +699,7 @@ const RESULT_STATIC: Record<
       reason:
         'You’re looking for training for several people: we build a programme tailored to your organization’s goals, level and calendar — from executive sessions to technical programmes.',
       href: '/corporate',
-      ctaLabel: 'Corporate training →',
+      ctaLabel: 'Corporate training',
     },
     fallback: {
       courseTitle: 'Explore the course catalog',
@@ -707,14 +707,14 @@ const RESULT_STATIC: Record<
       reason:
         'Your answers don’t map clearly enough onto a single course in the current catalog. Have a look at all the courses — or write to us and we’ll guide you.',
       href: '/cursuri',
-      ctaLabel: 'See the courses →',
+      ctaLabel: 'See the courses',
     },
     pathSub: 'Two courses, in order',
-    pathTitle: (a, b) => `Learning path: ${a} → ${b}`,
+    pathTitle: (a, b) => `Learning path: ${a}, then ${b}`,
     pathReason: (a, b) =>
       `You start with the big picture (${a}), then move to the next level (${b}) — same domain, in the order that fits you.`,
-    pathCta: 'Start with the first course →',
-    courseCta: 'See the course →',
+    pathCta: 'Start with the first course',
+    courseCta: 'See the course',
   },
   ro: {
     corporate: {
@@ -723,7 +723,7 @@ const RESULT_STATIC: Record<
       reason:
         'Cauți formare pentru mai mulți oameni: construim un program adaptat obiectivelor, nivelului și calendarului organizației tale — de la sesiuni executive la programe tehnice.',
       href: '/corporate',
-      ctaLabel: 'Corporate training →',
+      ctaLabel: 'Corporate training',
     },
     fallback: {
       courseTitle: 'Explorează catalogul de cursuri',
@@ -731,14 +731,14 @@ const RESULT_STATIC: Record<
       reason:
         'Răspunsurile tale nu se potrivesc suficient de clar cu un singur curs din catalogul actual. Aruncă o privire peste toate cursurile — sau scrie-ne și te ghidăm noi.',
       href: '/cursuri',
-      ctaLabel: 'Vezi cursurile →',
+      ctaLabel: 'Vezi cursurile',
     },
     pathSub: 'Două cursuri, în ordine',
-    pathTitle: (a, b) => `Parcurs de învățare: ${a} → ${b}`,
+    pathTitle: (a, b) => `Parcurs de învățare: ${a}, apoi ${b}`,
     pathReason: (a, b) =>
       `Începi cu imaginea de ansamblu (${a}), apoi treci la nivelul următor (${b}) — același domeniu, în ordinea potrivită pentru tine.`,
-    pathCta: 'Începe cu primul curs →',
-    courseCta: 'Vezi cursul →',
+    pathCta: 'Începe cu primul curs',
+    courseCta: 'Vezi cursul',
   },
 };
 

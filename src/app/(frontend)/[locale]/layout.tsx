@@ -10,6 +10,7 @@ import { CookieConsentBanner } from '@/components/consent/CookieConsentBanner'
 import { Footer } from '@/components/layout/Footer'
 import { Header } from '@/components/layout/Header'
 import { ScrollProgress } from '@/components/layout/ScrollProgress'
+import EventPopupSlot from '@/components/popup/EventPopupSlot'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { LOCALES, getDictionary, resolveLocale, type Locale } from '@/lib/i18n'
 import { DEFAULT_OG_IMAGE, SITE_NAME, SITE_TAGLINE, getSiteUrl } from '@/lib/seo/site'
@@ -159,6 +160,7 @@ export default async function RootLayout({
           </main>
           <Footer settings={settings} locale={locale} />
           <ScrollProgress />
+          <EventPopupSlot locale={locale} />
           <CookieConsentBanner locale={locale} />
           <Analytics ga4Id={ga4Id} gtmId={gtmId} />
         </ConsentProvider>

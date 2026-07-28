@@ -271,8 +271,10 @@ export default function OrderSummaryCard({
   )
 }
 
-/** The "What happens next" card under the summary (Figma: Card / What Happens Next). */
-export function WhatHappensNext({ locale }: { locale: Locale }) {
+/** The "What happens next" card under the summary (Figma: Card / What Happens Next).
+ * `steps` overrides the three lines (confirmation page, Figma 4031-156) — without it the
+ * checkout copy renders unchanged. */
+export function WhatHappensNext({ locale, steps }: { locale: Locale; steps?: string[] }) {
   const t = getDictionary(locale).checkout
   return (
     <div className="flex w-full flex-col gap-2.5 rounded-[24px] bg-line-soft px-6 py-[22px] lg:gap-3 lg:px-9 lg:py-7">
@@ -280,7 +282,7 @@ export function WhatHappensNext({ locale }: { locale: Locale }) {
         {t.whatHappensNext}
       </h3>
       {/* Numerele pe coloana lor + textul cu hanging indent (Figma 3932-118) */}
-      {[t.nextStepPay, t.nextStepInvoice, t.nextStepJoin].map((step, index) => (
+      {(steps ?? [t.nextStepPay, t.nextStepInvoice, t.nextStepJoin]).map((step, index) => (
         <div key={step} className="flex items-start gap-2.5">
           <span className="w-3 shrink-0 text-[13px] font-medium leading-5 text-[#959595] lg:text-grey-600">
             {index + 1}

@@ -45,3 +45,4 @@ npm-debug.log*
 # deploy artefacts (build local pentru cPanel — nu se versionează)
 /deploy/
 isad-deploy.tar.gz
+.vercel

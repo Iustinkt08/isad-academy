@@ -71,7 +71,7 @@ describe('validateLeadInput — contact', () => {
 
   it('rejects a malformed email', () => {
     const result = validateLeadInput({ ...validContact(), email: 'not-an-email' })
-    expect(result).toMatchObject({ ok: false, error: '"email" must be a valid email address.' })
+    expect(result).toMatchObject({ ok: false, error: '"email" must be a valid e-mail address.' })
   })
 
   it('rejects a subject outside the allowed set', () => {

@@ -198,7 +198,7 @@ export const privacyEn: LegalDocContent = {
         {
           "kind": "list",
           "items": [
-            "email address;",
+            "e-mail address;",
             "phone number;",
             "mailing address;",
             "country;",
@@ -302,7 +302,7 @@ export const privacyEn: LegalDocContent = {
             "purchasing courses or services;",
             "participating in online or in-person courses;",
             "participating in conferences, workshops, and webinars;",
-            "communicating via email;",
+            "communicating via e-mail;",
             "communicating by phone;",
             "communication via WhatsApp, Microsoft Teams, Zoom, or other platforms used to conduct activities;",
             "participation in ISAD.academy communities;",
@@ -974,7 +974,7 @@ export const privacyEn: LegalDocContent = {
             "payment processors;",
             "hosting service providers;",
             "IT service providers;",
-            "email service providers;",
+            "e-mail service providers;",
             "CRM service providers;",
             "videoconferencing service providers;",
             "analytics and monitoring service providers;",
@@ -1055,7 +1055,7 @@ export const privacyEn: LegalDocContent = {
         },
         {
           "kind": "p",
-          "text": "Email: support@isad.academy"
+          "text": "E-mail: support@isad.academy"
         },
         {
           "kind": "p",
@@ -1121,7 +1121,7 @@ export const privacyEn: LegalDocContent = {
         {
           "kind": "entity",
           "line1": "INTERNATIONAL SECURITY AND DEFENCE S.R.L.",
-          "line2": "Website: https://isad.academy · Email: support@isad.academy"
+          "line2": "Website: https://isad.academy · E-mail: support@isad.academy"
         }
       ]
     }

@@ -14,7 +14,7 @@ const terms: { en: Content; ro: Content } = {
           { type: 'p', text: 'The website https://isad.academy, hereinafter referred to as the “Website” or “ISAD.academy Platform,” is operated by:' },
           { type: 'p', text: 'INTERNATIONAL SECURITY AND DEFENCE S.R.L., a limited liability company organized and operating in accordance with Romanian law, with its registered office in Teişori, 6 Stejarului Street, Postal Code 87033, registered with the Trade Registry Office under No. J52/935/2021, with unique registration code 44849076, hereinafter referred to as “ISAD,” “ISAD.academy,” “the Provider,” or “the Service Provider.”' },
           { type: 'p', text: 'Contact information:' },
-          { type: 'ul', items: ['website: https://isad.academy;', 'email: contact@isad.academy;', 'phone: 40727 392 392;', 'mailing address: One Cotroceni Park, 44 Sergent Nutu Ion Street, Building CT3, Apartment 322.', 'By accessing the Site, creating an account, registering for a course or event, purchasing a subscription, or using any other service offered through the Platform, the User confirms that they have read, understood, and accepted these Terms and Conditions.'] },
+          { type: 'ul', items: ['website: https://isad.academy;', 'e-mail: contact@isad.academy;', 'phone: 40727 392 392;', 'mailing address: One Cotroceni Park, 44 Sergent Nutu Ion Street, Building CT3, Apartment 322.', 'By accessing the Site, creating an account, registering for a course or event, purchasing a subscription, or using any other service offered through the Platform, the User confirms that they have read, understood, and accepted these Terms and Conditions.'] },
           { type: 'p', text: 'Individuals who do not agree with the provisions of this document must cease using the Site and must not purchase or use ISAD.academy’s Services.' },
         ],
       },
@@ -89,7 +89,7 @@ const terms: { en: Content; ro: Content } = {
         blocks: [
           { type: 'p', text: 'To access certain Services, the User may be required to create a Personal Account.' },
           { type: 'p', text: 'The User must provide true, complete, accurate, and up-to-date information, including:' },
-          { type: 'ul', items: ['first and last name;', 'email address;', 'phone number;', 'billing information;', 'the name and details of the legal entity, if applicable;', 'any other information necessary to provide the Service.'] },
+          { type: 'ul', items: ['first and last name;', 'e-mail address;', 'phone number;', 'billing information;', 'the name and details of the legal entity, if applicable;', 'any other information necessary to provide the Service.'] },
           { type: 'p', text: 'The User is responsible for:' },
           { type: 'ul', items: ['maintaining the confidentiality of their login credentials;', 'all activities performed through their Account;', 'using a secure password;', 'not disclosing their login credentials to others;', 'immediately notifying the Provider in the event of unauthorized use.'] },
           { type: 'p', text: 'The Account and the right of access are personal and may not be transferred, resold, lent, or shared with third parties.' },
@@ -102,7 +102,7 @@ const terms: { en: Content; ro: Content } = {
         heading: '7. Registration for Courses and Events',
         blocks: [
           { type: 'p', text: 'Registration can be completed by:' },
-          { type: 'ul', items: ['filling out the form available on the Site;', 'creating a personal Account;', 'purchasing a Service directly;', 'accepting a commercial offer;', 'submitting a request via email;', 'registering through a partner;', 'any other procedure indicated by the Provider.'] },
+          { type: 'ul', items: ['filling out the form available on the Site;', 'creating a personal Account;', 'purchasing a Service directly;', 'accepting a commercial offer;', 'submitting a request via e-mail;', 'registering through a partner;', 'any other procedure indicated by the Provider.'] },
           { type: 'p', text: 'Registration is considered confirmed only after the conditions communicated for the respective Service have been met, which may include:' },
           { type: 'ul', items: ['confirmation sent by the Provider;', 'full or partial payment of the price;', 'acceptance of the Terms;', 'provision of the necessary information;', 'fulfillment of any admission requirements.'] },
           { type: 'p', text: 'The number of spots may be limited.' },
@@ -126,9 +126,9 @@ const terms: { en: Content; ro: Content } = {
         heading: '9. Method of Delivery',
         blocks: [
           { type: 'p', text: 'Services may be provided:' },
-          { type: 'ul', items: ['in person;', 'online, live;', 'online, via recorded materials;', 'in a hybrid format;', 'through an LMS;', 'via videoconferencing platforms;', 'via email;', 'through Communities;', 'through other means communicated to the User.'] },
+          { type: 'ul', items: ['in person;', 'online, live;', 'online, via recorded materials;', 'in a hybrid format;', 'through an LMS;', 'via videoconferencing platforms;', 'via e-mail;', 'through Communities;', 'through other means communicated to the User.'] },
           { type: 'p', text: 'The User is responsible for providing the necessary equipment and technical conditions, such as:' },
-          { type: 'ul', items: ['a compatible computer, tablet, or phone;', 'a stable internet connection;', 'a working email address;', 'an up-to-date browser;', 'necessary software and applications;', 'camera and microphone, if required;', 'compliance with the technical requirements specified for the course.'] },
+          { type: 'ul', items: ['a compatible computer, tablet, or phone;', 'a stable internet connection;', 'a working e-mail address;', 'an up-to-date browser;', 'necessary software and applications;', 'camera and microphone, if required;', 'compliance with the technical requirements specified for the course.'] },
           { type: 'p', text: 'The Provider is not liable for any inability to access the Service caused exclusively by the User’s equipment, connection, software, or settings.' },
         ],
       },
@@ -521,7 +521,7 @@ const terms: { en: Content; ro: Content } = {
         heading: '45. Communications',
         blocks: [
           { type: 'p', text: 'Communications between the Provider and the User may take place via:' },
-          { type: 'ul', items: ['email;', 'phone;', 'text message;', 'WhatsApp;', 'Telegram;', 'notifications on the Platform;', 'other means of communication.'] },
+          { type: 'ul', items: ['e-mail;', 'phone;', 'text message;', 'WhatsApp;', 'Telegram;', 'notifications on the Platform;', 'other means of communication.'] },
           { type: 'p', text: 'The user must ensure that their contact information is up to date and check their spam or junk folders as well.' },
           { type: 'p', text: 'Notifications regarding the performance of the contract may be sent without marketing consent, as they are necessary for the provision of the Service.' },
         ],
@@ -529,9 +529,9 @@ const terms: { en: Content; ro: Content } = {
       {
         heading: '46. Complaints',
         blocks: [
-          { type: 'p', text: 'Any complaint regarding the services offered through the Platform may be sent to the following email address: support@isad.academy' },
+          { type: 'p', text: 'Any complaint regarding the services offered through the Platform may be sent to the following e-mail address: support@isad.academy' },
           { type: 'p', text: 'The complaint must include, as applicable:' },
-          { type: 'ul', items: ['the Customer’s name;', 'the email address used to place the order;', 'the Service purchased;', 'the invoice or order number;', 'a description of the situation;', 'the requested solution;', 'relevant documents.'] },
+          { type: 'ul', items: ['the Customer’s name;', 'the e-mail address used to place the order;', 'the Service purchased;', 'the invoice or order number;', 'a description of the situation;', 'the requested solution;', 'relevant documents.'] },
           { type: 'p', text: 'The service provider will review the complaint and provide a response within a reasonable timeframe, taking into account the complexity of the situation and the deadlines set forth by law.' },
           { type: 'p', text: 'The parties will seek to resolve any dispute amicably.' },
         ],
@@ -597,7 +597,7 @@ const terms: { en: Content; ro: Content } = {
       {
         heading: '54. Final Identification Information',
         blocks: [
-          { type: 'p', text: 'Service Provider: INTERNATIONAL SECURITY AND DEFENCE S.R.L. Trade Name/Platform: ISAD.academy Unique Registration Code: 44849076 General email: contact@isad.academy Email for complaints and withdrawals: support@isad.academy Phone: +40727 392 392 Website: https://isad.academy' },
+          { type: 'p', text: 'Service Provider: INTERNATIONAL SECURITY AND DEFENCE S.R.L. Trade Name/Platform: ISAD.academy Unique Registration Code: 44849076 General e-mail: contact@isad.academy E-mail for complaints and withdrawals: support@isad.academy Phone: +40727 392 392 Website: https://isad.academy' },
           { type: 'p', text: 'These Terms and Conditions take effect on July 21, 2026, and remain in effect until replaced by an updated version.' },
           { type: 'p', text: 'INTERNATIONAL SECURITY AND DEFENCE S.R.L. Operator of the ISAD.academy platform' },
         ],

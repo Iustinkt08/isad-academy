@@ -39,7 +39,7 @@ export default function CatalogHeader({
           href={quizHref}
           className="rounded-[999px] border border-[#1c5d99] bg-gradient-to-b from-[#407ea2] to-[#1c5d99] to-[80%] px-[22px] pb-3 pt-[11px] text-[16px] font-medium leading-normal text-white shadow-[0_4px_4px_-2px_rgba(0,0,0,0.21)] transition-transform hover:scale-[1.03]"
         >
-          {t.quizCta} →
+          {t.quizCta}
         </a>
       </div>
     </header>

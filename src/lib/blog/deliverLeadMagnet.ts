@@ -69,7 +69,7 @@ export async function deliverLeadMagnet(
     email.length > MAX_EMAIL_LENGTH ||
     !EMAIL_RE.test(email.trim())
   ) {
-    return { status: 400, body: { ok: false, error: 'A valid email address is required.' } }
+    return { status: 400, body: { ok: false, error: 'A valid e-mail address is required.' } }
   }
 
   const posts = await payload.find({

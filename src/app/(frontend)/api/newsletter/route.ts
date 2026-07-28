@@ -32,7 +32,7 @@ export async function POST(request: Request): Promise<Response> {
   const email = (parsed.body as { email?: unknown } | null)?.email
 
   if (typeof email !== 'string' || email.length > MAX_EMAIL_LENGTH || !EMAIL_RE.test(email)) {
-    return Response.json({ ok: false, error: 'A valid email address is required.' }, { status: 400 })
+    return Response.json({ ok: false, error: 'A valid e-mail address is required.' }, { status: 400 })
   }
 
   const result = await getMailer().subscribeDoubleOptIn({ email: email.trim() })

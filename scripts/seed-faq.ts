@@ -60,9 +60,9 @@ const FAQ: { category: Category; q: string; a: string; qRo: string; aRo: string 
   {
     category: 'discover',
     q: 'Are the courses live or self-paced?',
-    a: 'All courses are delivered live on Google Meet, in small groups, directly by Dr. Silviu Gresoi. There are no pre-recorded lessons — every session leaves room for your questions and your organization’s real cases.',
+    a: 'All courses are delivered live on Zoom, in small groups, directly by Dr. Silviu Gresoi. There are no pre-recorded lessons — every session leaves room for your questions and your organization’s real cases.',
     qRo: 'Cursurile sunt live sau în ritm propriu?',
-    aRo: 'Toate cursurile sunt livrate live pe Google Meet, în grupuri mici, direct de Dr. Silviu Gresoi. Nu există lecții preînregistrate — fiecare sesiune lasă loc pentru întrebările tale și pentru cazurile reale din organizația ta.',
+    aRo: 'Toate cursurile sunt livrate live pe Zoom, în grupuri mici, direct de Dr. Silviu Gresoi. Nu există lecții preînregistrate — fiecare sesiune lasă loc pentru întrebările tale și pentru cazurile reale din organizația ta.',
   },
   // Learn — time framing, evaluations
   {
@@ -75,9 +75,9 @@ const FAQ: { category: Category; q: string; a: string; qRo: string; aRo: string 
   {
     category: 'learn',
     q: 'When do the next editions start?',
-    a: 'Each course page lists its upcoming editions with start dates and available seats. If an edition is sold out or no dates are open yet, leave your email under “Notify me” or subscribe to the newsletter — you’ll hear the moment new dates are announced.',
+    a: 'Each course page lists its upcoming editions with start dates and available seats. If an edition is sold out or no dates are open yet, leave your e-mail under “Notify me” or subscribe to the newsletter — you’ll hear the moment new dates are announced.',
     qRo: 'Când încep următoarele ediții?',
-    aRo: 'Fiecare pagină de curs listează edițiile viitoare, cu date de început și locuri disponibile. Dacă o ediție e sold out sau nu sunt încă date anunțate, lasă-ți emailul la „Anunță-mă" sau abonează-te la newsletter — afli imediat ce apar date noi.',
+    aRo: 'Fiecare pagină de curs listează edițiile viitoare, cu date de început și locuri disponibile. Dacă o ediție e sold out sau nu sunt încă date anunțate, lasă-ți e-mailul la „Anunță-mă" sau abonează-te la newsletter — afli imediat ce apar date noi.',
   },
   {
     category: 'learn',
@@ -126,9 +126,9 @@ const FAQ: { category: Category; q: string; a: string; qRo: string; aRo: string 
   {
     category: 'access',
     q: 'How do I enrol in a course?',
-    a: 'Pick your course, choose an edition and click Enrol. You add the participants (name + email for each seat), fill in your billing details and pay online. The confirmation and the invoice arrive by email right away, and the Google Meet invite follows before the start date.',
+    a: 'Pick your course, choose an edition and click Enrol. You add the participants (name + e-mail for each seat), fill in your billing details and pay online. The confirmation and the invoice arrive by e-mail right away, and the Zoom invite follows before the start date.',
     qRo: 'Cum mă înscriu la un curs?',
-    aRo: 'Alege cursul, selectează o ediție și apasă Înscrie-te. Adaugi participanții (nume + email pentru fiecare loc), completezi datele de facturare și plătești online. Confirmarea și factura sosesc imediat pe email, iar invitația de Google Meet urmează înainte de data de început.',
+    aRo: 'Alege cursul, selectează o ediție și apasă Înscrie-te. Adaugi participanții (nume + e-mail pentru fiecare loc), completezi datele de facturare și plătești online. Confirmarea și factura sosesc imediat pe e-mail, iar invitația de Zoom urmează înainte de data de început.',
   },
   {
     category: 'access',

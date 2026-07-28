@@ -1,16 +1,22 @@
 'use client'
 
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
 import type { CheckoutSuccessBody } from '@/lib/checkout'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { localePath, type Locale } from '@/lib/i18n/config'
-import { NewsletterForm } from '../layout/NewsletterForm'
-import { Badge } from '../ui/Badge'
+import { formatPrice } from '../courses/helpers'
 import { Button } from '../ui/Button'
-import { GlassPanel } from '../ui/GlassPanel'
+import {
+  ConfirmationHeader,
+  ConfirmationStepper,
+  OrderRecapCard,
+  SuccessMark,
+  type RecapRow,
+} from './Confirmation'
 import { CONFIRMATION_STORAGE_KEY, formatDateLocale } from './constants'
-import { PricingBreakdown } from './PricingBreakdown'
+import { WhatHappensNext } from './OrderSummaryCard'
 
 /** The stored `POST /api/checkout` 200 response — the server's own `CheckoutSuccessBody`
  * (type-only import, T16 — no ad-hoc mirror that could drift from the API contract). */
@@ -39,21 +45,30 @@ const parseStored = (raw: string | null): StoredConfirmation | null => {
 }
 
 /**
- * Confirmation recap (§6 Confirmare). `orders` has NO public read access (CLAUDE.md §4),
- * so there is nothing to re-fetch here by design: the checkout form stores the full
- * `POST /api/checkout` response in sessionStorage under `isad-checkout-confirmation`, and
- * this page renders THAT payload. A direct visit (or a lost/expired tab session) gets a
- * friendly "no recent order found" state instead.
+ * Confirmation page content (Figma 4031-156 desktop / 4031-218 mobile — „Enrolment
+ * confirmed."): stepper (1–2 checked, 3 active) → success mark with the SPINNING gradient
+ * ring → title/subtitle → order recap card → What happens next → CTAs.
+ *
+ * `orders` has NO public read access (CLAUDE.md §4), so there is nothing to re-fetch here
+ * by design: the checkout form stores the full `POST /api/checkout` response in
+ * sessionStorage and this page renders THAT payload. A direct visit (or a lost/expired tab
+ * session) gets a friendly "no recent order found" state instead.
+ *
+ * `outcome` (from /api/netopia/return) selects the pending/failed variants for
+ * hosted-page payments; the mock flow lands here already confirmed (no outcome param).
  * Bilingual site (RO under /ro): all copy comes from the `checkout` dictionary section.
  */
 export function ConfirmationRecap({
   locale,
   currency,
-  vatDisplay,
+  outcome,
 }: {
   locale: Locale
+  /** Fallback display currency (siteSettings) — the order's own `currency` wins. */
   currency: string
-  vatDisplay: 'incl' | 'excl'
+  /** Hosted-payment return hint from /api/netopia/return (`?outcome=`). Undefined for the
+   * synchronous (mock) flow, which lands here already confirmed. */
+  outcome?: 'paid' | 'pending' | 'failed'
 }) {
   const t = getDictionary(locale).checkout
   const [state, setState] = useState<'loading' | 'empty' | 'ready'>('loading')
@@ -76,7 +91,7 @@ export function ConfirmationRecap({
 
   if (state === 'loading') {
     return (
-      <p role="status" className="py-16 text-center text-body text-grey-500">
+      <p role="status" className="py-24 text-center text-body text-grey-500">
         {t.loadingOrder}
       </p>
     )
@@ -84,7 +99,7 @@ export function ConfirmationRecap({
 
   if (state === 'empty' || !order) {
     return (
-      <div className="mx-auto max-w-xl py-8 text-center">
+      <div className="mx-auto max-w-xl px-5 py-24 text-center">
         <h1 className="text-h2 text-ink">{t.noOrderTitle}</h1>
         <p className="mt-3 text-body text-ink/70">{t.noOrderMessage}</p>
         <div className="mt-6">
@@ -94,67 +109,82 @@ export function ConfirmationRecap({
     )
   }
 
+  // A cancelled/declined hosted payment: no seats were taken, nothing to recap — offer
+  // the way back instead of an "enrolled" screen that would be a lie.
+  if (outcome === 'failed') {
+    return (
+      <div className="mx-auto max-w-xl px-5 py-24 text-center">
+        <h1 className="text-h2 text-ink">{t.paymentFailedTitle}</h1>
+        <p className="mt-3 text-body text-ink/70">{t.paymentFailedMessage}</p>
+        <div className="mt-6">
+          <Button href={localePath(locale, '/cursuri')}>{t.browseCourses}</Button>
+        </div>
+      </div>
+    )
+  }
+
+  // "Processing": back from the payment page before the confirmation (IPN/status poll)
+  // landed — or navigated here directly mid-redirect.
+  const isPending = outcome === 'pending' || (outcome === undefined && order.status === 'requiresAction')
+
   const startDateLabel = formatDateLocale(order.session.startDate, locale) ?? order.session.startDate
   const quantity = Math.max(order.participants.length, 1)
+  // The currency the order was actually charged in (B1) — the settings prop is only the
+  // fallback for payloads stored before `currency` existed on the response.
+  const orderCurrency = order.currency ?? currency
+  const buyerEmail = order.buyerEmail ?? order.participants[0]?.email ?? t.inboxFallback
+
+  const recapRows: RecapRow[] = [
+    { label: t.editionRowLabel, value: t.editionStartValue(startDateLabel) },
+    { label: t.seatsRowLabel, value: `${quantity} × ${t.windowNames[order.pricing.appliedWindow]}` },
+    { label: t.paymentRowLabel, value: isPending ? t.paymentProcessingValue : t.paymentPaidValue },
+  ]
+
+  const nextSteps = [
+    isPending ? t.nextPendingEmail : t.nextConfirmEmail,
+    t.nextConfirmInvoice,
+    t.nextConfirmMeet,
+  ]
 
   return (
-    <div className="mx-auto max-w-2xl">
-      <div className="text-center">
-        <Badge variant="accent">{t.orderConfirmedBadge}</Badge>
-        <h1 className="mt-4 text-h1 text-ink">{t.enrolledTitle}</h1>
-        <p className="mt-3 text-body-lg text-ink/70">
-          {t.editionStarting(order.session.courseTitle, startDateLabel)}
-        </p>
+    <div className="flex flex-col items-center gap-6 px-5 pb-16 pt-12 lg:gap-7 lg:px-4 lg:pb-[120px] lg:pt-[130px]">
+      <ConfirmationStepper steps={[t.stepDetails, t.stepPayment, t.stepConfirmation]} />
+
+      {!isPending && <SuccessMark ariaLabel={t.successMarkAria} />}
+
+      <ConfirmationHeader
+        title={isPending ? t.paymentPendingTitle : t.confirmedTitle}
+        titleAccent={isPending ? undefined : t.confirmedTitleAccent}
+        subtitle={isPending ? t.paymentPendingNote : t.confirmedSubtitle(buyerEmail)}
+      />
+
+      <OrderRecapCard
+        orderRef={t.orderRefLabel(order.orderId)}
+        course={order.session.courseTitle}
+        provider={t.academyName}
+        rows={recapRows}
+        totalLabel={t.totalPaid}
+        total={formatPrice(order.pricing.total, orderCurrency, locale)}
+      />
+
+      <div className="w-full max-w-[350px] lg:max-w-[560px]">
+        <WhatHappensNext locale={locale} steps={nextSteps} />
       </div>
 
-      <GlassPanel className="mt-8 p-6 sm:p-8" data-testid="order-recap">
-        <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <h2 className="text-h4 text-ink">{t.orderSummary}</h2>
-          <p className="text-sm text-grey-500">
-            {t.orderReference} <span className="font-semibold text-ink">#{order.orderId}</span>
-          </p>
-        </div>
-
-        <div className="mt-5">
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-grey-500">
-            {t.participantHeading(quantity)}
-          </h3>
-          <ul className="mt-2 divide-y divide-ice/60">
-            {order.participants.map((participant, index) => (
-              <li key={index} className="flex flex-wrap justify-between gap-2 py-2 text-sm">
-                <span className="font-medium text-ink">{participant.name}</span>
-                <span className="text-grey-500">{participant.email}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div className="mt-5 border-t border-ice/60 pt-3">
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-grey-500">
-            {t.pricingHeading}
-          </h3>
-          <PricingBreakdown
-            locale={locale}
-            pricing={order.pricing}
-            quantity={quantity}
-            currency={currency}
-            vatDisplay={vatDisplay}
-          />
-        </div>
-
-        <p className="mt-4 rounded-2xl bg-ice/30 px-5 py-4 text-sm text-ink">{t.meetInviteNote}</p>
-      </GlassPanel>
-
-      <div className="mt-10 rounded-3xl border border-ice/70 bg-paper p-6 sm:p-8">
-        <h2 className="text-h4 text-ink">{t.stayInLoop}</h2>
-        <p className="mb-4 mt-1 text-sm text-grey-500">{t.stayInLoopSub}</p>
-        <NewsletterForm tone="light" locale={locale} />
-      </div>
-
-      <div className="mt-8 text-center">
-        <Button href={localePath(locale, '/cursuri')} variant="secondary">
-          {t.backToCourses}
-        </Button>
+      {/* Mobil: buton full-width + link dedesubt; desktop: pe un rând */}
+      <div className="flex w-full max-w-[350px] flex-col items-center gap-6 lg:w-auto lg:max-w-none lg:flex-row lg:gap-4">
+        <Link
+          href={localePath(locale, '/')}
+          className="w-full rounded-[999px] bg-gradient-to-b from-[#407ea2] to-[#1c5d99] to-[80%] pb-[13px] pt-3 text-center text-[16px] font-medium text-white shadow-[0_4px_4px_-2px_rgba(0,0,0,0.21)] transition-transform hover:scale-[1.02] lg:w-auto lg:px-[22px] lg:pb-3 lg:pt-[11px]"
+        >
+          {t.backToHomepage}
+        </Link>
+        <Link
+          href={localePath(locale, '/contact')}
+          className="text-[13.5px] font-medium text-[#1c5d99] transition-colors hover:text-[#407ea2] lg:text-[15px]"
+        >
+          {t.contactUs}
+        </Link>
       </div>
     </div>
   )
