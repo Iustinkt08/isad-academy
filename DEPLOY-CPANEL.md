@@ -30,7 +30,40 @@
 
 ## 3. Build local + upload (la FIECARE release)
 
+> **Deploy-ul automat din GitHub Actions NU funcționează (2026-07-30).** Firewall-ul
+> Hosterion blochează SSH-ul de la runnerii GitHub, care au IP-uri rotative: `npm ci` și
+> testele trec, dar pasul de snapshot al DB-ului atârnă și rularea cade fără să atingă
+> serverul. Până se rezolvă pe partea de hosting, releaseul se face de pe o mașină cu IP
+> stabil, în una din cele două variante de mai jos.
+>
+> **Varianta scurtă — `scripts/deploy-cpanel.sh`** face automat toți pașii din această
+> secțiune (snapshot DB producție → build → binare `sharp` pentru Linux → upload → restart →
+> verificare), și se oprește ÎNAINTE de a atinge serverul dacă ceva nu e în regulă.
+> Cere Docker pornit (Postgres local pentru build) și acces SSH:
+>
+> ```bash
+> cp scripts/deploy-cpanel.env.example ~/isad-deploy.env   # completează, NU comite
+> scripts/deploy-cpanel.sh ~/isad-deploy.env
+> ```
+>
+> **Varianta manuală** e mai jos. Două capcane care rup producția dacă se sar:
+> build-ul trebuie făcut din **DB-ul de producție** (vezi nota de la `npm run build`), iar
+> binarele `sharp` trebuie înlocuite cu varianta Linux.
+
 Build-ul NU se face pe server (RAM-ul shared nu ajunge). Local:
+
+> ⚠️ `next build` pre-randează ~45 de pagini statice **din baza de date**, deci
+> `DATABASE_URI` trebuie să indice un snapshot al DB-ului de **PRODUCȚIE**, nu baza de dev —
+> altfel site-ul live iese cu alt conținut. Snapshot rapid (Postgres-ul serverului nu e expus
+> public, deci `pg_dump` rulează pe server):
+> ```bash
+> ssh <server> "pg_dump --no-owner --no-privileges '<PROD_DATABASE_URI>'" > prod.sql
+> docker compose up -d postgres
+> docker exec isad-postgres psql -U postgres -c 'CREATE DATABASE isad_deploy;'
+> docker exec -i isad-postgres psql -U postgres -d isad_deploy -f - < prod.sql
+> # apoi build cu DATABASE_URI=postgres://postgres:postgres@127.0.0.1:5432/isad_deploy
+> # și NEXT_PUBLIC_SITE_URL=https://isad.academy (ajunge în bundle-ul de client!)
+> ```
 
 ```bash
 npm run build          # produce .next/standalone (server.js + node_modules minime)
@@ -56,9 +89,25 @@ Urcă prin SSH/SFTP în `~/apps/isad`:
 public                → ~/apps/isad/public
 ```
 
-Apoi în cPanel → Setup Node.js App → **Restart**. La pornire, în producție, Payload
-aplică automat migrațiile noi. (Semnătura unui deploy reușit: site-ul răspunde și
-`/admin` se încarcă.)
+Apoi în cPanel → Setup Node.js App → **Restart**. (Semnătura unui deploy reușit: site-ul
+răspunde și `/admin` se încarcă.)
+
+⚠️ **Migrațiile se aplică la pornire DOAR dacă `RUN_MIGRATIONS=true` e setat în env-ul
+aplicației din cPanel** (`prodMigrations` e gated în `src/payload.config.ts` — vezi
+comentariul de acolo pentru de ce). Un release care aduce migrații noi, pornit fără acest
+flag, lasă paginile care ating tabelele noi să dea eroare de coloană inexistentă.
+Verifică înainte de restart ce migrații sunt înregistrate în `src/migrations/index.ts`
+față de ce e deja aplicat în DB (tabelul `payload_migrations`).
+
+Restul variabilelor se setează tot acolo, o dată, și **nu** vin din `.env`-ul local (acela e
+strict pentru dezvoltare: are `DATABASE_URI` pe localhost și `NEXT_PUBLIC_SITE_URL` pe
+`http://localhost:3000`). Lista completă e în `.env.example`. De reținut:
+
+- `ALLOW_MOCK_PAYMENTS` — **niciodată setat în producție**: ar confirma automat orice
+  comandă, adică ar vinde toate locurile gratis.
+- `NETOPIA_SANDBOX` — orice altceva decât exact `false` ține plățile în sandbox.
+- `BREVO_API_KEY` — fără el, emailurile nu pleacă deloc (NoopMailer); expeditorul trebuie
+  verificat în Brevo.
 
 > Tip: fă-ți un script `deploy.sh` cu `rsync -az --delete` pe cele 3 căi de mai sus.
 
