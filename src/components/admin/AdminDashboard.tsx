@@ -62,7 +62,7 @@ const Card = ({
         {count != null && <span className="isad-dash__count"> · {count}</span>}
       </h3>
       <Link className="isad-dash__view-all" href={href}>
-        View all →
+        View all
       </Link>
     </header>
     {children}

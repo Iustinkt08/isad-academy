@@ -80,6 +80,7 @@ export interface Config {
     faqItems: FaqItem;
     leads: Lead;
     legalPages: LegalPage;
+    newsletters: Newsletter;
     eventRegistrations: EventRegistration;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
@@ -106,6 +107,7 @@ export interface Config {
     faqItems: FaqItemsSelect<false> | FaqItemsSelect<true>;
     leads: LeadsSelect<false> | LeadsSelect<true>;
     legalPages: LegalPagesSelect<false> | LegalPagesSelect<true>;
+    newsletters: NewslettersSelect<false> | NewslettersSelect<true>;
     eventRegistrations: EventRegistrationsSelect<false> | EventRegistrationsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
@@ -284,7 +286,7 @@ export interface Course {
     totalDocs?: number;
   };
   /**
-   * Quiz matching tags. Fill these in so the "Which course is right for me?" quiz can recommend this course. Leave Level empty to keep the course OUT of the quiz.
+   * Quiz matching tags. Fill these in so the course quiz can recommend this course. Leave Level empty to keep the course OUT of the quiz.
    */
   quizProfile?: {
     /**
@@ -773,6 +775,55 @@ export interface LegalPage {
   createdAt: string;
 }
 /**
+ * Write a newsletter and send it to everyone subscribed. Tick “Send now” and save — the message goes out once and cannot be re-sent.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "newsletters".
+ */
+export interface Newsletter {
+  id: number;
+  /**
+   * Subject line recipients see in their inbox.
+   */
+  subject: string;
+  /**
+   * Optional one-line intro shown under the title. Leave empty to skip it.
+   */
+  preheader?: string | null;
+  /**
+   * The message. Headings, bold, italic, links and lists are carried into the e-mail; images and embeds are not.
+   */
+  body: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * Tick and save to send. Sending happens once — this cannot be undone.
+   */
+  sendNow?: boolean | null;
+  /**
+   * Stamped when the newsletter was sent. Once set, it can never be re-sent.
+   */
+  sentAt?: string | null;
+  /**
+   * Outcome of the send — check here if the newsletter did not arrive.
+   */
+  lastResult?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * Sign-ups from the event popup. Public create only — read/update/delete are admin-only.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -970,6 +1021,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'legalPages';
         value: number | LegalPage;
+      } | null)
+    | ({
+        relationTo: 'newsletters';
+        value: number | Newsletter;
       } | null)
     | ({
         relationTo: 'eventRegistrations';
@@ -1322,6 +1377,20 @@ export interface LegalPagesSelect<T extends boolean = true> {
         body?: T;
         id?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "newsletters_select".
+ */
+export interface NewslettersSelect<T extends boolean = true> {
+  subject?: T;
+  preheader?: T;
+  body?: T;
+  sendNow?: T;
+  sentAt?: T;
+  lastResult?: T;
   updatedAt?: T;
   createdAt?: T;
 }

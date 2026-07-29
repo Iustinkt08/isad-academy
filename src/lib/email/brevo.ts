@@ -28,7 +28,7 @@
  * `{ ok: false, error }`.
  */
 import { renderBlogBroadcastEmail } from './templates/blogBroadcast'
-import type { BroadcastNewPostInput, Mailer, MailerResult, SendTransactionalInput, SubscribeDoubleOptInInput } from './types'
+import type { BroadcastCampaignInput, BroadcastNewPostInput, Mailer, MailerResult, SendTransactionalInput, SubscribeDoubleOptInInput } from './types'
 
 const BREVO_API_BASE = 'https://api.brevo.com/v3'
 const REQUEST_TIMEOUT_MS = 10_000
@@ -110,6 +110,39 @@ export const createBrevoMailer = (overrides: Partial<BrevoConfig> = {}): Mailer 
   // `${config.siteUrl}/newsletter/confirmed` below must never end up with a doubled slash.
   const config: BrevoConfig = { ...merged, siteUrl: merged.siteUrl.replace(/\/+$/, '') }
 
+  /** Create-then-send, shared by both broadcast methods. Brevo has no single
+   * "create + send immediately" call, so a created-but-unsent campaign (first call OK,
+   * second failing) surfaces as `{ ok: false }` like any other failure — nothing retries. */
+  const sendCampaign = async (input: BroadcastCampaignInput): Promise<MailerResult> => {
+    if (!config.newsletterListId) {
+      return { ok: false, error: 'Brevo broadcast is not configured (BREVO_NEWSLETTER_LIST_ID missing).' }
+    }
+
+    const created = await postJson(
+      '/emailCampaigns',
+      {
+        // Brevo rejects duplicate campaign names; the timestamp keeps re-sends distinct.
+        name: `${input.name} — ${new Date().toISOString()}`,
+        subject: input.subject,
+        sender: { email: config.senderEmail, name: config.senderName },
+        type: 'classic',
+        htmlContent: input.html,
+        recipients: { listIds: [Number(config.newsletterListId)] },
+      },
+      config.apiKey,
+    )
+
+    if (!created.ok) return { ok: false, error: created.error }
+
+    const campaignId = (created.json as { id?: number | string } | null)?.id
+    if (campaignId == null) {
+      return { ok: false, error: 'Brevo /emailCampaigns response did not include a campaign id.' }
+    }
+
+    const sent = await postJson(`/emailCampaigns/${campaignId}/sendNow`, {}, config.apiKey)
+    return toMailerResult(sent)
+  }
+
   return {
     name: 'brevo',
 
@@ -151,34 +184,12 @@ export const createBrevoMailer = (overrides: Partial<BrevoConfig> = {}): Mailer 
     },
 
     async broadcastNewPost(input: BroadcastNewPostInput): Promise<MailerResult> {
-      if (!config.newsletterListId) {
-        return { ok: false, error: 'Brevo broadcast is not configured (BREVO_NEWSLETTER_LIST_ID missing).' }
-      }
-
       const { subject, html } = renderBlogBroadcastEmail(input)
+      return sendCampaign({ name: `Blog: ${input.title}`, subject, html })
+    },
 
-      const created = await postJson(
-        '/emailCampaigns',
-        {
-          name: `Blog: ${input.title}`,
-          subject,
-          sender: { email: config.senderEmail, name: config.senderName },
-          type: 'classic',
-          htmlContent: html,
-          recipients: { listIds: [Number(config.newsletterListId)] },
-        },
-        config.apiKey,
-      )
-
-      if (!created.ok) return { ok: false, error: created.error }
-
-      const campaignId = (created.json as { id?: number | string } | null)?.id
-      if (campaignId == null) {
-        return { ok: false, error: 'Brevo /emailCampaigns response did not include a campaign id.' }
-      }
-
-      const sent = await postJson(`/emailCampaigns/${campaignId}/sendNow`, {}, config.apiKey)
-      return toMailerResult(sent)
+    async broadcastCampaign(input: BroadcastCampaignInput): Promise<MailerResult> {
+      return sendCampaign(input)
     },
   }
 }

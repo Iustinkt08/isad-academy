@@ -324,10 +324,12 @@ export const getQuizQuestions = (locale: QuizLocale): QuizQuestion[] =>
 /** Toate stringurile UI ale quiz-ului, per limbă (owner 2026-07-26: quiz bilingv). */
 export const QUIZ_UI = {
   en: {
-    pill: 'Course quiz',
-    titlePlain: 'Which course is right ',
-    titleGradient: 'for me',
-    titlePunctuation: '?',
+    // Owner 2026-07-29: „Which course is right for me?" devine „Course quiz" peste tot.
+    // Pilula preia formularea de orientare ca să nu repete identic titlul de sub ea.
+    pill: 'Find your course',
+    titlePlain: 'Course ',
+    titleGradient: 'quiz',
+    titlePunctuation: '.',
     sub: '12 short questions — we recommend the right course or learning path in under two minutes.',
     progress: (n: number, total: number) => `Question ${n} of ${total}`,
     back: '← Back',
@@ -347,10 +349,10 @@ export const QUIZ_UI = {
     corporateBandCta: 'Corporate training',
   },
   ro: {
-    pill: 'Quiz de curs',
-    titlePlain: 'Ce curs mi se ',
-    titleGradient: 'potrivește',
-    titlePunctuation: '?',
+    pill: 'Găsește-ți cursul',
+    titlePlain: 'Quiz de ',
+    titleGradient: 'cursuri',
+    titlePunctuation: '.',
     sub: '12 întrebări scurte — îți recomandăm cursul sau parcursul potrivit, în mai puțin de două minute.',
     progress: (n: number, total: number) => `Întrebarea ${n} din ${total}`,
     back: '← Înapoi',

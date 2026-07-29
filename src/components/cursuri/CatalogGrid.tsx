@@ -96,7 +96,7 @@ export default function CatalogGrid({
     <section className="flex flex-col items-center bg-[#f8f9fa] pb-[30px]">
       {/* Toolbar — 350 pe mobil; pe desktop aliniat la containerul standard al
           site-ului (max-w-6xl + px-8 = linia navbar/landing) */}
-      <div className="flex w-full max-w-[350px] items-center justify-between pb-8 lg:max-w-6xl lg:px-8 lg:pb-5">
+      <div className="flex w-full max-w-[min(350px,calc(100vw_-_40px))] items-center justify-between pb-8 lg:max-w-6xl lg:px-8 lg:pb-5">
         <p className="text-[14px] font-medium tracking-[-0.3px] text-[#959595]">
           {t.upcomingCount(courses.length)}
         </p>

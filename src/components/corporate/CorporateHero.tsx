@@ -33,7 +33,7 @@ export default function CorporateHero({ locale }: { locale: Locale }) {
           <PillTag>{t.pill}</PillTag>
 
           {/* Title — gradient on the highlighted phrase, period included (extract). */}
-          <h1 className="max-w-[700px] text-center text-[clamp(34px,4.5vw,54px)] font-semibold leading-[1.15] tracking-[-1.5px] text-ink">
+          <h1 className="max-w-[700px] text-center text-[min(8.72vw,34px)] font-semibold leading-[1.15] tracking-[-1.5px] text-ink md:text-[clamp(34px,4.5vw,54px)]">
             {t.titleTop}
             <br />
             {t.titleBottomPrefix}{' '}
@@ -43,7 +43,7 @@ export default function CorporateHero({ locale }: { locale: Locale }) {
             {'.'}
           </h1>
 
-          <p className="max-w-[760px] text-center text-[17px] leading-[27px] text-grey-600">
+          <p className="max-w-[760px] text-center text-[min(4.36vw,17px)] leading-[1.6] text-grey-600">
             {t.subtitle}
           </p>
 

@@ -38,7 +38,7 @@ export default function QuizResult({
       {/* Header */}
       <div className="flex flex-col items-center gap-3.5">
         <GradientPill label={ui.resultPill} />
-        <h1 className="max-w-[348px] text-center text-[28px] font-semibold leading-[34px] tracking-[-1px] text-[#222222] lg:max-w-none lg:text-[54px] lg:leading-[59.4px] lg:tracking-[-1.5px]">
+        <h1 className="max-w-[min(348px,calc(100vw_-_40px))] text-center text-[min(7.18vw,28px)] font-semibold leading-[1.22] tracking-[-1px] text-[#222222] lg:max-w-none lg:text-[54px] lg:leading-[59.4px] lg:tracking-[-1.5px]">
           {ui.resultTitlePlain}
           <span className="bg-[linear-gradient(90deg,#407ea2_0%,#1c5d99_100%)] bg-clip-text text-transparent">
             {ui.resultTitleGradient}
@@ -46,13 +46,13 @@ export default function QuizResult({
           {/* Semnul final rămâne NEGRU (convenția titlurilor — owner 2026-07-26) */}
           {ui.resultTitlePunctuation}
         </h1>
-        <p className="max-w-[350px] text-center text-[14px] leading-[21px] text-[#959595] lg:max-w-[640px] lg:text-[16px] lg:leading-[26px]">
+        <p className="max-w-[min(350px,calc(100vw_-_40px))] text-center text-[14px] leading-[21px] text-[#959595] lg:max-w-[640px] lg:text-[16px] lg:leading-[26px]">
           {ui.resultSub}
         </p>
       </div>
 
       {/* Recomandarea principală — 350/26 pe mobil (fără badge), 760/40 pe desktop */}
-      <div className="flex w-[350px] flex-col gap-3.5 rounded-[24px] border-[6px] border-[#f6f6f6] bg-white p-[26px] shadow-[24px_80px_50px_rgba(77,77,77,0.02),10px_36px_37px_rgba(77,77,77,0.03),3px_9px_20px_rgba(77,77,77,0.03)] lg:w-[760px] lg:gap-4 lg:p-10">
+      <div className="flex w-[min(350px,calc(100vw_-_40px))] flex-col gap-3.5 rounded-[24px] border-[6px] border-[#f6f6f6] bg-white p-[26px] shadow-[24px_80px_50px_rgba(77,77,77,0.02),10px_36px_37px_rgba(77,77,77,0.03),3px_9px_20px_rgba(77,77,77,0.03)] lg:w-[760px] lg:gap-4 lg:p-10">
         {/* Badge — DOAR pe desktop (nu există în designul mobil) */}
         <span className="hidden w-fit rounded-[20px] bg-[#f6f6f6] px-3 py-[5px] text-[12px] font-medium tracking-[-0.3px] text-[#1c5d99] lg:block">
           {ui.mainBadge}
@@ -93,7 +93,7 @@ export default function QuizResult({
       </div>
 
       {/* Banda pentru echipe — stivuită pe mobil (350), pe orizontală pe desktop (905) */}
-      <div className="flex w-[350px] flex-col items-start gap-2 rounded-[16px] bg-[#f6f6f6] px-[22px] py-[18px] lg:w-[905px] lg:flex-row lg:items-center lg:gap-3 lg:px-6 lg:py-5">
+      <div className="flex w-[min(350px,calc(100vw_-_40px))] flex-col items-start gap-2 rounded-[16px] bg-[#f6f6f6] px-[22px] py-[18px] lg:w-[905px] lg:flex-row lg:items-center lg:gap-3 lg:px-6 lg:py-5">
         <p className="text-[13px] leading-[19px] text-[#595959] lg:flex-1 lg:text-[14px] lg:leading-[21px]">
           {ui.corporateBand}
         </p>

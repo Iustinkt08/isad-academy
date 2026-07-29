@@ -41,7 +41,7 @@ const SAMPLE_PAST: PastEdition[] = [
 
 function PastCard({ edition, completedLabel }: { edition: PastEdition; completedLabel: string }) {
   return (
-    <article className="flex w-[350px] shrink-0 snap-start scroll-ml-5 flex-col gap-1.5 rounded-[24px] bg-[#f6f6f6] px-7 py-6 opacity-85 lg:w-[410px]">
+    <article className="flex w-[min(350px,calc(100vw_-_40px))] shrink-0 snap-start scroll-ml-5 flex-col gap-1.5 rounded-[24px] bg-[#f6f6f6] px-7 py-6 opacity-85 lg:w-[410px]">
       <h3 className="text-[17px] font-medium tracking-[-0.5px] text-[#737373]">
         {edition.title}
       </h3>

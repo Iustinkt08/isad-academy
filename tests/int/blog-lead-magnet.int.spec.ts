@@ -32,6 +32,9 @@ const createFakeMailer = (result: MailerResult = { ok: true }): Mailer & { sent:
     async broadcastNewPost() {
       return result
     },
+    async broadcastCampaign() {
+      return result
+    },
   }
 }
 

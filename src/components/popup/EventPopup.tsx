@@ -101,7 +101,7 @@ function useCountdown(target: string, labels: EventPopupLabels['timer']) {
 function Pill({ label }: { label: string }) {
   return (
     <span className="w-fit shrink-0 rounded-[26px] bg-[linear-gradient(90deg,#1c5d99_0%,#46d3f6_25%,#1c5d99_50%,#46d3f6_75%,#1c5d99_100%)] p-[3px]">
-      <span className="flex items-center whitespace-nowrap rounded-[23px] bg-white px-3.5 py-[2px] text-[13px] font-medium leading-[21px] text-black lg:px-4 lg:text-[15px] lg:leading-[23px]">
+      <span className="flex items-center whitespace-nowrap rounded-[23px] bg-white px-3.5 py-[2px] text-[min(3.33vw,13px)] font-medium leading-[1.6] text-black lg:px-4 lg:text-[15px] lg:leading-[23px]">
         {label}
       </span>
     </span>
@@ -236,7 +236,7 @@ export default function EventPopup({
       {/* Modalul — 350 mobil / 720 desktop */}
       <div
         ref={modalRef}
-        className="relative w-[350px] rounded-[24px] border-[6px] border-[#f6f6f6] bg-white px-5 py-6 shadow-[24px_80px_50px_rgba(77,77,77,0.02),10px_36px_37px_rgba(77,77,77,0.03),3px_9px_20px_rgba(77,77,77,0.03)] lg:w-[720px] lg:p-10"
+        className="relative w-full max-w-[350px] rounded-[24px] border-[6px] border-[#f6f6f6] bg-white px-5 py-6 shadow-[24px_80px_50px_rgba(77,77,77,0.02),10px_36px_37px_rgba(77,77,77,0.03),3px_9px_20px_rgba(77,77,77,0.03)] lg:w-[720px] lg:p-10"
       >
         {/* Close X */}
         <button
@@ -409,7 +409,7 @@ export default function EventPopup({
                 onClick={() => setPhase('info')}
                 className="text-[12.5px] font-medium text-[#959595] transition-colors hover:text-[#595959] lg:text-[13px]"
               >
-                ← {labels.back}
+                {labels.back}
               </button>
             </div>
           </form>

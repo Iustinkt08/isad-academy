@@ -34,7 +34,7 @@ import QuizResult from './QuizResult';
 export function GradientPill({ label }: { label: string }) {
   return (
     <span className="w-fit shrink-0 rounded-[26px] bg-[linear-gradient(90deg,#1c5d99_0%,#46d3f6_25%,#1c5d99_50%,#46d3f6_75%,#1c5d99_100%)] p-[3px]">
-      <span className="flex items-center whitespace-nowrap rounded-[23px] bg-white px-4 py-[2px] text-[15px] font-medium leading-[23px] text-black">
+      <span className="flex items-center whitespace-nowrap rounded-[23px] bg-white px-4 py-[2px] text-[min(3.85vw,15px)] font-medium leading-[1.53] text-black">
         {label}
       </span>
     </span>
@@ -183,7 +183,7 @@ export default function CourseQuiz({
       {/* Header */}
       <div className="flex flex-col items-center gap-3.5">
         <GradientPill label={ui.pill} />
-        <h1 className="max-w-[348px] text-center text-[28px] font-semibold leading-[34px] tracking-[-1px] text-[#222222] lg:max-w-none lg:text-[54px] lg:leading-[59.4px] lg:tracking-[-1.5px]">
+        <h1 className="max-w-[min(348px,calc(100vw_-_40px))] text-center text-[min(7.18vw,28px)] font-semibold leading-[1.22] tracking-[-1px] text-[#222222] lg:max-w-none lg:text-[54px] lg:leading-[59.4px] lg:tracking-[-1.5px]">
           {ui.titlePlain}
           <span className="bg-[linear-gradient(90deg,#407ea2_0%,#1c5d99_100%)] bg-clip-text text-transparent">
             {ui.titleGradient}
@@ -191,13 +191,13 @@ export default function CourseQuiz({
           {/* Semnul final rămâne NEGRU (convenția titlurilor — owner 2026-07-26) */}
           {ui.titlePunctuation}
         </h1>
-        <p className="max-w-[350px] text-center text-[14px] leading-[21px] text-[#959595] lg:max-w-[640px] lg:text-[16px] lg:leading-[26px]">
+        <p className="max-w-[min(350px,calc(100vw_-_40px))] text-center text-[14px] leading-[21px] text-[#959595] lg:max-w-[640px] lg:text-[16px] lg:leading-[26px]">
           {ui.sub}
         </p>
       </div>
 
       {/* Cardul — 350/26 pe mobil, 760/40 pe desktop */}
-      <div className="flex w-[350px] flex-col gap-5 rounded-[24px] border-[6px] border-[#f6f6f6] bg-white p-[26px] shadow-[24px_80px_50px_rgba(77,77,77,0.02),10px_36px_37px_rgba(77,77,77,0.03),3px_9px_20px_rgba(77,77,77,0.03)] lg:w-[760px] lg:gap-7 lg:p-10">
+      <div className="flex w-[min(350px,calc(100vw_-_40px))] flex-col gap-5 rounded-[24px] border-[6px] border-[#f6f6f6] bg-white p-[26px] shadow-[24px_80px_50px_rgba(77,77,77,0.02),10px_36px_37px_rgba(77,77,77,0.03),3px_9px_20px_rgba(77,77,77,0.03)] lg:w-[760px] lg:gap-7 lg:p-10">
         {phase === 'loading' ? (
           /* ============ LOADER — analizăm răspunsurile ============ */
           <div

@@ -44,7 +44,7 @@ export function BlogHeaderMobile({ locale }: { locale: Locale }) {
   const t = getDictionary(locale).blog;
   return (
     <header className="flex flex-col items-center gap-3 px-7 pt-16 lg:hidden">
-      <h1 className="text-center text-[28px] font-semibold leading-[34px] tracking-[-1px] text-[#222222]">
+      <h1 className="text-center text-[min(7.18vw,28px)] font-semibold leading-[1.22] tracking-[-1px] text-[#222222]">
         {t.headerTitlePlain}{' '}
         <span className="bg-[linear-gradient(90deg,#407ea2_0%,#1c5d99_100%)] bg-clip-text text-transparent">
           {t.headerTitleGradient}
@@ -52,7 +52,7 @@ export function BlogHeaderMobile({ locale }: { locale: Locale }) {
         {/* Punctul final rămâne NEGRU (convenția titlurilor site-ului — owner 2026-07-26) */}
         <span className="text-[#222222]">.</span>
       </h1>
-      <p className="max-w-[350px] text-center text-[14px] leading-[21px] text-[#959595]">
+      <p className="max-w-[min(350px,calc(100vw_-_40px))] text-center text-[14px] leading-[21px] text-[#959595]">
         {t.headerSub}
       </p>
     </header>
@@ -142,7 +142,7 @@ function SliderCard({ post, locale }: { post: BlogPostCard; locale: Locale }) {
   return (
     <a
       href={post.href}
-      className="group flex h-[458px] w-[300px] shrink-0 snap-start flex-col overflow-hidden rounded-[24px] bg-white shadow-[3px_9px_20px_rgba(77,77,77,0.04)]"
+      className="group flex h-[458px] w-[min(300px,calc(100vw_-_40px))] shrink-0 snap-start flex-col overflow-hidden rounded-[24px] bg-white shadow-[3px_9px_20px_rgba(77,77,77,0.04)]"
     >
       <CardCover post={post} brandLabel={t.brandLabel} />
       <div className="flex min-h-0 flex-1 flex-col justify-between px-7 pb-6 pt-[22px]">

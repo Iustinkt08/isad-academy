@@ -5,6 +5,9 @@ const nextConfig = {
   // Deploy pe cPanel/Passenger (owner 2026-07-26): bundle-ul .next/standalone conține
   // server.js + doar modulele necesare — pe server se urcă standalone + static + public.
   output: 'standalone',
+  // Media (uploads Payload) e pe disc, în afara git-ului; pe Vercel funcțiile primesc doar
+  // fișierele trasate — includem explicit folderul ca imaginile să fie servite și acolo.
+  outputFileTracingIncludes: { '/**': ['./media/**'] },
   async redirects() {
     return [
       // /certificare retired 2026-07-11 — certification lives on Home as a section

@@ -47,6 +47,7 @@ describe('getMailer (unit)', () => {
       sendTransactional: async () => ({ ok: true as const }),
       subscribeDoubleOptIn: async () => ({ ok: true as const }),
       broadcastNewPost: async () => ({ ok: true as const }),
+      broadcastCampaign: async () => ({ ok: true as const }),
     }
 
     setMailerForTesting(fake)
@@ -60,6 +61,7 @@ describe('getMailer (unit)', () => {
       sendTransactional: async () => ({ ok: true as const }),
       subscribeDoubleOptIn: async () => ({ ok: true as const }),
       broadcastNewPost: async () => ({ ok: true as const }),
+      broadcastCampaign: async () => ({ ok: true as const }),
     })
     setMailerForTesting(null)
 

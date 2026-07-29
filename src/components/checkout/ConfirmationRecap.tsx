@@ -167,12 +167,12 @@ export function ConfirmationRecap({
         total={formatPrice(order.pricing.total, orderCurrency, locale)}
       />
 
-      <div className="w-full max-w-[350px] lg:max-w-[560px]">
+      <div className="w-full max-w-[min(350px,calc(100vw_-_40px))] lg:max-w-[560px]">
         <WhatHappensNext locale={locale} steps={nextSteps} />
       </div>
 
       {/* Mobil: buton full-width + link dedesubt; desktop: pe un rând */}
-      <div className="flex w-full max-w-[350px] flex-col items-center gap-6 lg:w-auto lg:max-w-none lg:flex-row lg:gap-4">
+      <div className="flex w-full max-w-[min(350px,calc(100vw_-_40px))] flex-col items-center gap-6 lg:w-auto lg:max-w-none lg:flex-row lg:gap-4">
         <Link
           href={localePath(locale, '/')}
           className="w-full rounded-[999px] bg-gradient-to-b from-[#407ea2] to-[#1c5d99] to-[80%] pb-[13px] pt-3 text-center text-[16px] font-medium text-white shadow-[0_4px_4px_-2px_rgba(0,0,0,0.21)] transition-transform hover:scale-[1.02] lg:w-auto lg:px-[22px] lg:pb-3 lg:pt-[11px]"

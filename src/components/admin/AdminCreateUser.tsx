@@ -14,7 +14,6 @@
 
 'use client'
 
-import Link from 'next/link'
 import { useState } from 'react'
 
 import AdminAuthShell, { AdminBrand, adminInputCls } from './AdminAuthShell'
@@ -80,7 +79,7 @@ export default function AdminCreateUser({ firstUser = false }: { firstUser?: boo
     <AdminAuthShell>
       <form
         onSubmit={onSubmit}
-        className="flex w-[480px] max-w-full flex-col items-center gap-3.5 rounded-lg border-[6px] border-line-soft bg-white px-10 pb-9 pt-10 shadow-[3px_12px_32px_rgba(77,77,77,0.06)]"
+        className="flex w-[480px] max-w-full flex-col items-center gap-3.5 rounded-[24px] border-[6px] border-line-soft bg-white px-10 pb-9 pt-10 shadow-[3px_12px_32px_rgba(77,77,77,0.06)]"
       >
         <AdminBrand />
 
@@ -169,12 +168,12 @@ export default function AdminCreateUser({ firstUser = false }: { firstUser?: boo
           disabled={submitting}
           className="mt-1 w-full rounded-full bg-gradient-to-b from-steel to-blue to-[80%] pb-3.5 pt-[13px] text-[16px] font-medium text-white shadow-[0_4px_4px_-2px_rgba(0,0,0,0.21)] transition-transform hover:scale-[1.01] disabled:opacity-60"
         >
-          {submitting ? 'Creating…' : 'Create user →'}
+          {submitting ? 'Creating…' : 'Create user'}
         </button>
 
-        <Link href="/admin/login" className="text-[13px] font-medium text-blue hover:underline">
-          ← Back to sign in
-        </Link>
+        {/* FĂRĂ link „Back to sign in": vederea asta e create-FIRST-user — Payload
+            redirecționează /admin/login înapoi aici cât timp nu există niciun admin,
+            deci linkul ar fi mereu un no-op derutant. */}
       </form>
     </AdminAuthShell>
   )

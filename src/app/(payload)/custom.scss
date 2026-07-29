@@ -131,11 +131,11 @@ html[data-theme='dark'] {
   }
 }
 
-/* ---- Forgot / reset screens — the ONLY remaining minimal-template auth views (login
-   and create-first-user are full custom views now, styled by Tailwind via admin.css;
-   the :not() guards keep these rules off them). White page, soft grey pill fields with
-   GRAY focus (owner 2026-07-13: no blue strokes), Deep Blue pill CTA. ---- */
-.template-minimal:not(.login):not(.createFirstUser) {
+/* ---- Reset screen — the ONLY remaining minimal-template auth view (login,
+   create-first-user and forgot are full custom views now, styled by Tailwind via
+   admin.css; the :not() guards keep these rules off them). White page, soft grey pill
+   fields with GRAY focus (owner 2026-07-13: no blue strokes), Deep Blue pill CTA. ---- */
+.template-minimal:not(.login):not(.createFirstUser):not(.forgot-password) {
   background: #fff;
 
   input[type='email'],
@@ -178,26 +178,19 @@ html[data-theme='dark'] {
   }
 }
 
-/* ---- Sidebar brand lockup (admin.components.beforeNavLinks — NavLogo.tsx). Reuses the
-   .isad-admin-logo--light/--dark theme-swap classes; the global `--dark { display: none }`
-   rule above hides the white icon on light, and the scoped override below flips it. ---- */
+/* ---- Sidebar brand mark (admin.components.beforeNavLinks — NavLogo.tsx). Icon-only,
+   like the site header (31×28); theme-swapped via .isad-admin-logo--light/--dark: the
+   global `--dark { display: none }` rule above hides the white icon on light, and the
+   scoped override below flips it. ---- */
 .isad-nav-logo {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
   margin-bottom: 1.25rem;
   text-decoration: none;
 
   img {
-    width: 22px;
+    width: 31px;
     height: auto;
-  }
-
-  .isad-nav-logo__wordmark {
-    font-size: 0.9375rem;
-    font-weight: 600;
-    letter-spacing: -0.3px;
-    color: var(--theme-text);
   }
 }
 

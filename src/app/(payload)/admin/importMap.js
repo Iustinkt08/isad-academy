@@ -34,6 +34,7 @@ import { AdminDashboard as AdminDashboard_0171ae121c3d9523aafb7bdbec1300c5 } fro
 import { NavLogo as NavLogo_62fd1b684515cecb7439e1dd363f1096 } from '../../../components/admin/NavLogo'
 import { LoginView as LoginView_249db7119b96b4d9f8230bf9c6fe37f4 } from '../../../components/admin/views/LoginView'
 import { CreateFirstUserView as CreateFirstUserView_8e03725038cc339ee8882db66ef1ce1c } from '../../../components/admin/views/CreateFirstUserView'
+import { ForgotPasswordView as ForgotPasswordView_425497e56228a312fab6dff2596bab01 } from '../../../components/admin/views/ForgotPasswordView'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
 /** @type import('payload').ImportMap */
@@ -74,5 +75,6 @@ export const importMap = {
   "/components/admin/NavLogo#NavLogo": NavLogo_62fd1b684515cecb7439e1dd363f1096,
   "/components/admin/views/LoginView#LoginView": LoginView_249db7119b96b4d9f8230bf9c6fe37f4,
   "/components/admin/views/CreateFirstUserView#CreateFirstUserView": CreateFirstUserView_8e03725038cc339ee8882db66ef1ce1c,
+  "/components/admin/views/ForgotPasswordView#ForgotPasswordView": ForgotPasswordView_425497e56228a312fab6dff2596bab01,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }

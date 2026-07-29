@@ -38,10 +38,10 @@ export default function CourseHeader({ data }: { data: CourseHeaderData }) {
 
         {/* Mobil: text 13px pe UN rând (Figma 3925-115); desktop: 14px ca până acum */}
         <PillTag>
-          <span className="whitespace-nowrap text-[13px] lg:text-[14px]">{data.pillLabel}</span>
+          <span className="whitespace-nowrap text-[min(3.33vw,13px)] lg:text-[14px]">{data.pillLabel}</span>
         </PillTag>
 
-        <h1 className="text-[28px] font-semibold leading-[34px] tracking-[-1px] text-ink lg:text-[clamp(34px,4.5vw,54px)] lg:leading-normal lg:tracking-[-0.028em]">
+        <h1 className="text-[min(7.18vw,28px)] font-semibold leading-[1.22] tracking-[-1px] text-ink lg:text-[clamp(34px,4.5vw,54px)] lg:leading-normal lg:tracking-[-0.028em]">
           {data.titlePlain}
           <span className="text-gradient-brand tracking-[-0.04em]">{data.titleGradient}</span>
           <span className="text-ink">.</span>

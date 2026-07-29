@@ -57,17 +57,19 @@
   }
 }
 
-/* The custom login / create-first-user views fill the whole viewport — undo the
-   MinimalTemplate frame Payload wraps built-in-view overrides with (centering,
+/* The custom login / create-first-user / forgot views fill the whole viewport — undo
+   the MinimalTemplate frame Payload wraps built-in-view overrides with (centering,
    60px padding, 480px max-width). Unlayered on purpose: beats `payload-default`. */
 section.template-minimal.login,
-section.template-minimal.createFirstUser {
+section.template-minimal.createFirstUser,
+section.template-minimal.forgot-password {
   padding: 0;
   background: none;
 }
 
 section.template-minimal.login .template-minimal__wrap,
-section.template-minimal.createFirstUser .template-minimal__wrap {
+section.template-minimal.createFirstUser .template-minimal__wrap,
+section.template-minimal.forgot-password .template-minimal__wrap {
   max-width: none;
   width: 100%;
 }

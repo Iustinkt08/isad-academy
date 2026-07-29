@@ -264,7 +264,7 @@ export function OurCoursesSection({
           <Container>
             <h2
               id="our-courses-heading"
-              className="mx-auto max-w-[256px] text-center text-[28px] font-semibold leading-[34px] tracking-[-0.04em] text-ink lg:max-w-[600px] lg:text-[clamp(32px,4vw,48px)] lg:leading-[1.1]"
+              className="mx-auto max-w-[256px] text-center text-[min(7.18vw,28px)] font-semibold leading-[1.22] tracking-[-0.04em] text-ink lg:max-w-[600px] lg:text-[clamp(32px,4vw,48px)] lg:leading-[1.1]"
             >
               {t.headingLead}{' '}
               <span className="text-gradient-brand">{t.headingHighlight}</span>

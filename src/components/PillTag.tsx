@@ -12,7 +12,7 @@ import type { ReactNode } from 'react'
 
 const SIZES = {
   xs: 'px-3 py-[3px] text-[12px]',
-  sm: 'px-4 py-1 text-[14px]',
+  sm: 'px-4 py-1 text-[min(3.5vw,14px)] whitespace-nowrap',
   md: 'px-4 py-0.5 text-[28px]',
 } as const
 

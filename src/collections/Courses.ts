@@ -127,7 +127,7 @@ export const Courses: CollectionConfig = {
         description: 'Editions of this course. Add/edit them from the Course Sessions collection.',
       },
     },
-    // Owner 2026-07-26: powers the "Which course is right for me?" quiz. The engine
+    // Owner 2026-07-26: powers the course quiz. The engine
     // (src/components/quiz/quiz-data.ts) matches quiz answers against these tags —
     // weighted scoring, hard gates, nearest-edition tie-break. A course WITHOUT a level
     // is simply excluded from quiz recommendations (safe default for drafts/mockups).
@@ -136,7 +136,7 @@ export const Courses: CollectionConfig = {
       type: 'group',
       admin: {
         description:
-          'Quiz matching tags. Fill these in so the "Which course is right for me?" quiz ' +
+          'Quiz matching tags. Fill these in so the course quiz ' +
           'can recommend this course. Leave Level empty to keep the course OUT of the quiz.',
       },
       fields: [

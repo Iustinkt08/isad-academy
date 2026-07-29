@@ -24,13 +24,13 @@ export default function CheckoutHeader({
 
   return (
     <header className="flex flex-col items-center gap-3 px-4 pt-12 lg:gap-5 lg:pt-[100px]">
-      <h1 className="max-w-[348px] text-center text-[28px] font-semibold leading-[34px] tracking-[-1px] text-ink lg:max-w-none lg:text-[clamp(34px,6vw,54px)] lg:leading-normal lg:tracking-[-1.5px]">
+      <h1 className="max-w-[min(348px,calc(100vw_-_40px))] text-center text-[min(7.18vw,28px)] font-semibold leading-[1.22] tracking-[-1px] text-ink lg:max-w-none lg:text-[clamp(34px,6vw,54px)] lg:leading-normal lg:tracking-[-1.5px]">
         {t.headerTitle}{' '}
         <span className="text-gradient-brand tracking-[-1.2px] lg:tracking-[-2.16px]">
           {t.headerTitleAccent}
         </span>
       </h1>
-      <p className="max-w-[350px] text-center text-[13px] leading-[19px] text-grey-600 lg:max-w-none lg:text-[16px] lg:leading-normal">
+      <p className="max-w-[min(350px,calc(100vw_-_40px))] text-center text-[13px] leading-[19px] text-grey-600 lg:max-w-none lg:text-[16px] lg:leading-normal">
         {t.headerSubtitle}
       </p>
 

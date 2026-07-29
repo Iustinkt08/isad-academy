@@ -28,6 +28,15 @@ export type BroadcastNewPostInput = {
   url: string
 }
 
+/** A one-off newsletter written in the admin (owner 2026-07-29) — already-rendered HTML,
+ * so the provider only has to address it to the subscriber list. `name` is the internal
+ * campaign label in the provider's dashboard, never shown to recipients. */
+export type BroadcastCampaignInput = {
+  name: string
+  subject: string
+  html: string
+}
+
 export interface Mailer {
   /** Short, human-readable identifier for logging (e.g. `'brevo'`, `'noop'`). Not used for
    * branching logic anywhere outside `src/lib/email/**`. */
@@ -39,4 +48,6 @@ export interface Mailer {
   subscribeDoubleOptIn(input: SubscribeDoubleOptInInput): Promise<MailerResult>
   /** Broadcasts a "new blog post" campaign to the newsletter list. */
   broadcastNewPost(input: BroadcastNewPostInput): Promise<MailerResult>
+  /** Broadcasts an ad-hoc newsletter (composed in the admin) to the same list. */
+  broadcastCampaign(input: BroadcastCampaignInput): Promise<MailerResult>
 }

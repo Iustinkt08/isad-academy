@@ -101,11 +101,11 @@ export function HomeHero({
         <div className="animate-rise mx-auto mb-10 flex max-w-[800px] flex-col items-center gap-5 text-center">
           {/* Poppins SemiBold, capped at 48px (owner 2026-07-13: scale titles to the
               container, not the 1920 Figma frame); tracking −0.04em scales with the clamp */}
-          <h1 className="text-[clamp(2.125rem,4vw+1rem,48px)] font-semibold leading-[1.1] tracking-[-0.04em] text-ink">
+          <h1 className="text-[min(8.72vw,34px)] font-semibold leading-[1.1] tracking-[-0.04em] text-ink md:text-[clamp(2.125rem,4vw+1rem,48px)]">
             {head} <span className="text-gradient">{tail}</span>
             <span className="text-ink">.</span>
           </h1>
-          <p className="text-lg font-medium tracking-[-0.04em] text-grey-600">{subtitle}</p>
+          <p className="text-[min(4.62vw,18px)] font-medium leading-[1.55] tracking-[-0.04em] text-grey-600">{subtitle}</p>
           <Link
             href={ctaLink}
             className="mt-1 rounded-full border border-blue bg-gradient-to-b from-steel to-blue to-[80%] px-[15px] pb-2 pt-[7px] text-center text-[16px] leading-normal text-white shadow-[0_4px_4px_-2px_rgba(0,0,0,0.21)] transition-transform hover:scale-[1.03]"

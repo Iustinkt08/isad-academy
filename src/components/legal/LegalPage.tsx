@@ -19,7 +19,7 @@ import type { ReactNode } from 'react'
 function GradientPill({ label }: { label: string }) {
   return (
     <span className="w-fit shrink-0 rounded-[26px] bg-[linear-gradient(90deg,#1c5d99_0%,#46d3f6_25%,#1c5d99_50%,#46d3f6_75%,#1c5d99_100%)] p-[3px]">
-      <span className="flex items-center whitespace-nowrap rounded-[23px] bg-white px-4 py-[2px] text-[13px] font-medium leading-[21px] text-black lg:text-[15px] lg:leading-[23px]">
+      <span className="flex items-center whitespace-nowrap rounded-[23px] bg-white px-4 py-[2px] text-[min(3.33vw,13px)] font-medium leading-[1.6] text-black lg:text-[15px] lg:leading-[23px]">
         {label}
       </span>
     </span>
@@ -47,7 +47,7 @@ export default function LegalPageLayout({
     <div className="flex flex-col items-center gap-6 bg-[#f8f9fa] px-5 pb-16 pt-16 lg:gap-9 lg:px-4 lg:pb-[120px] lg:pt-20">
       <header className="flex flex-col items-center gap-3 lg:gap-3.5">
         <GradientPill label={pillLabel} />
-        <h1 className="text-center text-[28px] font-semibold leading-[34px] tracking-[-1px] text-[#222222] lg:text-[54px] lg:leading-[59.4px] lg:tracking-[-1.5px]">
+        <h1 className="text-center text-[min(7.18vw,28px)] font-semibold leading-[1.22] tracking-[-1px] text-[#222222] lg:text-[54px] lg:leading-[59.4px] lg:tracking-[-1.5px]">
           {titlePlain}
           <span className="bg-[linear-gradient(90deg,#407ea2_0%,#1c5d99_100%)] bg-clip-text text-transparent">
             {gradientWord}
@@ -60,7 +60,7 @@ export default function LegalPageLayout({
         {/* Switcher-ul de limbă a fost SCOS (owner 2026-07-26) — există deja în navbar */}
       </header>
 
-      <article className="flex w-full max-w-[350px] flex-col gap-[18px] rounded-[24px] border-[6px] border-[#f6f6f6] bg-white p-6 shadow-[3px_9px_20px_rgba(77,77,77,0.03)] lg:max-w-[760px] lg:gap-6 lg:px-10 lg:pb-10 lg:pt-[34px]">
+      <article className="flex w-full max-w-[min(350px,calc(100vw_-_40px))] flex-col gap-[18px] rounded-[24px] border-[6px] border-[#f6f6f6] bg-white p-6 shadow-[3px_9px_20px_rgba(77,77,77,0.03)] lg:max-w-[760px] lg:gap-6 lg:px-10 lg:pb-10 lg:pt-[34px]">
         {children}
       </article>
     </div>

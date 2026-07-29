@@ -35,12 +35,12 @@ export async function generateMetadata({
   // Bilingv (owner 2026-07-26) — quiz-ul urmează limba selectată.
   return locale === 'ro'
     ? {
-        title: 'Ce curs mi se potrivește?',
+        title: 'Quiz de cursuri',
         description:
           '12 întrebări scurte — îți recomandăm cursul sau parcursul potrivit, în mai puțin de două minute.',
       }
     : {
-        title: 'Which course is right for me?',
+        title: 'Course quiz',
         description:
           '12 short questions — we recommend the right course or learning path in under two minutes.',
       }

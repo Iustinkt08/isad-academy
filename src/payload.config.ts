@@ -21,6 +21,7 @@ import { FaqItems } from './collections/FaqItems'
 import { Leads } from './collections/Leads'
 import { LegalPages } from './collections/LegalPages'
 import { Media } from './collections/Media'
+import { Newsletters } from './collections/Newsletters'
 import { Orders } from './collections/Orders'
 import { Partners } from './collections/Partners'
 import { Reviews } from './collections/Reviews'
@@ -30,6 +31,7 @@ import { EventPopup } from './globals/EventPopup'
 import { ExpertBio } from './globals/ExpertBio'
 import { Homepage } from './globals/Homepage'
 import { SiteSettings } from './globals/SiteSettings'
+import { payloadMailerAdapter } from './lib/email/payloadAdapter'
 import { sendReviewRequests } from './lib/reviews/sendReviewRequests'
 import { lexicalToPlainText } from './lib/richtext/plainText'
 
@@ -86,6 +88,7 @@ export default buildConfig({
         createFirstUser: {
           Component: '/components/admin/views/CreateFirstUserView#CreateFirstUserView',
         },
+        forgot: { Component: '/components/admin/views/ForgotPasswordView#ForgotPasswordView' },
       },
     },
   },
@@ -104,6 +107,7 @@ export default buildConfig({
     FaqItems,
     Leads,
     LegalPages,
+    Newsletters,
     EventRegistrations,
   ],
   globals: [SiteSettings, Homepage, ExpertBio, CertificationInfo, EventPopup],
@@ -183,6 +187,9 @@ export default buildConfig({
     ],
   },
   secret: process.env.PAYLOAD_SECRET || '',
+  // Payload's own account emails (admin password reset) go through the project Mailer —
+  // Brevo when BREVO_API_KEY is set, console/noop otherwise. See lib/email/payloadAdapter.
+  email: payloadMailerAdapter,
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },

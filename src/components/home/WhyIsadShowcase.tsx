@@ -59,6 +59,10 @@ const buildFallbackStats = (t: Dictionary['whyShowcase']): Stat[] => [
 ]
 
 // px → cqw (card = 1300px ⇒ 1cqw = 13px). clamp(min, cqw, px) keeps small screens legible.
+/** Auto-advance cadence for the desktop carousel (owner 2026-07-29). Long enough to read
+ * a card before it moves on. */
+const AUTO_ADVANCE_MS = 5000
+
 const type = (px: number, min: number) => `clamp(${min}px, ${(px / 13).toFixed(3)}cqw, ${px}px)`
 const size = (px: number) => `${(px / 13).toFixed(3)}cqw`
 
@@ -222,6 +226,61 @@ export function WhyIsadShowcase({
     return () => cancelAnimationFrame(id)
   }, [anim])
 
+  /**
+   * Safety net for the slide commit. The rotation above is driven by `transitionend`, which
+   * a browser will NOT deliver if the transition never completes — e.g. the tab is hidden
+   * (Chrome throttles compositing) or the transition is interrupted. Without this, `slide`
+   * would stay non-zero forever and the carousel would freeze for good, arrows included.
+   * Committing slightly after the 500ms transition is idempotent: whichever of the two
+   * fires first sets `slide` back to 0, and the other then early-returns.
+   */
+  useEffect(() => {
+    if (slide === 0) return
+    const id = setTimeout(onSlideEnd, 700)
+    return () => clearTimeout(id)
+    // `onSlideEnd` is re-created every render, but only its `slide` capture matters and the
+    // effect already re-runs whenever `slide` changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [slide])
+
+  /**
+   * Auto-slide (owner 2026-07-29) — DESKTOP ONLY: this section is `hidden lg:block`, so the
+   * timer is gated on the same 1024px breakpoint rather than running invisibly on phones
+   * (the mobile showcase is WhySectionMobile, deliberately untouched). It also stands down
+   * for `prefers-reduced-motion`, while the tab is hidden, and while the pointer/keyboard is
+   * on the card — so it never fights someone reading or using the arrows.
+   *
+   * The tick advances only from the idle state (`s === 0`); a tick landing mid-transition is
+   * a no-op, which mirrors the `go()` guard and keeps the order rotation consistent.
+   */
+  const [autoPaused, setAutoPaused] = useState(false)
+
+  useEffect(() => {
+    const desktop = window.matchMedia('(min-width: 1024px)')
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)')
+    let timer: ReturnType<typeof setInterval> | null = null
+
+    const sync = () => {
+      if (timer != null) {
+        clearInterval(timer)
+        timer = null
+      }
+      if (autoPaused || !desktop.matches || reduced.matches || document.hidden) return
+      timer = setInterval(() => setSlide((s) => (s === 0 ? 1 : s)), AUTO_ADVANCE_MS)
+    }
+
+    sync()
+    desktop.addEventListener('change', sync)
+    reduced.addEventListener('change', sync)
+    document.addEventListener('visibilitychange', sync)
+    return () => {
+      if (timer != null) clearInterval(timer)
+      desktop.removeEventListener('change', sync)
+      reduced.removeEventListener('change', sync)
+      document.removeEventListener('visibilitychange', sync)
+    }
+  }, [autoPaused])
+
   // Cursor-following trail on the main card (owner request): a blurred blue ellipse eases
   // toward the pointer via rAF; a radial mask reveals a white copy of the wordmark (and the
   // arrows) only under it (localised). It sits below the content cards.
@@ -252,6 +311,7 @@ export function WhyIsadShowcase({
     return { x: e.clientX - r.left, y: e.clientY - r.top }
   }
   const onCardEnter = (e: ReactMouseEvent<HTMLDivElement>) => {
+    setAutoPaused(true)
     if (!cardRef.current) return
     const p = pointFromEvent(e)
     targetPos.current = { ...p }
@@ -264,6 +324,7 @@ export function WhyIsadShowcase({
     targetPos.current = pointFromEvent(e)
   }
   const onCardLeave = () => {
+    setAutoPaused(false)
     setTrailOn(false)
     if (rafId.current != null) {
       cancelAnimationFrame(rafId.current)
@@ -321,6 +382,10 @@ export function WhyIsadShowcase({
             onMouseEnter={onCardEnter}
             onMouseMove={onCardMove}
             onMouseLeave={onCardLeave}
+            /* Keyboard users get the same courtesy as pointer users: tabbing onto the
+               arrows holds the carousel still. */
+            onFocusCapture={() => setAutoPaused(true)}
+            onBlurCapture={() => setAutoPaused(false)}
             className="@container relative overflow-hidden border-[6px] border-[#F6F6F6] bg-white shadow-[0_18px_38px_rgba(77,77,77,0.10),0_7px_15px_rgba(77,77,77,0.08),0_2px_6px_rgba(77,77,77,0.06)]"
             style={{ borderRadius: size(24) }}
           >

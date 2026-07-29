@@ -20,6 +20,7 @@ describe('POST /api/newsletter (unit) — T7', () => {
       sendTransactional: async () => ({ ok: true }),
       subscribeDoubleOptIn: async () => ({ ok: true }),
       broadcastNewPost: async () => ({ ok: true }),
+      broadcastCampaign: async () => ({ ok: true }),
     })
 
     const response = await POST(jsonRequest({ email: 'reader@example.com' }))
@@ -86,6 +87,7 @@ describe('POST /api/newsletter (unit) — T7', () => {
       sendTransactional: async () => ({ ok: true }),
       subscribeDoubleOptIn: async () => ({ ok: false, error: 'Brevo is down' }),
       broadcastNewPost: async () => ({ ok: true }),
+      broadcastCampaign: async () => ({ ok: true }),
     })
 
     const response = await POST(jsonRequest({ email: 'reader@example.com' }))

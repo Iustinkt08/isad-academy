@@ -98,9 +98,9 @@ export function Footer({ settings, locale }: { settings: SiteSetting | null; loc
               ))}
             </div>
 
-            {/* ANPC SAL + SOL — official badges, used as-is (legal requirement, §7),
-                pushed to the right edge (owner 2026-07-14) */}
-            <div className="flex flex-wrap items-center gap-3 lg:justify-end">
+            {/* ANPC SAL + SOL — official badges, used as-is (legal requirement, §7).
+                Left-aligned with the LEGAL column (owner 2026-07-30) */}
+            <div className="flex flex-wrap items-center gap-3">
               <a
                 href={legalEntity?.anpcUrl || 'https://anpc.ro/ce-este-sal/'}
                 target="_blank"

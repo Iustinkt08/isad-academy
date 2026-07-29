@@ -45,7 +45,7 @@ export default function CourseCard({
   return (
     <article
       data-testid="course-card"
-      className="group relative h-[460px] w-[347.52px] shrink-0 snap-start scroll-ml-[21px] overflow-hidden rounded-[24px] border-[6px] border-[#f6f6f6] bg-white shadow-[24px_80px_50px_rgba(77,77,77,0.02),10px_36px_37px_rgba(77,77,77,0.03),3px_9px_20px_rgba(77,77,77,0.03)]"
+      className="group relative h-[460px] w-[min(347.52px,calc(100vw_-_42px))] shrink-0 snap-start scroll-ml-[21px] overflow-hidden rounded-[24px] border-[6px] border-[#f6f6f6] bg-white shadow-[24px_80px_50px_rgba(77,77,77,0.02),10px_36px_37px_rgba(77,77,77,0.03),3px_9px_20px_rgba(77,77,77,0.03)]"
     >
       {/* Glow albastru la bază — hover (desktop) / card activ (mobil, doar sub lg) */}
       <div
@@ -56,7 +56,7 @@ export default function CourseCard({
       />
 
       {/* Content stack — 255px @ (46,46), gap 12; fără chips în v2 */}
-      <div className="absolute left-[40px] top-[40px] flex w-[255px] flex-col items-start gap-3">
+      <div className="absolute left-[40px] top-[40px] flex w-[min(255px,calc(100%_-_68px))] flex-col items-start gap-3">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={course.icon ?? '/brand/icon-black.svg'}

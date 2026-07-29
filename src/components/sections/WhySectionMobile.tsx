@@ -55,7 +55,7 @@ const NOTCH_ROTATE_MS = 3200;
 function GradientPill({ label }: { label: string }) {
   return (
     <span className="w-fit shrink-0 rounded-[26px] bg-[linear-gradient(90deg,#1c5d99_0%,#46d3f6_25%,#1c5d99_50%,#46d3f6_75%,#1c5d99_100%)] p-[3px]">
-      <span className="flex items-center whitespace-nowrap rounded-[23px] bg-white px-4 py-[2px] text-[15px] font-medium leading-[23px] text-black">
+      <span className="flex items-center whitespace-nowrap rounded-[23px] bg-white px-4 py-[2px] text-[min(3.85vw,15px)] font-medium leading-[1.53] text-black">
         {label}
       </span>
     </span>
@@ -247,13 +247,13 @@ export default function WhySectionMobile({
   return (
     <section className="bg-white pb-14 pt-16 lg:hidden">
       {/* Titlu — Poppins SemiBold 28/34, -1px, #222222 */}
-      <h2 className="text-center text-[28px] font-semibold leading-[34px] tracking-[-1px] text-[#222222]">
+      <h2 className="text-center text-[min(7.18vw,28px)] font-semibold leading-[1.22] tracking-[-1px] text-[#222222]">
         {tw.heading}
       </h2>
 
       {/* Subtitlu — 14/21 #959595, max 350px, la 16px sub titlu; refolosește cele
           trei fragmente ale showcase-ului de desktop, îmbinate într-o singură frază */}
-      <p className="mx-auto mt-4 max-w-[350px] text-center text-[14px] leading-[21px] text-[#959595]">
+      <p className="mx-auto mt-4 max-w-[min(350px,calc(100vw_-_40px))] text-center text-[14px] leading-[21px] text-[#959595]">
         {`${tw.subLead} ${tw.subHighlight}, ${tw.subTail}`}
       </p>
 

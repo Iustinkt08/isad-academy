@@ -129,7 +129,7 @@ function TestimonialCard({ card }: { card: CardData }) {
     .slice(0, 2)
 
   return (
-    <figure className="relative h-[228px] w-[431px] shrink-0 overflow-hidden rounded-[16px] bg-white shadow-[0_0_7px_1px_rgba(0,0,0,0.09)]">
+    <figure className="relative h-[228px] w-[min(431px,calc(100vw_-_40px))] shrink-0 overflow-hidden rounded-[16px] bg-white shadow-[0_0_7px_1px_rgba(0,0,0,0.09)]">
       <QuoteMark />
 
       {/* Avatar 52px @ (28,28) — optional photo, initials fallback */}
@@ -151,7 +151,7 @@ function TestimonialCard({ card }: { card: CardData }) {
       )}
 
       {/* Author — 12/14 Medium, two lines, centred on y=54 */}
-      <figcaption className="absolute left-[99px] top-[54px] w-[286px] -translate-y-1/2 text-[12px] font-medium leading-[14px] text-ink">
+      <figcaption className="absolute left-[99px] top-[54px] w-[min(286px,calc(100%_-_113px))] -translate-y-1/2 text-[12px] font-medium leading-[14px] text-ink">
         <p>
           {card.name}
           {card.roleCompany && ` · ${card.roleCompany}`}
@@ -160,7 +160,7 @@ function TestimonialCard({ card }: { card: CardData }) {
       </figcaption>
 
       {/* Quote — 12/16 Medium, centred on y=138 */}
-      <blockquote className="absolute left-[27px] top-[138px] w-[377px] -translate-y-1/2 text-[12px] font-medium leading-4 text-ink">
+      <blockquote className="absolute left-[27px] top-[138px] w-[min(377px,calc(100%_-_54px))] -translate-y-1/2 text-[12px] font-medium leading-4 text-ink">
         {card.text}
       </blockquote>
     </figure>

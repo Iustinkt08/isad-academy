@@ -21,14 +21,14 @@ export default function CatalogHeader({
   const t = getDictionary(locale).catalog;
   return (
     <header className="flex flex-col items-center gap-3.5 bg-[#f8f9fa] px-4 pb-8 pt-16 lg:gap-5 lg:pb-[50px] lg:pt-20">
-      <h1 className="max-w-[348px] text-center text-[28px] font-semibold leading-[34px] tracking-[-1px] text-[#222222] lg:max-w-none lg:text-[54px] lg:leading-normal lg:tracking-[-1.5px]">
+      <h1 className="max-w-[min(348px,calc(100vw_-_40px))] text-center text-[min(7.18vw,28px)] font-semibold leading-[1.22] tracking-[-1px] text-[#222222] lg:max-w-none lg:text-[54px] lg:leading-normal lg:tracking-[-1.5px]">
         {t.titlePlain}
         <span className="bg-[linear-gradient(90deg,#407ea2_0%,#1c5d99_100%)] bg-clip-text tracking-[-1.2px] text-transparent lg:tracking-[-2.16px]">
           {t.titleGradient}
         </span>
         {'.'}
       </h1>
-      <p className="max-w-[350px] text-center text-[14px] leading-[21px] text-[#959595] lg:max-w-none lg:text-[17px] lg:leading-normal">
+      <p className="max-w-[min(350px,calc(100vw_-_40px))] text-center text-[14px] leading-[21px] text-[#959595] lg:max-w-none lg:text-[17px] lg:leading-normal">
         {t.subtitle}
       </p>
 

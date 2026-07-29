@@ -1,7 +1,7 @@
 /**
  * AdminAuthShell — shared backdrop for the admin auth screens (login + create user).
- * 1:1 from Figma (nodes 3768:18 / 3770:18): page centered on surface-subtle, diffuse
- * blue dome at the bottom, logo watermark top-right, white 480px card centered.
+ * From Figma (nodes 3768:18 / 3770:18): page centered on surface-subtle, white 480px
+ * card centered (watermark + bottom blue blur dome dropped, owner 2026-07-28).
  *
  * Mounted through Payload custom views (admin.components.views.login /
  * .createFirstUser) — NOT as standalone Next routes. Tailwind utilities come from
@@ -13,20 +13,6 @@
 export default function AdminAuthShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="isad-admin-auth relative flex min-h-screen items-center justify-center overflow-hidden bg-surface-subtle px-4 py-16">
-      {/* Diffuse blue dome at the base (echo of the site hero) */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -bottom-[380px] left-1/2 h-[700px] w-[1600px] -translate-x-1/2 rounded-[50%] bg-gradient-to-b from-steel to-blue opacity-25 blur-[120px]"
-      />
-      {/* Logo watermark, top-right corner */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        aria-hidden
-        src="/brand/icon-black.svg"
-        alt=""
-        className="pointer-events-none absolute -top-16 right-16 h-[275px] w-[300px] object-contain opacity-[0.04]"
-      />
-
       {children}
 
       <p className="absolute bottom-8 left-1/2 -translate-x-1/2 text-[12px] tracking-[0.4px] text-grey-600">
@@ -36,14 +22,12 @@ export default function AdminAuthShell({ children }: { children: React.ReactNode
   )
 }
 
-/** Brand header inside the card (logo + wordmark) — shared by both screens */
+/** Brand header inside the card — icon-only "A" mark, approved Black variant, same size
+ * as the site header (owner 2026-07-28; <120px → icon per brand rule). */
 export function AdminBrand() {
   return (
-    <div className="flex items-center gap-2">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/brand/icon-black.svg" alt="" className="h-[26px] w-7 object-contain" />
-      <span className="text-[17px] font-semibold tracking-[-0.4px] text-ink">isad.academy</span>
-    </div>
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src="/brand/icon-black.svg" alt="isad.academy" className="h-[28px] w-[31px] object-contain" />
   )
 }
 

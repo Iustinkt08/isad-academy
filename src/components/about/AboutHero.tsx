@@ -17,7 +17,7 @@ import { getDictionary } from '@/lib/i18n/dictionaries';
 function GradientPill({ label }: { label: string }) {
   return (
     <span className="w-fit shrink-0 rounded-[26px] bg-[linear-gradient(90deg,#1c5d99_0%,#46d3f6_25%,#1c5d99_50%,#46d3f6_75%,#1c5d99_100%)] p-[3px]">
-      <span className="flex items-center whitespace-nowrap rounded-[23px] bg-white px-4 py-[2px] text-[15px] font-medium leading-[23px] text-black">
+      <span className="flex items-center whitespace-nowrap rounded-[23px] bg-white px-4 py-[2px] text-[min(3.85vw,15px)] font-medium leading-[1.53] text-black">
         {label}
       </span>
     </span>
@@ -31,7 +31,7 @@ export default function AboutHero({ locale }: { locale: Locale }) {
       <GradientPill label={t.heroPill} />
 
       {/* Titlu — mobil 28/34, desktop 54/59.4; „changing world." în gradient */}
-      <h1 className="max-w-[350px] text-center text-[28px] font-semibold leading-[34px] tracking-[-1px] text-[#222222] lg:max-w-[1000px] lg:text-[54px] lg:leading-[59.4px] lg:tracking-[-1.5px]">
+      <h1 className="max-w-[min(350px,calc(100vw_-_40px))] text-center text-[min(7.18vw,28px)] font-semibold leading-[1.22] tracking-[-1px] text-[#222222] lg:max-w-[1000px] lg:text-[54px] lg:leading-[59.4px] lg:tracking-[-1.5px]">
         {t.heroTitlePlain}
         <span className="bg-[linear-gradient(90deg,#407ea2_0%,#1c5d99_100%)] bg-clip-text text-transparent">
           {t.heroTitleGradient}
@@ -40,7 +40,7 @@ export default function AboutHero({ locale }: { locale: Locale }) {
       </h1>
 
       {/* Intro — 2 paragrafe; pe desktop și linia de fondare */}
-      <div className="flex max-w-[350px] flex-col gap-3.5 lg:max-w-[760px]">
+      <div className="flex max-w-[min(350px,calc(100vw_-_40px))] flex-col gap-3.5 lg:max-w-[760px]">
         <p className="text-center text-[14px] leading-[21px] text-[#595959] lg:text-[16px] lg:leading-[26px]">
           {t.heroIntro1}
         </p>

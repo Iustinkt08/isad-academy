@@ -114,8 +114,8 @@ export function ConfirmationHeader({
   subtitle: string
 }) {
   return (
-    <div className="flex w-full max-w-[350px] flex-col items-center gap-3 lg:max-w-[760px] lg:gap-3.5">
-      <h1 className="text-center text-[28px] font-semibold leading-[34px] tracking-[-1px] text-[#222222] lg:text-[54px] lg:leading-[59.4px] lg:tracking-[-1.5px]">
+    <div className="flex w-full max-w-[min(350px,calc(100vw_-_40px))] flex-col items-center gap-3 lg:max-w-[760px] lg:gap-3.5">
+      <h1 className="text-center text-[min(7.18vw,28px)] font-semibold leading-[1.22] tracking-[-1px] text-[#222222] lg:text-[54px] lg:leading-[59.4px] lg:tracking-[-1.5px]">
         {title}
         {titleAccent ? (
           <>
@@ -154,7 +154,7 @@ export function OrderRecapCard({
   return (
     <section
       data-testid="order-recap"
-      className="flex w-full max-w-[350px] flex-col gap-3 rounded-[24px] bg-white p-6 shadow-[3px_9px_24px_rgba(77,77,77,0.04)] lg:max-w-[560px] lg:gap-3.5 lg:border-[6px] lg:border-[#f6f6f6] lg:px-8 lg:py-[30px] lg:shadow-[3px_9px_20px_rgba(77,77,77,0.03)]"
+      className="flex w-full max-w-[min(350px,calc(100vw_-_40px))] flex-col gap-3 rounded-[24px] bg-white p-6 shadow-[3px_9px_24px_rgba(77,77,77,0.04)] lg:max-w-[560px] lg:gap-3.5 lg:border-[6px] lg:border-[#f6f6f6] lg:px-8 lg:py-[30px] lg:shadow-[3px_9px_20px_rgba(77,77,77,0.03)]"
     >
       <p className="text-[12px] font-medium tracking-[0.2px] text-[#959595]">{orderRef}</p>
 

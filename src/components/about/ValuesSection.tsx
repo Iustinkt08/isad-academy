@@ -1,50 +1,23 @@
 /**
- * About / Our Values — v3. ÎNLOCUIEȘTE vechiul ValuesSection.tsx.
+ * About / Our Values — v4 (Figma 3873-110 / card 3891-3089, owner 2026-07-29).
  * DOAR PE DESKTOP (hidden lg:flex): în designul mobil (Figma 3977-571)
  * secțiunea de valori NU există separat — conținutul valorilor e integrat la
- * punctele traseului din BeliefsPath. Pe desktop rămâne 1:1 cu Figma 3873-94:
- * titlu „Our values." + 3 carduri 346.67×260 cu checkmark gradient, body
- * Poppins Light și glow albastru pe hover.
- * TOATE valorile sunt EXPLICITE (px/hex). Server component.
+ * punctele traseului din BeliefsPath.
+ *
+ * Schimbare v4: checkmark-ul gradient DISPARE; în locul lui cardul primește
+ * MONOGRAMA de brand ca filigran, ancorată în colțul din dreapta-jos (167×148,
+ * ieșind 15px în dreapta și 6px sub marginea interioară — exact geometria din
+ * Figma). Asset-ul e cel din proiect (/brand/blog-monogram.svg, același folosit
+ * de cardurile de blog): are opacity 0.5 + granulația încorporate, deci
+ * echivalează cu instanța Figma aplicată la opacity 50%.
+ *
+ * Titlu 20/30 (−0.8) la 56px de sus, body Poppins Light 14/23 pe 248px la 98px,
+ * ambele la 36px de marginea stângă; glow albastru pe hover (patternul
+ * CourseCard). TOATE valorile sunt EXPLICITE (px/hex). Server component.
  */
 
 import type { Locale } from '@/lib/i18n/config';
 import { getDictionary } from '@/lib/i18n/dictionaries';
-
-/** Checkmark 16×16 — stroke gradient #1C5D99→#407EA2, 3px, capete rotunde */
-function GradientCheck() {
-  return (
-    <svg
-      aria-hidden
-      width="17"
-      height="17"
-      viewBox="0 0 17 17"
-      fill="none"
-      className="relative ml-[5px]"
-    >
-      <path
-        d="M2.5 9L6.5 13L14.5 4"
-        stroke="url(#vc-grad)"
-        strokeWidth="3"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <defs>
-        <linearGradient
-          id="vc-grad"
-          x1="2.5"
-          y1="13"
-          x2="14.5"
-          y2="4"
-          gradientUnits="userSpaceOnUse"
-        >
-          <stop stopColor="#1C5D99" />
-          <stop offset="1" stopColor="#407EA2" />
-        </linearGradient>
-      </defs>
-    </svg>
-  );
-}
 
 export default function ValuesSection({ locale }: { locale: Locale }) {
   const t = getDictionary(locale).about;
@@ -62,13 +35,20 @@ export default function ValuesSection({ locale }: { locale: Locale }) {
         {t.values.map((v) => (
           <article
             key={v.title}
-            className="group relative h-[260px] w-[346.67px] overflow-hidden rounded-[24px] border-[6px] border-[#f6f6f6] bg-white pl-9 pr-4 pt-[41px] shadow-[3px_9px_20px_rgba(77,77,77,0.03)]"
+            className="group relative h-[260px] w-[346.67px] overflow-hidden rounded-[24px] border-[6px] border-[#f6f6f6] bg-white pl-9 pr-4 pt-[56px] shadow-[3px_9px_20px_rgba(77,77,77,0.03)]"
           >
+            {/* Filigranul de brand — colț dreapta-jos, sub conținut (Figma 4067:171) */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/brand/blog-monogram.svg"
+              alt=""
+              aria-hidden
+              className="pointer-events-none absolute -bottom-[6px] -right-[15px] h-[148px] w-[167px] select-none"
+            />
             <div
               aria-hidden
               className="pointer-events-none absolute bottom-[-38px] left-[6px] right-[6px] h-[89px] rounded-full bg-[linear-gradient(90deg,#1c5d99_24%,#407ea2_83%)] opacity-0 blur-[55px] transition-opacity duration-300 group-hover:opacity-100"
             />
-            <GradientCheck />
             <h3 className="relative text-[20px] font-medium leading-[30px] tracking-[-0.8px] text-[#222222]">
               {v.title}
             </h3>
