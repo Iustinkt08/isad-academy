@@ -13,7 +13,7 @@ const RUN_ID = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
 let emailCounter = 0
 const uniqueEmail = (label: string): string => `${label}-${RUN_ID}-${emailCounter++}@example.com`
 
-type RecordedCall = { method: 'broadcastNewPost' | 'sendTransactional' | 'subscribeDoubleOptIn'; args: unknown }
+type RecordedCall = { method: 'broadcastCampaign' | 'broadcastNewPost' | 'sendTransactional' | 'subscribeDoubleOptIn'; args: unknown }
 
 /** A recording `Mailer` — never hits the network, just remembers every call so hooks can be
  * asserted on "exactly once"/"exactly zero" without any Brevo config. */
@@ -32,6 +32,10 @@ const createFakeMailer = (result: MailerResult = { ok: true }): Mailer & { calls
     },
     async broadcastNewPost(input) {
       calls.push({ method: 'broadcastNewPost', args: input })
+      return result
+    },
+    async broadcastCampaign(input) {
+      calls.push({ method: 'broadcastCampaign', args: input })
       return result
     },
   }
@@ -107,21 +111,15 @@ describe('email hooks (int) — T7', () => {
         overrideAccess: true,
       })
 
-      // Creating a pending order must not send anything.
-      expect(fake.calls).toHaveLength(0)
-
-      await payload.update({
-        collection: 'orders',
-        id: order.id,
-        data: { paymentStatus: 'confirmed' },
-        overrideAccess: true,
-      })
-
+      // Creating a pending order sends the "order received" receipt — and only that
+      // (`sendOrderReceivedEmail`, owner 2026-07-30; before that template existed, creating
+      // a pending order sent nothing at all).
       expect(fake.calls).toHaveLength(1)
       expect(fake.calls[0]!.method).toBe('sendTransactional')
-      expect((fake.calls[0]!.args as { to: string }).to).toBe(buyerEmail)
+      const receipt = fake.calls[0]!.args as { to: string; subject: string }
+      expect(receipt.to).toBe(buyerEmail)
+      expect(receipt.subject).toContain('received your isad.academy order')
 
-      // Re-saving confirmed -> confirmed (a same-status resave) must not re-fire.
       await payload.update({
         collection: 'orders',
         id: order.id,
@@ -129,7 +127,22 @@ describe('email hooks (int) — T7', () => {
         overrideAccess: true,
       })
 
-      expect(fake.calls).toHaveLength(1)
+      expect(fake.calls).toHaveLength(2)
+      expect(fake.calls[1]!.method).toBe('sendTransactional')
+      const confirmation = fake.calls[1]!.args as { to: string; subject: string }
+      expect(confirmation.to).toBe(buyerEmail)
+      expect(confirmation.subject).toContain('is confirmed')
+
+      // Re-saving confirmed -> confirmed (a same-status resave) must not re-fire, and the
+      // receipt must never fire again either (it is create-only).
+      await payload.update({
+        collection: 'orders',
+        id: order.id,
+        data: { paymentStatus: 'confirmed' },
+        overrideAccess: true,
+      })
+
+      expect(fake.calls).toHaveLength(2)
     })
 
     it('does not fail the order update when the mailer reports failure', async () => {
@@ -159,7 +172,9 @@ describe('email hooks (int) — T7', () => {
       })
 
       expect(updated.paymentStatus).toBe('confirmed')
-      expect(fake.calls).toHaveLength(1)
+      // Both the receipt (on create) and the confirmation (on update) were attempted and
+      // both reported failure — neither may break the order.
+      expect(fake.calls).toHaveLength(2)
 
       const persisted = await payload.findByID({ collection: 'orders', id: order.id, overrideAccess: true })
       expect(persisted.paymentStatus).toBe('confirmed')

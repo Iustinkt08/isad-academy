@@ -1,7 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { isAdmin } from '../access/isAdmin'
-import { sendOrderConfirmationEmail } from '../lib/email/hooks'
+import { sendOrderConfirmationEmail, sendOrderReceivedEmail } from '../lib/email/hooks'
 import { issueInvoiceOnConfirm } from '../lib/invoicing/hooks/issueInvoiceOnConfirm'
 import { consumeSeatsOnConfirm, releaseSeatsOnDelete } from '../lib/seats'
 
@@ -171,8 +171,17 @@ export const Orders: CollectionConfig = {
   // exact same not-confirmed -> confirmed transition (detected independently — the seat
   // hook's own logic is untouched). It never throws, so a Brevo outage can never undo the
   // seat consumption/order confirmation that already succeeded above it.
+  // `sendOrderReceivedEmail` (owner 2026-07-30) covers the other end: create-with-pending
+  // only, so a buyer sent to a hosted payment page gets a receipt while the payment settles.
+  // It skips orders that are already confirmed on create, so it can never contradict the
+  // confirmation email above.
   hooks: {
-    afterChange: [consumeSeatsOnConfirm, sendOrderConfirmationEmail, issueInvoiceOnConfirm],
+    afterChange: [
+      consumeSeatsOnConfirm,
+      sendOrderReceivedEmail,
+      sendOrderConfirmationEmail,
+      issueInvoiceOnConfirm,
+    ],
     afterDelete: [releaseSeatsOnDelete],
   },
 }

@@ -14,6 +14,9 @@ export type BaseLayoutInput = {
   title: string
   bodyHtml: string
   footerText?: string
+  /** Inbox preview text (the grey line clients show next to the subject). Client-supplied
+   * templates each define one — owner 2026-07-30. Hidden in the rendered body. */
+  preheader?: string
 }
 
 /** Escapes the five HTML-significant characters — every template interpolates
@@ -27,7 +30,7 @@ export const escapeHtml = (value: string): string =>
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;')
 
-export const renderBaseLayout = ({ title, bodyHtml, footerText }: BaseLayoutInput): string => `<!doctype html>
+export const renderBaseLayout = ({ title, bodyHtml, footerText, preheader }: BaseLayoutInput): string => `<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -35,6 +38,11 @@ export const renderBaseLayout = ({ title, bodyHtml, footerText }: BaseLayoutInpu
     <title>${escapeHtml(title)}</title>
   </head>
   <body style="margin:0;padding:0;background-color:${ICE}33;font-family:Helvetica,Arial,sans-serif;color:${INK};">
+    ${
+      preheader
+        ? `<div style="display:none;max-height:0;overflow:hidden;mso-hide:all;">${escapeHtml(preheader)}</div>`
+        : ''
+    }
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="padding:32px 16px;">
       <tr>
         <td align="center">
