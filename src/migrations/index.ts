@@ -1,6 +1,5 @@
 import * as migration_20260726_001907_initial from './20260726_001907_initial';
-import * as migration_20260727_235321_event_popup from './20260727_235321_event_popup';
-import * as migration_20260729_000347_newsletters from './20260729_000347_newsletters';
+import * as migration_20260730_010559_event_popup_and_newsletters from './20260730_010559_event_popup_and_newsletters';
 
 export const migrations = [
   {
@@ -9,13 +8,8 @@ export const migrations = [
     name: '20260726_001907_initial',
   },
   {
-    up: migration_20260727_235321_event_popup.up,
-    down: migration_20260727_235321_event_popup.down,
-    name: '20260727_235321_event_popup',
-  },
-  {
-    up: migration_20260729_000347_newsletters.up,
-    down: migration_20260729_000347_newsletters.down,
-    name: '20260729_000347_newsletters'
+    up: migration_20260730_010559_event_popup_and_newsletters.up,
+    down: migration_20260730_010559_event_popup_and_newsletters.down,
+    name: '20260730_010559_event_popup_and_newsletters'
   },
 ];

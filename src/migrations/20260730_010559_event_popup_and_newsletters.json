@@ -4556,6 +4556,107 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.newsletters": {
+      "name": "newsletters",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "subject": {
+          "name": "subject",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "preheader": {
+          "name": "preheader",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "body": {
+          "name": "body",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "send_now": {
+          "name": "send_now",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "sent_at": {
+          "name": "sent_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "last_result": {
+          "name": "last_result",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "newsletters_updated_at_idx": {
+          "name": "newsletters_updated_at_idx",
+          "columns": [
+            {
+              "expression": "updated_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "newsletters_created_at_idx": {
+          "name": "newsletters_created_at_idx",
+          "columns": [
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.event_registrations": {
       "name": "event_registrations",
       "schema": "",
@@ -5263,6 +5364,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "newsletters_id": {
+          "name": "newsletters_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
         "event_registrations_id": {
           "name": "event_registrations_id",
           "type": "integer",
@@ -5511,6 +5618,21 @@
           "method": "btree",
           "with": {}
         },
+        "payload_locked_documents_rels_newsletters_id_idx": {
+          "name": "payload_locked_documents_rels_newsletters_id_idx",
+          "columns": [
+            {
+              "expression": "newsletters_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
         "payload_locked_documents_rels_event_registrations_id_idx": {
           "name": "payload_locked_documents_rels_event_registrations_id_idx",
           "columns": [
@@ -5703,6 +5825,19 @@
           "tableTo": "legal_pages",
           "columnsFrom": [
             "legal_pages_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "payload_locked_documents_rels_newsletters_fk": {
+          "name": "payload_locked_documents_rels_newsletters_fk",
+          "tableFrom": "payload_locked_documents_rels",
+          "tableTo": "newsletters",
+          "columnsFrom": [
+            "newsletters_id"
           ],
           "columnsTo": [
             "id"
@@ -7612,12 +7747,6 @@
           "primaryKey": false,
           "notNull": false
         },
-        "seats_left": {
-          "name": "seats_left",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false
-        },
         "updated_at": {
           "name": "updated_at",
           "type": "timestamp(3) with time zone",
@@ -8114,6 +8243,6 @@
     "tables": {},
     "columns": {}
   },
-  "id": "f7b08d5c-a5f9-4b9a-b1ee-b1648da29ef8",
+  "id": "525b950c-8d02-4aa1-bd50-566a3c6fa482",
   "prevId": "00000000-0000-0000-0000-000000000000"
 }

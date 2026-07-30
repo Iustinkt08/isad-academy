@@ -122,3 +122,28 @@ jobs:
 
       - name: Restart Passenger app
         run: ssh deploy "mkdir -p '${{ secrets.APP_DIR }}/tmp' && touch '${{ secrets.APP_DIR }}/tmp/restart.txt'"
+
+      # Atingerea lui restart.txt NU înseamnă că aplicația a pornit. Pe 2026-07-29 o migrație
+      # eșuată a omorât boot-ul, Passenger a dat 503 pe tot site-ul, iar workflow-ul a raportat
+      # "success" — de aici pasul de mai jos, care eșuează dacă aplicația nu răspunde.
+      # `/admin` e verificat separat: e prima rută care cade când migrațiile nu s-au aplicat.
+      - name: Verify the app actually booted
+        run: |
+          site="https://isad.academy"
+          for i in $(seq 1 20); do
+            sleep 6
+            code="$(curl -s -o /dev/null -w '%{http_code}' -L --max-time 25 "$site/" || true)"
+            echo "încercare $i: / -> $code"
+            if [ "$code" = "200" ]; then
+              admin="$(curl -s -o /dev/null -w '%{http_code}' -L --max-time 25 "$site/admin" || true)"
+              echo "/admin -> $admin"
+              if [ "$admin" != "200" ]; then
+                echo "::error::Site-ul răspunde, dar /admin dă $admin — verifică RUN_MIGRATIONS și logurile aplicației."
+                exit 1
+              fi
+              echo "Deploy verificat: / și /admin răspund 200."
+              exit 0
+            fi
+          done
+          echo "::error::Aplicația nu răspunde 200 după restart (ultimul cod: $code). Vezi stderr-ul aplicației în cPanel → Setup Node.js App."
+          exit 1

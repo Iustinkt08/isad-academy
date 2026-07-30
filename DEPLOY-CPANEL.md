@@ -92,6 +92,25 @@ public                → ~/apps/isad/public
 Apoi în cPanel → Setup Node.js App → **Restart**. (Semnătura unui deploy reușit: site-ul
 răspunde și `/admin` se încarcă.)
 
+⚠️ **Capcană dovedită (2026-07-30):** în dev, schema se sincronizează cu `push`, nu cu migrații.
+`payload migrate:create` scrie doar *diferența* față de ultimul snapshot `.json` din
+`src/migrations/`, deci un tabel creat prin push și nesurprins într-un snapshot NU ajunge
+niciodată într-o migrație. Exact asta a doborât producția: tabelele `event_popup*` fuseseră
+create prin push, iar migrația rămasă în repo doar ștergea o coloană din ele
+(`ALTER TABLE "event_popup" DROP COLUMN "seats_left"`) → în producție tabelul nu exista →
+migrația a aruncat la boot → Passenger a dat 503 pe tot site-ul.
+
+**Verifică înainte de fiecare release cu migrații noi:** rulează migrațiile pe o bază care
+reproduce producția, nu pe baza ta de dev:
+```bash
+docker exec isad-postgres psql -U postgres -c 'CREATE DATABASE isad_prodsim;'
+# aplică DOAR migrațiile deja aplicate în producție, apoi pornește Payload ca în producție:
+NODE_ENV=production RUN_MIGRATIONS=true \
+DATABASE_URI=postgres://postgres:postgres@127.0.0.1:5432/isad_prodsim \
+  npx tsx -e "import {getPayload} from 'payload'; import c from './src/payload.config'; await getPayload({config:c})"
+```
+Dacă asta pornește curat, pornește și pe server.
+
 ⚠️ **Migrațiile se aplică la pornire DOAR dacă `RUN_MIGRATIONS=true` e setat în env-ul
 aplicației din cPanel** (`prodMigrations` e gated în `src/payload.config.ts` — vezi
 comentariul de acolo pentru de ce). Un release care aduce migrații noi, pornit fără acest
