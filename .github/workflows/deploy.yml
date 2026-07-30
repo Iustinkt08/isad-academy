@@ -50,9 +50,12 @@ jobs:
       - name: Unit tests (quality gate)
         run: npx vitest run tests/unit
 
-      # O SINGURĂ conexiune TCP pe tot deploy-ul (ControlMaster): tunelul DB, scp-ul
-      # și restart-ul se multiplexează prin ea. Firewall-ul Hosterion (Imunify/CSF)
-      # a blocat temporar SSH-ul când fiecare run deschidea 4-5 conexiuni separate.
+      # FĂRĂ multiplexare (2026-07-30). ControlMaster a fost încercat ca să existe o singură
+      # conexiune TCP pe tot deploy-ul, dar Hosterion închide conexiunea persistentă
+      # ("Connection closed by remote host") și atunci TOT ce urmează cade cu
+      # "Failed to connect to new control master" — asta a blocat deploy-urile de pe 26-29 iulie.
+      # Fiecare pas deschide acum propria sesiune scurtă, cu reîncercări: cele 4 conexiuni sunt
+      # oricum distanțate natural de build-ul dintre ele.
       - name: Load SSH deploy key
         run: |
           mkdir -p ~/.ssh
@@ -65,33 +68,29 @@ jobs:
             User ${{ secrets.SSH_USER }}
             IdentityFile ~/.ssh/deploy_key
             StrictHostKeyChecking accept-new
-            ControlMaster auto
-            ControlPath ~/.ssh/cm-%r@%h-%p
-            ControlPersist 20m
+            ControlMaster no
+            ControlPath none
+            ConnectTimeout 25
             ServerAliveInterval 15
             ServerAliveCountMax 8
             TCPKeepAlive yes
           EOF
 
-      # DIAGNOSTIC TEMPORAR (2026-07-27, de șters după fix): conexiunea mux moare cu
-      # "Broken pipe" imediat după KEX, iar masterul demonizat înghite eroarea reală.
-      # A izolează transportul (fără mux), B reproduce config-ul curent, verbose.
-      # IP-urile se maschează — repo public, iar IP-ul rezolvat nu e mascat de Actions.
-      - name: SSH diagnostic (temporar)
-        run: |
-          set +e
-          mask() { sed -E 's/([0-9]{1,3}\.){3}[0-9]{1,3}/x.x.x.x/g'; }
-          echo "=== A: ssh simplu, fara mux ==="
-          ssh -vv -S none -o ControlMaster=no deploy 'echo SSH_OK' 2>&1 | mask | tail -60
-          echo "=== B: ssh cu mux (config curent) ==="
-          ssh -vv deploy 'echo MUX_OK' 2>&1 | mask | tail -40
-          true
-
       # Snapshot-ul DB de producție într-o comandă ssh de câteva secunde (sesiunile
       # scurte trec de firewall-ul hostului; cele persistente sunt omorâte).
       - name: Snapshot production DB into runner Postgres
         run: |
-          ssh deploy "pg_dump --no-owner --no-privileges '${{ secrets.PROD_DATABASE_URI }}'" > prod.sql
+          for attempt in 1 2 3; do
+            if ssh deploy "pg_dump --no-owner --no-privileges '${{ secrets.PROD_DATABASE_URI }}'" > prod.sql; then
+              break
+            fi
+            echo "snapshot: încercarea $attempt a eșuat"
+            if [ "$attempt" = "3" ]; then
+              echo "::error::pg_dump prin SSH a eșuat de 3 ori — firewall-ul Hosterion blochează conexiunea."
+              exit 1
+            fi
+            sleep $((attempt * 20))
+          done
           test -s prod.sql
           psql "postgres://postgres:ci@127.0.0.1:5432/isad" -q -v ON_ERROR_STOP=0 -f prod.sql > /dev/null
           rm prod.sql
@@ -116,12 +115,36 @@ jobs:
       - name: Upload bundle (tar prin SSH; media/ și tmp/ rămân neatinse)
         run: |
           tar czf bundle.tar.gz -C deploy .
-          scp bundle.tar.gz deploy:~/bundle.tar.gz
-          ssh deploy \
-            "cd '${{ secrets.APP_DIR }}' && rm -rf .next node_modules public server.js package.json && tar xzf ~/bundle.tar.gz && rm ~/bundle.tar.gz"
+          for attempt in 1 2 3; do
+            if scp bundle.tar.gz deploy:~/bundle.tar.gz; then break; fi
+            echo "scp: încercarea $attempt a eșuat"
+            if [ "$attempt" = "3" ]; then echo "::error::scp a eșuat de 3 ori"; exit 1; fi
+            sleep $((attempt * 20))
+          done
+          # Arhiva NU se șterge aici: dacă extract-ul cade la jumătate, reîncercarea are nevoie
+          # de ea. E ștearsă în pasul de restart, după ce extract-ul a reușit.
+          for attempt in 1 2 3; do
+            if ssh deploy "cd '${{ secrets.APP_DIR }}' && rm -rf .next node_modules public server.js package.json && tar xzf ~/bundle.tar.gz"; then
+              break
+            fi
+            echo "extract: încercarea $attempt a eșuat"
+            if [ "$attempt" = "3" ]; then
+              echo "::error::Extract-ul a eșuat de 3 ori — aplicația poate fi incompletă pe server. Repetă deploy-ul."
+              exit 1
+            fi
+            sleep $((attempt * 20))
+          done
 
       - name: Restart Passenger app
-        run: ssh deploy "mkdir -p '${{ secrets.APP_DIR }}/tmp' && touch '${{ secrets.APP_DIR }}/tmp/restart.txt'"
+        run: |
+          for attempt in 1 2 3; do
+            if ssh deploy "mkdir -p '${{ secrets.APP_DIR }}/tmp' && touch '${{ secrets.APP_DIR }}/tmp/restart.txt' && rm -f ~/bundle.tar.gz"; then
+              break
+            fi
+            echo "restart: încercarea $attempt a eșuat"
+            if [ "$attempt" = "3" ]; then echo "::error::Restart-ul a eșuat de 3 ori"; exit 1; fi
+            sleep $((attempt * 20))
+          done
 
       # Atingerea lui restart.txt NU înseamnă că aplicația a pornit. Pe 2026-07-29 o migrație
       # eșuată a omorât boot-ul, Passenger a dat 503 pe tot site-ul, iar workflow-ul a raportat
