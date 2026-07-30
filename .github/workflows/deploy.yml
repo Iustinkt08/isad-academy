@@ -108,6 +108,20 @@ jobs:
           cp -R .next/standalone/. deploy/
           cp -R .next/static deploy/.next/static
           cp -R public deploy/public
+          # server.js din standalone e CommonJS (`require('next')`), dar package.json-ul
+          # copiat din rădăcină aduce "type": "module" — Node îl încarcă atunci ca ESM și
+          # aplicația moare la boot cu `Cannot find module 'next'` (503 pe tot site-ul,
+          # incident 2026-07-30). Scripturile de aici nu rulează niciodată pe server.
+          node -e '
+            const fs = require("fs")
+            const p = "deploy/package.json"
+            const pkg = JSON.parse(fs.readFileSync(p, "utf8"))
+            if (pkg.type === "module") {
+              delete pkg.type
+              fs.writeFileSync(p, JSON.stringify(pkg, null, 2) + "\n")
+              console.log("package.json: type=module eliminat (server.js e CommonJS)")
+            }
+          '
 
       # Hosterion nu are rsync pe server — transferul se face cu tar+scp. Ștergerea
       # explicită a directoarelor de aplicație dă semantica lui `rsync --delete`;

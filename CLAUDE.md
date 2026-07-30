@@ -37,12 +37,16 @@ BREVO_NEWSLETTER_LIST_ID=...
 NEXT_PUBLIC_GA4_ID=
 NEXT_PUBLIC_GTM_ID=
 # Payment (MockProvider by default; Netopia implementat — API v2 hosted page)
-PAYMENT_PROVIDER=mock        # mock | stripe | netopia | euplatesc
+# decizie owner 2026-07-27: Netopia (înlocuiește Revolut); chei sandbox din admin.netopia-payments.com → „Mediu de testare"
+PAYMENT_PROVIDER=mock        # mock | netopia | stripe | euplatesc
 NETOPIA_API_KEY=             # din admin Netopia (sandbox: sandbox.netopia-payments.com)
 NETOPIA_POS_SIGNATURE=
 NETOPIA_SANDBOX=true         # default sandbox; EXACT 'false' pentru live
 NETOPIA_PUBLIC_KEY=          # certificat PEM (sau base64) pt. verificarea IPN
 # STRIPE_SECRET_KEY= / EUPLATESC_* (later)
+# ALLOW_MOCK_PAYMENTS — NU se setează în producție (ar vinde locurile gratis)
+# RUN_MIGRATIONS=true — DOAR în env-ul aplicației din cPanel; migrațiile nu se aplică
+#   la boot fără el (prodMigrations e gated în payload.config). Nesetat local + la build.
 ```
 
 ---
@@ -310,7 +314,7 @@ Paletă oficială (Brand Book p.10): Deep Blue `#1C5D99`, Steel Blue `#407EA2`, 
 - [ ] **Early Bird display** (ambele ferestre vs doar activa) → `siteSettings.earlyBirdDisplay` — încă nedecis
 - [x] **Stacking policy** — **`stackAll` confirmat (B3: „Se acumuleaza")** (seedat)
 - [x] **Member** — **membrii organizației APCF; primesc cod/ID înrolat ca voucher (B4)** — mecanismul `discountCodes type: member` existent se potrivește; % încă necomunicat
-- [x] **Payment processor** — mock până la semnare, confirmat (B7)
+- [x] **Payment processor** — **NETOPIA Payments** (decizie owner 2026-07-27, înlocuiește Revolut din aceeași zi); cont în curs de configurare pe admin.netopia-payments.com (în wizard-ul „Implementare" se alege platforma **Node.js**); mock rămâne activ până la cheile de sandbox (API key + POS signature din „Mediu de testare") — **NetopiaProvider IMPLEMENTAT** (Payments API v2 hosted page: `src/lib/payments/netopia.ts`, IPN `src/app/api/netopia/ipn/route.ts`, return `src/app/api/netopia/return/route.ts`; v. `docs/NETOPIA.md`)
 - [x] **Invoicing** — **DA, automat, SmartBill (B8)** → track separat de ofertat
 - [x] **Legal entity + CUI** — **International Security and Defence SRL (ISAD), CIF 44849076 (A1)** (seedat în `legalEntity`)
 - [x] **Legal texts** — le trimite clientul (A2); politica de anulare: definită în A3 (rambursare/reprogramare; anulare de către ISAD → rambursare integrală / transfer gratuit / voucher opțional; refund → seat eliberat — implementat)

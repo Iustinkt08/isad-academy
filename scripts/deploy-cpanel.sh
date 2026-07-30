@@ -165,6 +165,23 @@ mkdir -p deploy/.next
 cp -R .next/standalone/. deploy/
 cp -R .next/static deploy/.next/static
 cp -R public deploy/public
+
+# Next copiază package.json-ul din rădăcină în .next/standalone, deci bundle-ul moștenește
+# "type": "module". Dar server.js generat de Next e CommonJS (`require('next')`): cu type
+# module lângă el, Node îl încarcă drept ESM și moare cu `Cannot find module 'next'` —
+# aplicația nu pornește deloc, 503 pe tot site-ul (incident 2026-07-30). Scripturile din acest
+# package.json nu se rulează niciodată pe server, deci câmpul se poate scoate în siguranță.
+node -e '
+  const fs = require("fs")
+  const p = "deploy/package.json"
+  const pkg = JSON.parse(fs.readFileSync(p, "utf8"))
+  if (pkg.type === "module") {
+    delete pkg.type
+    fs.writeFileSync(p, JSON.stringify(pkg, null, 2) + "\n")
+    console.log("  package.json: type=module eliminat (server.js e CommonJS)")
+  }
+' || fail "nu am putut normaliza deploy/package.json"
+
 tar czf bundle.tar.gz -C deploy .
 echo "  bundle.tar.gz: $(du -h bundle.tar.gz | cut -f1)"
 

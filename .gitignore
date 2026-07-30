@@ -12,9 +12,8 @@ dist/
 *.tsbuildinfo
 
 # environment
-.env
-.env.local
-.env.*.local
+.env*
+!.env.example
 
 # payload media uploads
 /media
