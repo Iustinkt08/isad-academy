@@ -2,8 +2,9 @@
  * About / Beliefs — „What guides us". v3 RESPONSIVE. ÎNLOCUIEȘTE BeliefsPath.tsx.
  *
  * Desktop (≥lg): 1:1 cu Figma 3873-94 — traseul ORIZONTAL: subtitlu 24 #407EA2,
- *   3 waypoints (cerc 44 cu inel gradient + număr) pe linia gradient 920×3,
- *   crezurile sub puncte, waypoint GOL la capătul liniei. (Neschimbat.)
+ *   3 waypoints (cerc 44 cu inel gradient + număr) pe linia gradient 800×3,
+ *   crezurile sub puncte; linia se termină la waypoint-ul 3, fără cerc gol
+ *   la capăt (owner 2026-08-03).
  *
  * Mobil (<lg): 1:1 cu Figma 3977-571 — traseul VERTICAL cu INFORMAȚIA LA PUNCTE:
  *   subtitlu 20 aliniat stânga; linia gradient verticală prin centrul cercurilor;
@@ -128,11 +129,8 @@ export default function BeliefsPath({ locale }: { locale: Locale }) {
         <div className="relative flex w-[1160px] gap-10">
           <div
             aria-hidden
-            className="absolute left-[180px] top-[20.5px] h-[3px] w-[920px] rounded-[2px] bg-[linear-gradient(90deg,#407ea2_0%,#1c5d99_55%,#46d3f6_100%)]"
+            className="absolute left-[180px] top-[20.5px] h-[3px] w-[800px] rounded-[2px] bg-[linear-gradient(90deg,#407ea2_0%,#1c5d99_55%,#46d3f6_100%)]"
           />
-          <span aria-hidden className="absolute left-[1092px] top-[14px]">
-            <RingCircle size={16} ring={3} color="#46d3f6" />
-          </span>
           {beliefs.map((b, i) => (
             <div
               key={b.tail}
