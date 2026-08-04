@@ -89,7 +89,7 @@ export default function EnrolmentCard({
       {showChip && (
         <div className="absolute -right-4 -top-[18px] z-20 flex items-center gap-2 rounded-full bg-white px-3.5 py-[9px] shadow-[0_6px_18px_rgba(0,0,0,0.12)] lg:px-4 lg:py-2">
           <span aria-hidden="true" className="size-2.5 rounded-full bg-[#8b1a1a]" />
-          <span className="text-seats-alert text-[12.5px] font-medium lg:text-[13px] lg:font-semibold">
+          <span className="text-seats-alert max-w-[70vw] truncate text-[12.5px] font-medium lg:text-[13px] lg:font-semibold">
             {t.onlySeatsLeft(selected.seatsLeft)}
           </span>
         </div>

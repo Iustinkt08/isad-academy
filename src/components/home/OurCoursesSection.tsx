@@ -149,11 +149,13 @@ function CourseCard({
           unoptimized
           className="h-11 w-10 object-contain object-left"
         />
-        <h3 className="text-[18px] font-medium leading-snug tracking-[-0.72px] text-ink">
+        {/* Clamp-uri: textele vin din CMS — fără ele cardurile din grid ies inegale
+            și rezumatul poate împinge pill-ul peste tab-ul de dată */}
+        <h3 className="line-clamp-2 text-[18px] font-medium leading-snug tracking-[-0.72px] text-ink">
           {course.title}
         </h3>
-        <p className="text-[14px] leading-[1.5] text-ink">{courseSubtitle(course)}</p>
-        <p className="text-[14px] leading-[1.5] text-[#959595]">{courseSummary(course)}</p>
+        <p className="line-clamp-1 text-[14px] leading-[1.5] text-ink">{courseSubtitle(course)}</p>
+        <p className="line-clamp-3 text-[14px] leading-[1.5] text-[#959595]">{courseSummary(course)}</p>
 
         {/* Enroll — black pill with subtle ring, anchored to the same bottom line on every
             card regardless of blurb length (owner 2026-07-12) */}

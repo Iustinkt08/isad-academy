@@ -509,7 +509,7 @@ export function WhyIsadShowcase({
                 {statList.map((stat, index) => (
                   <span
                     key={stat.label}
-                    className="whitespace-nowrap font-medium"
+                    className="font-medium"
                     style={{ fontSize: type(19, 11), letterSpacing: '-0.56px', lineHeight: 1.4 }}
                   >
                     {stat.num && <span className="text-[#1C5D99]">{stat.num} </span>}

@@ -97,7 +97,7 @@ export default function BlogCard({
           <p className="absolute left-7 top-[30px] whitespace-nowrap text-[12px] font-medium text-ink">
             {dict.blog.brandLabel}
           </p>
-          <p className="absolute left-7 top-[96px] max-w-[300px] text-[26px] font-semibold leading-[32px] tracking-[-0.8px] text-ink">
+          <p className="absolute left-7 top-[96px] line-clamp-2 max-w-[300px] text-[26px] font-semibold leading-[32px] tracking-[-0.8px] text-ink">
             {category ?? dict.blog.listTitle}
           </p>
         </div>
@@ -111,13 +111,13 @@ export default function BlogCard({
           </span>
         )}
 
-        <h2 className="text-[20px] font-medium leading-[27px] tracking-[-0.7px] text-ink">
+        <h2 className="line-clamp-2 text-[20px] font-medium leading-[27px] tracking-[-0.7px] text-ink">
           <Link href={href} className="transition-colors hover:text-blue">
             {post.title}
           </Link>
         </h2>
         {post.excerpt && (
-          <p className="text-[14px] leading-[22px] text-[#959595]">{post.excerpt}</p>
+          <p className="line-clamp-3 text-[14px] leading-[22px] text-[#959595]">{post.excerpt}</p>
         )}
 
         <div className="mt-auto flex items-center justify-between pt-1">

@@ -72,7 +72,7 @@ export function CourseAudience({ locale, audience }: { locale: Locale; audience:
     <section className={cardCls}>
       <h2 className={headingCls}>{t.audienceTitle}</h2>
       {audience.map((a) => (
-        <div key={a} className="flex items-center gap-3 px-0.5">
+        <div key={a} className="flex items-start gap-3 px-0.5">
           <CheckIcon />
           <span className="text-[15px] leading-[23px] text-grey-600">{a}</span>
         </div>
@@ -111,8 +111,8 @@ export function CourseProgramme({
           {/* Mobil: „Day N + data" pe un rând, subiectul dedesubt; desktop: toate trei inline
               (lg:contents dizolvă metarândul în rândul flex) */}
           <span className="flex items-center gap-2.5 lg:contents">
-            <span className="text-[14px] font-semibold tracking-[-0.3px] text-blue">{d.day}</span>
-            <span className="text-[13px] font-medium text-grey-600">{d.date}</span>
+            <span className="shrink-0 text-[14px] font-semibold tracking-[-0.3px] text-blue">{d.day}</span>
+            <span className="shrink-0 text-[13px] font-medium text-grey-600">{d.date}</span>
           </span>
           <span className="text-[14.5px] leading-[21px] text-grey-600 lg:leading-normal">
             {d.topic}

@@ -80,7 +80,7 @@ function CardCover({ post, brandLabel }: { post: BlogPostCard; brandLabel: strin
       <span className="absolute left-7 top-[30px] whitespace-nowrap text-[12px] font-medium text-[#000000]">
         {brandLabel}
       </span>
-      <span className="absolute left-7 top-24 max-w-[240px] text-[26px] font-semibold leading-8 tracking-[-0.8px] text-[#000000]">
+      <span className="absolute left-7 top-24 line-clamp-2 max-w-[240px] text-[26px] font-semibold leading-8 tracking-[-0.8px] text-[#000000]">
         {post.category}
       </span>
     </div>
@@ -123,10 +123,10 @@ export function FeaturedArticleCard({
       <CardCover post={post} brandLabel={t.brandLabel} />
       <div className="flex flex-col gap-3 px-7 pb-6 pt-[22px]">
         {post.isNew && <NewChip label={t.newBadge} />}
-        <h2 className="text-[20px] font-medium leading-[27px] tracking-[-0.7px] text-[#222222]">
+        <h2 className="line-clamp-2 text-[20px] font-medium leading-[27px] tracking-[-0.7px] text-[#222222]">
           {post.title}
         </h2>
-        <p className="text-[14px] leading-[22px] text-[#959595]">{post.excerpt}</p>
+        <p className="line-clamp-3 text-[14px] leading-[22px] text-[#959595]">{post.excerpt}</p>
         <div className="flex items-center justify-between pt-1">
           <span className="text-[13px] text-[#959595]">{post.date}</span>
           <ReadArticleBtn label={t.readArticle} />
@@ -147,10 +147,11 @@ function SliderCard({ post, locale }: { post: BlogPostCard; locale: Locale }) {
       <CardCover post={post} brandLabel={t.brandLabel} />
       <div className="flex min-h-0 flex-1 flex-col justify-between px-7 pb-6 pt-[22px]">
         <div className="flex flex-col gap-3">
-          <h3 className="text-[20px] font-medium leading-[27px] tracking-[-0.7px] text-[#222222]">
+          {/* Clamp-uri: cardul are 458px ficși — textul lung din CMS s-ar tăia brut */}
+          <h3 className="line-clamp-2 text-[20px] font-medium leading-[27px] tracking-[-0.7px] text-[#222222]">
             {post.title}
           </h3>
-          <p className="text-[14px] leading-[22px] text-[#959595]">{post.excerpt}</p>
+          <p className="line-clamp-3 text-[14px] leading-[22px] text-[#959595]">{post.excerpt}</p>
         </div>
         <div className="flex items-center justify-between pt-1">
           <span className="text-[13px] text-[#959595]">{post.date}</span>

@@ -39,7 +39,7 @@ export function RelatedCourseCard({ course, locale }: { course: Course; locale: 
         <p className="text-[10.5px] font-medium uppercase tracking-[2px] text-[#959595]">
           {t.relatedCourse}
         </p>
-        <p className="text-[17px] font-medium tracking-[-0.5px] text-[#222222] [word-break:break-word]">
+        <p className="line-clamp-2 text-[17px] font-medium tracking-[-0.5px] text-[#222222] [word-break:break-word]">
           {course.title}
         </p>
         {course.durationHours != null && (

@@ -152,15 +152,16 @@ function TestimonialCard({ card }: { card: CardData }) {
 
       {/* Author — 12/14 Medium, two lines, centred on y=54 */}
       <figcaption className="absolute left-[99px] top-[54px] w-[min(286px,calc(100%_-_113px))] -translate-y-1/2 text-[12px] font-medium leading-[14px] text-ink">
-        <p>
+        <p className="line-clamp-2">
           {card.name}
           {card.roleCompany && ` · ${card.roleCompany}`}
         </p>
-        {card.course && <p>{card.course}</p>}
+        {card.course && <p className="line-clamp-1">{card.course}</p>}
       </figcaption>
 
       {/* Quote — 12/16 Medium, centred on y=138 */}
-      <blockquote className="absolute left-[27px] top-[138px] w-[min(377px,calc(100%_-_54px))] -translate-y-1/2 text-[12px] font-medium leading-4 text-ink">
+      {/* line-clamp-5: cutia are 228px ficși — citate mai lungi din CMS ar ieși peste autor */}
+      <blockquote className="absolute left-[27px] top-[138px] line-clamp-5 w-[min(377px,calc(100%_-_54px))] -translate-y-1/2 text-[12px] font-medium leading-4 text-ink">
         {card.text}
       </blockquote>
     </figure>

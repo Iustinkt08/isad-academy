@@ -47,7 +47,7 @@ export default function CourseHeader({ data }: { data: CourseHeaderData }) {
           <span className="text-ink">.</span>
         </h1>
 
-        <p className="max-w-[820px] text-[14px] leading-[21px] text-grey-600 lg:text-[17px] lg:leading-normal">
+        <p className="line-clamp-3 max-w-[820px] text-[14px] leading-[21px] text-grey-600 lg:text-[17px] lg:leading-normal">
           {data.teaser}
         </p>
       </Container>

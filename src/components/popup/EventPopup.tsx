@@ -236,7 +236,7 @@ export default function EventPopup({
       {/* Modalul — 350 mobil / 720 desktop */}
       <div
         ref={modalRef}
-        className="relative w-full max-w-[350px] rounded-[24px] border-[6px] border-[#f6f6f6] bg-white px-5 py-6 shadow-[24px_80px_50px_rgba(77,77,77,0.02),10px_36px_37px_rgba(77,77,77,0.03),3px_9px_20px_rgba(77,77,77,0.03)] lg:w-[720px] lg:p-10"
+        className="relative max-h-[90dvh] w-full max-w-[350px] overflow-y-auto rounded-[24px] border-[6px] border-[#f6f6f6] bg-white px-5 py-6 shadow-[24px_80px_50px_rgba(77,77,77,0.02),10px_36px_37px_rgba(77,77,77,0.03),3px_9px_20px_rgba(77,77,77,0.03)] lg:w-[720px] lg:p-10"
       >
         {/* Close X */}
         <button
@@ -257,7 +257,7 @@ export default function EventPopup({
                 {data.titleGradient}
               </span>
             </h2>
-            <p className="text-[13.5px] leading-5 text-[#595959] lg:text-[15px] lg:leading-6">
+            <p className="line-clamp-4 text-[13.5px] leading-5 text-[#595959] lg:text-[15px] lg:leading-6">
               {data.description}
             </p>
 
@@ -303,10 +303,10 @@ export default function EventPopup({
                       </span>
                     )}
                     <div className="min-w-0">
-                      <p className="text-[13.5px] font-medium leading-5 text-[#222222] lg:text-[14px] lg:leading-[21px]">
+                      <p className="truncate text-[13.5px] font-medium leading-5 text-[#222222] lg:text-[14px] lg:leading-[21px]">
                         {s.name}
                       </p>
-                      <p className="text-[12px] leading-[17px] text-[#959595] lg:text-[12.5px] lg:leading-[18px]">
+                      <p className="line-clamp-1 text-[12px] leading-[17px] text-[#959595] lg:text-[12.5px] lg:leading-[18px]">
                         {s.role}
                       </p>
                     </div>
@@ -315,7 +315,7 @@ export default function EventPopup({
               </div>
             </div>
 
-            <p className="text-[12px] leading-[18px] text-[#959595] lg:text-[13px] lg:leading-5">
+            <p className="line-clamp-2 text-[12px] leading-[18px] text-[#959595] lg:text-[13px] lg:leading-5">
               {data.metaLine}
             </p>
 
@@ -347,7 +347,7 @@ export default function EventPopup({
                 {labels.formTitleGradient}
               </span>
             </h2>
-            <p className="text-[12.5px] leading-[19px] text-[#595959] lg:text-[14px] lg:leading-[22px]">
+            <p className="line-clamp-2 text-[12.5px] leading-[19px] text-[#595959] lg:text-[14px] lg:leading-[22px]">
               {data.titlePlain}
               {data.titleGradient} · {data.metaLine} — {labels.formIntroSuffix}
             </p>
