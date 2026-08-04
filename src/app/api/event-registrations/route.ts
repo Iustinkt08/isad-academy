@@ -2,6 +2,7 @@ import { getPayload } from 'payload'
 
 import config from '../../../payload.config'
 import { parseJsonBody } from '../../../lib/api/parseJsonBody'
+import { enforceRateLimit, RL_FORM } from '../../../lib/api/rateLimit'
 import { createEventRegistration } from '../../../lib/events/createEventRegistration'
 
 /** A registration body is a handful of short fields; 20KB is generous headroom
@@ -21,6 +22,9 @@ const MAX_BODY_BYTES = 20_000
  *   413 { ok: false, error } — oversized body
  */
 export async function POST(request: Request): Promise<Response> {
+  const limited = enforceRateLimit(request, { name: 'event-registrations', ...RL_FORM })
+  if (limited) return limited
+
   const parsed = await parseJsonBody(request, MAX_BODY_BYTES)
   if (!parsed.ok) {
     return Response.json({ ok: false, error: parsed.error }, { status: parsed.status })

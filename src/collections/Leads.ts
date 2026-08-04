@@ -19,7 +19,12 @@ export const Leads: CollectionConfig = {
   defaultSort: '-createdAt',
   access: {
     read: isAdmin,
-    create: () => true,
+    // Public submission goes through the hardened `/api/leads/submit` service, which writes
+    // via the Local API with `overrideAccess: true` (honeypot + strict validation already
+    // applied). Payload's own REST/GraphQL create endpoint must NOT be a public bypass that
+    // skips that validation and fires the notification email — so require an authenticated
+    // user here (securitate: A01/A03).
+    create: ({ req }) => Boolean(req.user),
     update: isAdmin,
     delete: isAdmin,
   },

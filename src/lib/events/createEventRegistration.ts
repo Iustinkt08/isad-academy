@@ -50,6 +50,21 @@ export const createEventRegistration = async (
   const occupation = readField('occupation')
 
   if (!eventId) return { status: 400, body: { ok: false, error: 'Missing event id.' } }
+
+  // eventId trebuie să corespundă evenimentului ACTIV, VIITOR din CMS. Fără asta, `eventId`
+  // era text liber: un atacator incrementa `evt-1`, `evt-2`… și ocolea complet dedupe-ul de
+  // mai jos → rânduri + emailuri nelimitate pe același email (securitate: A04, abuz).
+  const popup = await payload
+    .findGlobal({ slug: 'eventPopup', overrideAccess: true })
+    .catch(() => null)
+  const activeEventId =
+    popup?.active && popup.eventDate && new Date(popup.eventDate).getTime() >= Date.now()
+      ? String(popup.eventDate)
+      : null
+  if (!activeEventId || eventId !== activeEventId) {
+    return { status: 400, body: { ok: false, error: 'This event is not open for registration.' } }
+  }
+
   if (!firstName) return { status: 400, body: { ok: false, error: 'First name is required.' } }
   if (!lastName) return { status: 400, body: { ok: false, error: 'Last name is required.' } }
   if (!EMAIL_RE.test(email)) {

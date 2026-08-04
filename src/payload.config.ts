@@ -42,7 +42,18 @@ const truncateForMeta = (text: string, maxLength = 155): string =>
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
+/** URL-ul public canonic — pinează whitelist-ul CSRF/CORS al Payload la origine-a proprie,
+ * ca o cerere cross-origin cu cookie de admin să nu poată acționa asupra API-ului. */
+const SERVER_URL = process.env.NEXT_PUBLIC_SITE_URL?.trim() || undefined
+const ORIGIN_ALLOWLIST = SERVER_URL ? [SERVER_URL] : []
+
 export default buildConfig({
+  ...(SERVER_URL ? { serverURL: SERVER_URL } : {}),
+  // CSRF + CORS restrânse la propria origine (securitate: A01/A05). GraphQL e dezactivat —
+  // nu-l folosim nicăieri, iar endpoint-ul lui ocolea validarea rutelor întărite.
+  csrf: ORIGIN_ALLOWLIST,
+  cors: ORIGIN_ALLOWLIST,
+  graphQL: { disable: true },
   // Bilingual content (owner decision 2026-07-13): every content field carries EN + RO.
   // EN is canonical; `fallback: true` shows EN wherever an RO translation is missing.
   localization: {

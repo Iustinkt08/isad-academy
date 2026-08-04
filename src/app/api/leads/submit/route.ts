@@ -2,6 +2,7 @@ import { getPayload } from 'payload'
 
 import config from '../../../../payload.config'
 import { parseJsonBody } from '../../../../lib/api/parseJsonBody'
+import { enforceRateLimit, RL_FORM } from '../../../../lib/api/rateLimit'
 import { createLead } from '../../../../lib/leads/createLead'
 
 /** Guards against parsing an arbitrarily large request body (mirrors /api/checkout). A real
@@ -27,6 +28,9 @@ const MAX_BODY_BYTES = 20_000
  *   413 { ok: false, error }    — oversized body
  */
 export async function POST(request: Request): Promise<Response> {
+  const limited = enforceRateLimit(request, { name: 'leads', ...RL_FORM })
+  if (limited) return limited
+
   const parsed = await parseJsonBody(request, MAX_BODY_BYTES)
   if (!parsed.ok) {
     return Response.json({ ok: false, error: parsed.error }, { status: parsed.status })

@@ -2,6 +2,7 @@ import { getPayload } from 'payload'
 
 import config from '../../../payload.config'
 import { parseJsonBody } from '../../../lib/api/parseJsonBody'
+import { enforceRateLimit, RL_CHECKOUT } from '../../../lib/api/rateLimit'
 import { processCheckout } from '../../../lib/checkout/processCheckout'
 import { getVisitorCountry } from '../../../lib/currency'
 import { LOCALE_COOKIE } from '../../../lib/i18n/config'
@@ -35,6 +36,9 @@ const MAX_BODY_BYTES = 20_000
  *   4xx { error, detail?, soldOut? } — see `processCheckout`'s `CheckoutFailureBody`.
  */
 export async function POST(request: Request): Promise<Response> {
+  const limited = enforceRateLimit(request, { name: 'checkout', ...RL_CHECKOUT })
+  if (limited) return limited
+
   const parsed = await parseJsonBody(request, MAX_BODY_BYTES)
   if (!parsed.ok) {
     return Response.json({ error: parsed.error }, { status: parsed.status })

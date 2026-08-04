@@ -21,7 +21,10 @@ export const EventRegistrations: CollectionConfig = {
   defaultSort: '-createdAt',
   access: {
     read: isAdmin,
-    create: () => true,
+    // Same as `leads`: public sign-ups flow through the hardened
+    // `/api/event-registrations` service (`overrideAccess: true` after honeypot + dedupe +
+    // eventId validation). The raw Payload create endpoint must not be a public bypass.
+    create: ({ req }) => Boolean(req.user),
     update: isAdmin,
     delete: isAdmin,
   },

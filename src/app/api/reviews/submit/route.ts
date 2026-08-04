@@ -2,6 +2,7 @@ import { getPayload } from 'payload'
 
 import config from '../../../../payload.config'
 import { parseJsonBody } from '../../../../lib/api/parseJsonBody'
+import { enforceRateLimit, RL_FORM } from '../../../../lib/api/rateLimit'
 import { submitReview } from '../../../../lib/reviews/submitReview'
 
 /** A review submission body (token + a short text + optional name/role) is at most a few KB
@@ -22,6 +23,9 @@ const MAX_BODY_BYTES = 10_000
  *   409 { ok: false, error }               — already submitted for this (session, email)
  */
 export async function POST(request: Request): Promise<Response> {
+  const limited = enforceRateLimit(request, { name: 'reviews', ...RL_FORM })
+  if (limited) return limited
+
   const parsed = await parseJsonBody(request, MAX_BODY_BYTES)
   if (!parsed.ok) {
     return Response.json({ ok: false, error: parsed.error }, { status: parsed.status })

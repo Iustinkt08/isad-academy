@@ -32,7 +32,8 @@ function persist(decision: ConsentDecision) {
   } catch {
     // Storage unavailable (private mode etc.) — the cookie below still persists it.
   }
-  document.cookie = `${STORAGE_KEY}=${decision}; Max-Age=${COOKIE_MAX_AGE}; Path=/; SameSite=Lax`
+  const secure = location.protocol === 'https:' ? '; Secure' : ''
+  document.cookie = `${STORAGE_KEY}=${decision}; Max-Age=${COOKIE_MAX_AGE}; Path=/; SameSite=Lax${secure}`
 }
 
 function readStored(): ConsentDecision | null {

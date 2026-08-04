@@ -6,7 +6,10 @@ export type PaymentOutcome = 'confirmed' | 'failed' | 'refunded'
 
 export type ApplyPaymentOutcomeResult =
   | { ok: true; changed: boolean; order: Order }
-  | { ok: false; reason: 'notFound' | 'providerMismatch' | 'refMismatch' | 'soldOut' | 'skipped' }
+  | {
+      ok: false
+      reason: 'notFound' | 'providerMismatch' | 'refMismatch' | 'amountMismatch' | 'soldOut' | 'skipped'
+    }
 
 /**
  * Applies an asynchronous payment result (Netopia IPN / return-status poll) to an order,
@@ -29,8 +32,14 @@ export const applyPaymentOutcome = async (args: {
   outcome: PaymentOutcome
   expectedProvider: string
   expectedProviderRef?: string
+  /** Suma/moneda raportate de procesator (IPN). Când sunt date, se compară cu totalul
+   * snapshot al comenzii ÎNAINTE de confirmare — o captură parțială sau o sumă nepotrivită
+   * nu mai confirmă comanda la preț întreg (securitate). Canalul de return-poll nu le are,
+   * deci verificarea e opțională. */
+  expectedAmount?: number
+  expectedCurrency?: string
 }): Promise<ApplyPaymentOutcomeResult> => {
-  const { payload, orderId, outcome, expectedProvider, expectedProviderRef } = args
+  const { payload, orderId, outcome, expectedProvider, expectedProviderRef, expectedAmount, expectedCurrency } = args
 
   const order = (await payload
     .findByID({ collection: 'orders', id: orderId, overrideAccess: true, depth: 0 })
@@ -44,6 +53,22 @@ export const applyPaymentOutcome = async (args: {
     order.providerRef !== expectedProviderRef
   ) {
     return { ok: false, reason: 'refMismatch' }
+  }
+
+  // Verificarea sumei — doar la confirmare, doar când procesatorul a raportat o sumă și
+  // comanda are un total snapshot. 1 ban toleranță pentru rotunjiri float.
+  if (outcome === 'confirmed' && typeof expectedAmount === 'number' && typeof order.pricing?.total === 'number') {
+    const amountOk = Math.abs(expectedAmount - order.pricing.total) <= 0.01
+    const currencyOk =
+      !expectedCurrency ||
+      !order.pricing.currency ||
+      expectedCurrency.toUpperCase() === order.pricing.currency.toUpperCase()
+    if (!amountOk || !currencyOk) {
+      payload.logger.error(
+        `[payments] order ${orderId} amount/currency mismatch — paid ${expectedAmount} ${expectedCurrency ?? '?'}, expected ${order.pricing.total} ${order.pricing.currency ?? '?'}; NOT confirming.`,
+      )
+      return { ok: false, reason: 'amountMismatch' }
+    }
   }
 
   const current = order.paymentStatus

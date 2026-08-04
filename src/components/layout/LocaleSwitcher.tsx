@@ -71,7 +71,8 @@ export function LocaleSwitcher({
     setOpen(false)
     if (next === current) return
     setCurrent(next)
-    document.cookie = `${LOCALE_COOKIE}=${next}; path=/; max-age=31536000; samesite=lax`
+    const secure = location.protocol === 'https:' ? '; secure' : ''
+    document.cookie = `${LOCALE_COOKIE}=${next}; path=/; max-age=31536000; samesite=lax${secure}`
     startTransition(() => {
       router.push(localePath(next, stripLocalePrefix(pathname)))
     })

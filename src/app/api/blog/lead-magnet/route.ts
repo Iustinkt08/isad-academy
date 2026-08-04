@@ -2,6 +2,7 @@ import { getPayload } from 'payload'
 
 import config from '../../../../payload.config'
 import { parseJsonBody } from '../../../../lib/api/parseJsonBody'
+import { enforceRateLimit, RL_FORM } from '../../../../lib/api/rateLimit'
 import { deliverLeadMagnet } from '../../../../lib/blog/deliverLeadMagnet'
 
 /** Guards against parsing an arbitrarily large request body (mirrors /api/leads/submit). A real
@@ -22,6 +23,9 @@ const MAX_BODY_BYTES = 5_000
  *   502 { ok: false, error }    — mailer reported a failure
  */
 export async function POST(request: Request): Promise<Response> {
+  const limited = enforceRateLimit(request, { name: 'lead-magnet', ...RL_FORM })
+  if (limited) return limited
+
   const parsed = await parseJsonBody(request, MAX_BODY_BYTES)
   if (!parsed.ok) {
     return Response.json({ ok: false, error: parsed.error }, { status: parsed.status })

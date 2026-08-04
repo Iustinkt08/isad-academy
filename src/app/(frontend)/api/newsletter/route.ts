@@ -1,4 +1,5 @@
 import { parseJsonBody } from '../../../../lib/api/parseJsonBody'
+import { enforceRateLimit, RL_FORM } from '../../../../lib/api/rateLimit'
 import { getMailer } from '../../../../lib/email'
 
 /** Guards against parsing an arbitrarily large request body — a real newsletter signup body
@@ -23,6 +24,9 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
  *     surfaces as a broken signup FORM to a visitor before Brevo is wired up.
  */
 export async function POST(request: Request): Promise<Response> {
+  const limited = enforceRateLimit(request, { name: 'newsletter', ...RL_FORM })
+  if (limited) return limited
+
   // Oversized bodies are 413 (T16 — aligned with every other public POST route; was 400).
   const parsed = await parseJsonBody(request, MAX_BODY_BYTES)
   if (!parsed.ok) {

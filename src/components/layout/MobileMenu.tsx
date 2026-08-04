@@ -119,7 +119,8 @@ export function MobileMenu({
   const switchLanguage = () => {
     // Keep the sheet open — switching the language should not dismiss the menu.
     const next: Locale = locale === 'ro' ? 'en' : 'ro'
-    document.cookie = `${LOCALE_COOKIE}=${next}; path=/; max-age=31536000; samesite=lax`
+    const secure = location.protocol === 'https:' ? '; secure' : ''
+    document.cookie = `${LOCALE_COOKIE}=${next}; path=/; max-age=31536000; samesite=lax${secure}`
     router.push(localePath(next, stripLocalePrefix(pathname)))
   }
 

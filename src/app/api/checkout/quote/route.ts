@@ -2,6 +2,7 @@ import { getPayload } from 'payload'
 
 import config from '../../../../payload.config'
 import { parseJsonBody } from '../../../../lib/api/parseJsonBody'
+import { enforceRateLimit } from '../../../../lib/api/rateLimit'
 import { quoteCheckout } from '../../../../lib/checkout/quoteCheckout'
 import { getVisitorCountry } from '../../../../lib/currency'
 
@@ -23,6 +24,10 @@ const MAX_BODY_BYTES = 5_000
  *   409 { error, soldOut? } — past / sold out (soldOut: true) / no active price window
  */
 export async function POST(request: Request): Promise<Response> {
+  // Recalcul live de preț la fiecare tastare de cod — limită mai permisivă, dar mărginită.
+  const limited = enforceRateLimit(request, { name: 'quote', limit: 40, windowMs: 10 * 60 * 1000 })
+  if (limited) return limited
+
   const parsed = await parseJsonBody(request, MAX_BODY_BYTES)
   if (!parsed.ok) {
     return Response.json({ error: parsed.error }, { status: parsed.status })

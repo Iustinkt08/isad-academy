@@ -75,6 +75,9 @@ export async function POST(request: Request): Promise<Response> {
     outcome,
     expectedProvider: 'netopia',
     expectedProviderRef: payment?.ntpID,
+    // Ultima verificare independentă: suma efectiv plătită vs. totalul comenzii.
+    expectedAmount: payment?.amount ?? ipnOrder?.amount,
+    expectedCurrency: payment?.currency ?? ipnOrder?.currency,
   })
 
   if (result.ok) {
@@ -92,6 +95,11 @@ export async function POST(request: Request): Promise<Response> {
   if (result.reason === 'skipped') {
     // e.g. a late "failed" for an order the return-poll already confirmed — nothing to do.
     return ack(200)
+  }
+  if (result.reason === 'amountMismatch') {
+    // Sumă/monedă nepotrivite — applyPaymentOutcome a logat deja. NU confirmăm; cerem
+    // Netopiei să nu retrimită (e o discrepanță care se rezolvă manual, nu prin retry).
+    return ack(200, 'Amount mismatch — order left unconfirmed for manual review.')
   }
 
   payload.logger.warn(`[netopia:ipn] order ${orderId} → ${outcome} rejected (${result.reason})`)

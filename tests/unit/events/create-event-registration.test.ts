@@ -6,15 +6,24 @@ import {
   HONEYPOT_FIELD,
 } from '../../../src/lib/events/createEventRegistration'
 
-/** Minimal Payload stub — only the two Local API calls the pipeline makes. */
-const makePayload = (existingCount = 0) => {
+/** The active event id = its date key; far future so the check is clock-robust. */
+const FUTURE_EVENT_ID = '2099-01-01T00:00:00.000Z'
+
+/** Minimal Payload stub — the two Local API calls the pipeline makes, plus `findGlobal`
+ * (eventId is now validated against the active `eventPopup` global). By default the popup
+ * is active and its date matches `FUTURE_EVENT_ID`. */
+const makePayload = (
+  existingCount = 0,
+  popup: unknown = { active: true, eventDate: FUTURE_EVENT_ID },
+) => {
   const find = vi.fn().mockResolvedValue({ totalDocs: existingCount, docs: [] })
   const create = vi.fn().mockResolvedValue({ id: 1 })
-  return { payload: { find, create } as unknown as Payload, find, create }
+  const findGlobal = vi.fn().mockResolvedValue(popup)
+  return { payload: { find, create, findGlobal } as unknown as Payload, find, create, findGlobal }
 }
 
 const validInput = {
-  eventId: '2026-08-10T15:00:00.000Z',
+  eventId: FUTURE_EVENT_ID,
   firstName: 'Ana',
   lastName: 'Popescu',
   email: 'ana@example.com',
@@ -64,6 +73,22 @@ describe('createEventRegistration', () => {
   ])('rejects %s with 400', async (_label, input) => {
     const { payload, create } = makePayload()
     const result = await createEventRegistration(input, { payload })
+
+    expect(result.status).toBe(400)
+    expect(create).not.toHaveBeenCalled()
+  })
+
+  it('rejects an eventId that is not the active event (dedupe-bypass guard)', async () => {
+    const { payload, create } = makePayload()
+    const result = await createEventRegistration({ ...validInput, eventId: 'evt-forged-2' }, { payload })
+
+    expect(result.status).toBe(400)
+    expect(create).not.toHaveBeenCalled()
+  })
+
+  it('rejects when the popup is inactive / no event is open', async () => {
+    const { payload, create } = makePayload(0, { active: false, eventDate: FUTURE_EVENT_ID })
+    const result = await createEventRegistration(validInput, { payload })
 
     expect(result.status).toBe(400)
     expect(create).not.toHaveBeenCalled()
