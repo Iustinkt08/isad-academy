@@ -63,11 +63,13 @@ export default function CourseCard({
           alt=""
           className="h-[52.5px] w-12 object-contain"
         />
-        <h3 className="text-[20px] font-medium leading-normal tracking-[-0.8px] text-[#000000]">
+        {/* Clamp-uri: conținutul vine din CMS — limitele țin stack-ul deasupra
+            butonului „View course" (pinned la 348px) indiferent cât text se introduce */}
+        <h3 className="line-clamp-2 text-[20px] font-medium leading-normal tracking-[-0.8px] text-[#000000]">
           {course.title}
         </h3>
-        <p className="text-[16px] leading-6 text-[#000000]">{course.subtitle}</p>
-        <p className="text-[16px] leading-6 text-[#959595]">{course.description}</p>
+        <p className="line-clamp-1 text-[16px] leading-6 text-[#000000]">{course.subtitle}</p>
+        <p className="line-clamp-4 text-[16px] leading-6 text-[#959595]">{course.description}</p>
       </div>
 
       {/* Singura zonă clickabilă — pinned la aceeași înălțime pe toate cardurile */}
