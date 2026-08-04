@@ -120,6 +120,7 @@ function buildOrganizationJsonLd(settings: SiteSetting | null): Record<string, u
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: SITE_NAME,
+    ...(settings?.legalEntity?.name ? { legalName: settings.legalEntity.name } : {}),
     url: siteUrl,
     logo: `${siteUrl}${DEFAULT_OG_IMAGE}`,
     ...(contactPoint ? { contactPoint } : {}),

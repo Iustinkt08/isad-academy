@@ -37,7 +37,14 @@ export const sendLeadNotificationEmail: CollectionAfterChangeHook<Lead> = async 
 
     const { subject, html, text } = renderLeadNotificationEmail(doc)
 
-    const result = await getMailer().sendTransactional({ to: notifyEmail, subject, html, text })
+    // replyTo = emailul lead-ului: destinatarul (Silviu) poate răspunde omului cu un simplu Reply.
+    const result = await getMailer().sendTransactional({
+      to: notifyEmail,
+      subject,
+      html,
+      text,
+      replyTo: doc.email || undefined,
+    })
 
     if (!result.ok) {
       req.payload.logger.warn(`[email] lead ${doc.id} notification failed: ${result.error}`)

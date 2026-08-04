@@ -142,6 +142,7 @@ function buildCourseJsonLd(
     url: courseUrl,
     ...(description ? { description } : {}),
     ...(image ? { image: `${siteUrl}${image}` } : {}),
+    ...(course.durationHours ? { timeRequired: `PT${course.durationHours}H` } : {}),
     provider: {
       '@type': 'Organization',
       name: SITE_NAME,

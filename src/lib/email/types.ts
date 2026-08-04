@@ -16,6 +16,10 @@ export type SendTransactionalInput = {
   subject: string
   html: string
   text: string
+  /** Unde ajunge un Reply al destinatarului. Providerul cade înapoi pe adresa globală de
+   * reply-to din env (BREVO_REPLY_TO_EMAIL) când lipsește; util per-mesaj la notificările
+   * de lead, unde Reply trebuie să meargă direct la emailul lead-ului. */
+  replyTo?: string
 }
 
 export type SubscribeDoubleOptInInput = {

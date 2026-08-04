@@ -40,6 +40,9 @@ export type BrevoConfig = {
   newsletterListId: string
   doiTemplateId: string
   siteUrl: string
+  /** Adresa citită de client (ex. contact@isad.academy) — Reply-urile la orice email
+   * trimis de pe noreply@ ajung aici. Gol = nu se trimite antetul replyTo. */
+  replyToEmail: string
 }
 
 /** Reads every Brevo-related env var fresh — never cached at module-load time (mirrors
@@ -51,6 +54,7 @@ const readConfigFromEnv = (): BrevoConfig => ({
   senderName: process.env.BREVO_SENDER_NAME?.trim() || 'isad.academy',
   newsletterListId: process.env.BREVO_NEWSLETTER_LIST_ID?.trim() || '',
   doiTemplateId: process.env.BREVO_DOI_TEMPLATE_ID?.trim() || '',
+  replyToEmail: process.env.BREVO_REPLY_TO_EMAIL?.trim() || '',
   siteUrl: (process.env.NEXT_PUBLIC_SITE_URL?.trim() || 'http://localhost:3000').replace(/\/+$/, ''),
 })
 
@@ -125,6 +129,7 @@ export const createBrevoMailer = (overrides: Partial<BrevoConfig> = {}): Mailer 
         name: `${input.name} — ${new Date().toISOString()}`,
         subject: input.subject,
         sender: { email: config.senderEmail, name: config.senderName },
+        ...(config.replyToEmail ? { replyTo: config.replyToEmail } : {}),
         type: 'classic',
         htmlContent: input.html,
         recipients: { listIds: [Number(config.newsletterListId)] },
@@ -147,6 +152,7 @@ export const createBrevoMailer = (overrides: Partial<BrevoConfig> = {}): Mailer 
     name: 'brevo',
 
     async sendTransactional(input: SendTransactionalInput): Promise<MailerResult> {
+      const replyTo = input.replyTo?.trim() || config.replyToEmail
       const response = await postJson(
         '/smtp/email',
         {
@@ -155,6 +161,7 @@ export const createBrevoMailer = (overrides: Partial<BrevoConfig> = {}): Mailer 
           subject: input.subject,
           htmlContent: input.html,
           textContent: input.text,
+          ...(replyTo ? { replyTo: { email: replyTo } } : {}),
         },
         config.apiKey,
       )
