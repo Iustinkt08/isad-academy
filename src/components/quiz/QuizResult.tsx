@@ -53,15 +53,17 @@ export default function QuizResult({
 
       {/* Recomandarea principală — 350/26 pe mobil (fără badge), 760/40 pe desktop */}
       <div className="flex w-[min(350px,calc(100vw_-_40px))] flex-col gap-3.5 rounded-[24px] border-[6px] border-[#f6f6f6] bg-white p-[26px] shadow-[24px_80px_50px_rgba(77,77,77,0.02),10px_36px_37px_rgba(77,77,77,0.03),3px_9px_20px_rgba(77,77,77,0.03)] lg:w-[760px] lg:gap-4 lg:p-10">
-        {/* Badge — DOAR pe desktop (nu există în designul mobil) */}
-        <span className="hidden w-fit rounded-[20px] bg-[#f6f6f6] px-3 py-[5px] text-[12px] font-medium tracking-[-0.3px] text-[#1c5d99] lg:block">
-          {ui.mainBadge}
-        </span>
-
+        {/* Badge-ul „Main recommendation" a fost SCOS (owner 2026-08-05) */}
         <div className="flex items-center gap-3 lg:gap-4">
-          {/* Slotul de icon — inițiala cursului, ca în design */}
-          <span className="flex size-12 shrink-0 items-center justify-center rounded-[12px] bg-[#f6f6f6] text-[18px] font-semibold text-[#1c5d99] lg:size-14 lg:text-[22px]">
-            {r.courseTitle.charAt(0)}
+          {/* Slotul de icon — logo-ul negru (owner 2026-08-05, înlocuiește inițiala) */}
+          <span className="flex size-12 shrink-0 items-center justify-center rounded-[12px] bg-[#f6f6f6] lg:size-14">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/brand/icon-black.svg"
+              alt=""
+              aria-hidden="true"
+              className="h-7 w-6 object-contain lg:h-8 lg:w-7"
+            />
           </span>
           <div className="min-w-0 flex-1">
             <h2 className="text-[17px] font-medium leading-6 tracking-[-0.5px] text-[#222222] lg:text-[24px] lg:leading-normal lg:tracking-[-0.8px]">
