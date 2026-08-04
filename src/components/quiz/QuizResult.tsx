@@ -75,7 +75,7 @@ export default function QuizResult({
           {r.reason}
         </p>
 
-        <div className="flex flex-wrap items-center gap-3.5 lg:gap-4">
+        <div className="flex flex-col items-start gap-3.5 lg:flex-row lg:items-center lg:gap-4">
           <Link
             href={r.href}
             className="whitespace-nowrap rounded-[999px] bg-gradient-to-b from-[#407ea2] to-[#1c5d99] to-[80%] px-5 pb-[11px] pt-2.5 text-[15px] font-medium leading-normal text-white shadow-[0_4px_4px_-2px_rgba(0,0,0,0.21)] transition-transform hover:scale-[1.03] lg:px-[22px] lg:pb-3 lg:pt-[11px] lg:text-[16px]"
