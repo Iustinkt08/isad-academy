@@ -5,6 +5,7 @@ import type { SiteSetting } from '@/payload-types'
 
 import { getDictionary, localePath, type Locale } from '../../lib/i18n'
 import { Container } from '../ui/Container'
+import { NetopiaBadge } from '../ui/NetopiaBadge'
 import { NewsletterForm } from './NewsletterForm'
 
 /*
@@ -98,7 +99,10 @@ export function Footer({ settings, locale }: { settings: SiteSetting | null; loc
               ))}
             </div>
 
-            {/* ANPC SAL + SOL — official badges, used as-is (legal requirement, §7).
+            {/* Badge-uri oficiale, folosite ca atare — ANPC SAL + SOL (obligație legală RO,
+                §7) și NETOPIA Payments (obligație contractuală față de procesator,
+                HANDOFF.md TODO #3). Toate trei sunt mărci ale unor terți: se scalează, nu
+                se restilizează. Footerul e `bg-paper` (deschis) ⇒ NETOPIA varianta `light`.
                 Left-aligned with the LEGAL column (owner 2026-07-30) */}
             <div className="flex flex-wrap items-center gap-3">
               <a
@@ -129,6 +133,8 @@ export function Footer({ settings, locale }: { settings: SiteSetting | null; loc
                   className="h-12 w-auto"
                 />
               </a>
+              {/* Linkat în tab nou, ca badge-urile ANPC de deasupra (owner 2026-08-05). */}
+              <NetopiaBadge tone="light" height={48} linked />
             </div>
           </div>
         </div>

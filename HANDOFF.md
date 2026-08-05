@@ -28,16 +28,25 @@ Explicat pe îndelete, ca să fie clar de ce:
 - **De ce nu facem abonarea direct din butonul de pe site?** Pentru că oricine poate scrie adresa altcuiva în formular. Fără confirmare, am trimite newslettere unor oameni care nu au cerut asta → plângeri de spam, probleme GDPR (nu putem dovedi consimțământul), iar Brevo poate penaliza/suspenda contul dacă rata de spam crește. Emailul de confirmare este dovada legală a consimțământului. Așa funcționează toate site-urile serioase.
 - Brevo are suport nativ pentru double opt-in — folosește-l, nu reinventa.
 
-### 3. Identitatea vizuală Netopia — CERINȚĂ DE LA NETOPIA
-- Adaugă pe site elementele de identitate vizuală cerute de Netopia (logo Netopia Payments + siglele cardurilor, de regulă în footer și/sau pe pagina de checkout).
-- Verifică în documentația/contractul Netopia exact ce cer (au ghid de branding). Fără asta nu aprobă trecerea pe producție.
+### 3. Identitatea vizuală Netopia — CERINȚĂ DE LA NETOPIA — ✅ FĂCUT (2026-08-05)
+- Însemnul oficial (wordmark NETOPIA Payments + Mastercard + Visa) apare în **footer** (lângă badge-urile ANPC) și în **sumarul comenzii din checkout**, sub butonul de plată.
+- Assets-urile vin din kitul oficial pentru parteneri, copiate bit-cu-bit în `public/netopia/`; regulile de folosire sunt în `public/netopia/NOTICE.txt`, iar plasarea e documentată în `docs/NETOPIA.md` → „Identitate vizuală".
+- **Rămâne de verificat cu Netopia la aprobare:** dacă cer și un link către pagina lor sau o mențiune în Termeni. Manualul lor (ed. 2022) cere doar afișarea însemnelor, atât.
 
 ### 4. Continuarea testelor de securitate
 - Primul val e făcut (vezi commit `72b59d9`). De continuat: testare endpoint-uri Payload, rate limiting pe rutele sensibile rămase, verificare permisiuni pe colecții, teste pe fluxul de plată (IPN), eventual un audit cu `/security-review` în Claude Code.
 
-### 5. Integrare SmartBill
-- Emitere automată de facturi la plățile confirmate (după IPN-ul Netopia de succes).
-- API SmartBill: necesită cont + token; datele de facturare se iau din comandă.
+### 5. ~~Integrare SmartBill~~ — ABANDONAT (decizie owner, 2026-08-05)
+Nu se mai implementează facturarea automată. Consecințe deja aplicate în cod:
+
+- Textul din checkout **nu mai promite** emitere automată: „Invoice sent by e-mail after
+  payment" / „Factura sosește pe e-mail după plată". Nu-l schimba înapoi în „automat" —
+  ar fi o promisiune pe care site-ul nu o poate ține (risc de reclamație ANPC).
+- **Facturile se emit și se trimit manual.** Datele de facturare (nume/CUI/adresă, la
+  comenzile B2B) sunt pe comandă, în dashboard-ul Payload → Sales → Orders.
+- Scheletul `src/lib/invoicing/` rămâne pe loc, **inert**: default-ul e `NoopInvoicer`,
+  nu se apelează niciun serviciu extern, iar stub-ul SmartBill eșuează soft. E punctul de
+  pornire dacă decizia se schimbă cândva — nu e cod activ.
 
 ## Instrucțiuni pentru prima conversație cu Claude Code
 

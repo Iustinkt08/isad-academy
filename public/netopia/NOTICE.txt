@@ -1,0 +1,49 @@
+NETOPIA Payments — însemne de identitate vizuală (marcă înregistrată, terță parte)
+=================================================================================
+
+Proveniență
+-----------
+Descărcate din kitul oficial pentru parteneri:
+https://netopia-payments.com/storage/2022/11/Identitate-Parteneri-NETOPIA-Payments.zip
+(pagina sursă: https://netopia-payments.com/brand/ — „Manual de identitate", ediția
+04 noiembrie 2022). Fișierele sunt copiate BIT-CU-BIT din kit, fără reprelucrare:
+
+  netopia-cards-light.png  ←  bg-white.png   (kit)
+  netopia-cards-dark.png   ←  bg-black.png   (kit)
+
+Ambele sunt „Varianta 2 — ONLINE" din manual: wordmark NETOPIA PAYMENTS (fără silueta
+de clădiri) însoțit de siglele Mastercard și Visa. Manualul o indică explicit ca
+varianta pentru mediul online; Varianta 1 (cu silueta de clădiri) e rezervată tipăririi.
+
+Drepturi
+--------
+Însemnele rămân proprietatea intelectuală a NETOPIA Payments SRL, respectiv a
+Mastercard și Visa. Sunt licențiate spre afișare comercianților parteneri, în scopul
+semnalării mijloacelor de plată acceptate. NU sunt sub licența acestui repo.
+
+Reguli de folosire (cap. 1 „Variante interzise", cap. 2 „Recomandări pentru parteneri")
+---------------------------------------------------------------------------------------
+Se aleg DUPĂ CULOAREA FUNDALULUI:
+  * fundal alb sau gri  → netopia-cards-light.png (wordmark albastru)
+  * orice fundal colorat sau închis → netopia-cards-dark.png (wordmark alb)
+
+Interzis: deformarea, rotirea, înclinarea, recolorarea (a logotipului sau a unei părți
+din el), modificarea distanțelor dintre elemente, reorganizarea dispunerii lor.
+În practică: se scalează PROPORȚIONAL și atât. Nu se aplică filtre CSS, nu se schimbă
+opacitatea, nu se decupează.
+
+Aria minimă de siguranță (spațiul liber din jur) e deja INCLUSĂ în pânza fișierelor:
+conținutul opac e 1541×219 px într-o pânză de 1852×349 px, adică 65 px liber sus/jos și
+153 px stânga/dreapta — peste pătratul X ≈ 55 px cerut de manual. De aceea fișierele se
+folosesc ca atare, iar `<Image>` le randează cu `unoptimized`: recompresia ar retușa o
+marcă înregistrată.
+
+Excepțiile de la aceste norme cer aprobarea prealabilă a reprezentanților NETOPIA.
+
+Alternativa neadoptată
+----------------------
+Netopia oferă și un script de badge găzduit de ei (admin.netopia-payments.com/mediakit,
+necesită autentificare de comerciant). Nu îl folosim: ar însemna un script terț pe toate
+paginile, contra politicii „third-party = consent-gated + lazy" (CLAUDE.md §3.9) și a
+CSP-ului din next.config.mjs, care permite doar `img-src 'self'`. Găzduirea locală a
+imaginilor oficiale satisface aceeași cerință, fără cost de performanță.

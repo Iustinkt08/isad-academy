@@ -20,6 +20,7 @@ import {
 } from '@/lib/pricing'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import type { Locale } from '@/lib/i18n/config'
+import { NetopiaBadge } from '../ui/NetopiaBadge'
 import { formatPrice } from '../courses/helpers'
 
 const CHECK_GRADIENT_ID = 'checkout-check-gradient'
@@ -267,6 +268,18 @@ export default function OrderSummaryCard({
           </li>
         ))}
       </ul>
+
+      {/* NETOPIA — cerință contractuală de afișare (HANDOFF.md TODO #3), pusă exact acolo
+          unde și răspunde la o întrebare reală a cumpărătorului: „cine îmi ia datele de
+          card?". Cardul e alb ⇒ varianta `light` (wordmark albastru). */}
+      <div className="flex flex-col items-center gap-1.5 pt-1">
+        <p className="text-[12px] leading-[18px] text-[#959595] lg:text-grey-600">
+          {t.securePaymentsBy}
+        </p>
+        {/* `linked` deschide în tab nou — o navigare în aceeași fereastră ar goli
+            formularul de checkout deja completat. */}
+        <NetopiaBadge tone="light" height={40} linked />
+      </div>
     </div>
   )
 }

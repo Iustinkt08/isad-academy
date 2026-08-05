@@ -61,6 +61,29 @@ autoritar. Verifică în dashboard-ul Payload (Sales → Orders) că `paymentSta
 - IPN cu semnătură invalidă / audiență greșită / body umblat → respins cu 4xx (Netopia
   reîncearcă).
 
+## Identitate vizuală (cerință de aprobare)
+
+Netopia **nu aprobă trecerea POS-ului pe producție** fără însemnele lor pe site. Afișate în
+două locuri, ambele pe fundal deschis ⇒ varianta „light" (wordmark albastru):
+
+| Unde | Fișier | Înălțime | De ce acolo |
+|---|---|---|---|
+| Footer, lângă badge-urile ANPC | `src/components/layout/Footer.tsx` | 48 px | vizibil pe orice pagină, aliniat cu celelalte însemne oficiale |
+| Sumarul comenzii, sub butonul de plată | `src/components/checkout/OrderSummaryCard.tsx` | 40 px | răspunde la „cine îmi ia datele de card?" exact când omul întreabă |
+
+Componenta e `src/components/ui/NetopiaBadge.tsx`. Prop-ul `tone` **nu are default**,
+intenționat: varianta se alege după culoarea fundalului, iar un default ar ascunde decizia.
+
+Regulile de marcă (ce e interzis, cum se alege varianta, de ce `unoptimized`) stau în
+**`public/netopia/NOTICE.txt`**, alături de assets — citește-l înainte să modifici randarea.
+Pe scurt: se scalează proporțional și atât; fără recolorare, rotire, decupare sau filtre CSS.
+Aria de siguranță e deja în pânza PNG-urilor, nu mai adăuga padding.
+
+Assets-urile sunt copiate bit-cu-bit din kitul oficial pentru parteneri
+(<https://netopia-payments.com/brand/>). Nu folosim scriptul de badge găzduit de Netopia:
+ar fi un script terț pe toate paginile, contra CSP-ului (`img-src 'self'`) și a politicii
+„third-party = consent-gated + lazy" (CLAUDE.md §3.9).
+
 ## Teste
 
 - `tests/unit/payments/netopia-provider.test.ts` — construirea cererii de start, URL-uri
