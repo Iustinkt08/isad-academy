@@ -1,6 +1,7 @@
 import { parseJsonBody } from '../../../../lib/api/parseJsonBody'
 import { enforceRateLimit, RL_FORM } from '../../../../lib/api/rateLimit'
 import { getMailer } from '../../../../lib/email'
+import { isLocale } from '../../../../lib/i18n/config'
 
 /** Guards against parsing an arbitrarily large request body — a real newsletter signup body
  * (just an email address) is well under 100 bytes; 2KB is generous headroom. */
@@ -39,7 +40,15 @@ export async function POST(request: Request): Promise<Response> {
     return Response.json({ ok: false, error: 'A valid e-mail address is required.' }, { status: 400 })
   }
 
-  const result = await getMailer().subscribeDoubleOptIn({ email: email.trim() })
+  // `locale` decides which confirmation page Brevo's email links back to. An unrecognised or
+  // missing value falls back to EN rather than 400 — a bad locale must never block an
+  // otherwise valid subscription.
+  const rawLocale = (parsed.body as { locale?: unknown } | null)?.locale
+
+  const result = await getMailer().subscribeDoubleOptIn({
+    email: email.trim(),
+    locale: isLocale(rawLocale) ? rawLocale : undefined,
+  })
 
   if (!result.ok) {
     return Response.json(

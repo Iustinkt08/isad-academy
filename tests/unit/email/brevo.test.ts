@@ -152,6 +152,60 @@ describe('BrevoMailer (unit)', () => {
       expect(body.redirectionUrl).toBe('https://isad.academy/newsletter/confirmed')
     })
 
+    it('sends an RO subscriber to the Romanian confirmation page', async () => {
+      fetchMock.mockResolvedValueOnce(new Response(null, { status: 204 }))
+
+      const mailer = createBrevoMailer(BASE_CONFIG)
+      await mailer.subscribeDoubleOptIn({ email: 'cititor@example.com', locale: 'ro' })
+
+      const body = JSON.parse(fetchMock.mock.calls[0]![1].body)
+      expect(body.redirectionUrl).toBe('https://isad.academy/ro/newsletter/confirmed')
+    })
+
+    it('uses the RO template for a Romanian subscriber', async () => {
+      fetchMock.mockResolvedValueOnce(new Response(null, { status: 204 }))
+
+      const mailer = createBrevoMailer({ ...BASE_CONFIG, doiTemplateIdRo: '9' })
+      await mailer.subscribeDoubleOptIn({ email: 'cititor@example.com', locale: 'ro' })
+
+      expect(JSON.parse(fetchMock.mock.calls[0]![1].body).templateId).toBe(9)
+    })
+
+    it('falls back to the EN template when no RO template is configured', async () => {
+      // A missing translation must never cost a subscriber — they get the EN email.
+      fetchMock.mockResolvedValueOnce(new Response(null, { status: 204 }))
+
+      const mailer = createBrevoMailer(BASE_CONFIG)
+      await mailer.subscribeDoubleOptIn({ email: 'cititor@example.com', locale: 'ro' })
+
+      expect(JSON.parse(fetchMock.mock.calls[0]![1].body).templateId).toBe(3)
+    })
+
+    it('uses the EN template for English subscribers even when RO is configured', async () => {
+      fetchMock.mockResolvedValueOnce(new Response(null, { status: 204 }))
+
+      const mailer = createBrevoMailer({ ...BASE_CONFIG, doiTemplateIdRo: '9' })
+      await mailer.subscribeDoubleOptIn({ email: 'reader@example.com', locale: 'en' })
+
+      expect(JSON.parse(fetchMock.mock.calls[0]![1].body).templateId).toBe(3)
+    })
+
+    it('keeps EN unprefixed, whether the locale is explicit or omitted', async () => {
+      fetchMock
+        .mockResolvedValueOnce(new Response(null, { status: 204 }))
+        .mockResolvedValueOnce(new Response(null, { status: 204 }))
+
+      const mailer = createBrevoMailer(BASE_CONFIG)
+      await mailer.subscribeDoubleOptIn({ email: 'reader@example.com', locale: 'en' })
+      await mailer.subscribeDoubleOptIn({ email: 'reader@example.com' })
+
+      for (const call of fetchMock.mock.calls) {
+        expect(JSON.parse(call[1].body).redirectionUrl).toBe(
+          'https://isad.academy/newsletter/confirmed',
+        )
+      }
+    })
+
     it('returns { ok: false } without calling fetch when the list/template id is not configured', async () => {
       const mailer = createBrevoMailer({ ...BASE_CONFIG, newsletterListId: '', doiTemplateId: '' })
       const result = await mailer.subscribeDoubleOptIn({ email: 'reader@example.com' })
@@ -237,6 +291,66 @@ describe('BrevoMailer (unit)', () => {
 
       expect(result.ok).toBe(false)
       expect(fetchMock).not.toHaveBeenCalled()
+    })
+  })
+
+  // Wiring check for src/lib/email/senders.ts — the pure resolution logic is covered in
+  // senders.test.ts; what matters here is that the resolved address actually reaches Brevo.
+  describe('per-category senders', () => {
+    const SENDERS = {
+      ...BASE_CONFIG,
+      newsletterSenderEmail: 'news@isad.academy',
+      newsletterSenderName: 'isad.academy news',
+      notificationSenderEmail: 'alerts@isad.academy',
+      notificationSenderName: 'isad.academy alerts',
+    }
+
+    it('ships an internal notification from the notification address', async () => {
+      fetchMock.mockResolvedValueOnce(jsonResponse({ messageId: 'x' }, { status: 201 }))
+
+      await createBrevoMailer(SENDERS).sendTransactional({
+        to: 'silviu@isad.academy',
+        subject: 'New lead',
+        html: '<p>lead</p>',
+        text: 'lead',
+        sender: 'notification',
+      })
+
+      const body = JSON.parse(fetchMock.mock.calls[0]![1].body)
+      expect(body.sender).toEqual({ email: 'alerts@isad.academy', name: 'isad.academy alerts' })
+    })
+
+    it('ships a campaign from the newsletter address, never the transactional one', async () => {
+      fetchMock
+        .mockResolvedValueOnce(jsonResponse({ id: 42 }, { status: 201 }))
+        .mockResolvedValueOnce(jsonResponse({}, { status: 201 }))
+
+      await createBrevoMailer(SENDERS).broadcastCampaign({
+        name: 'August newsletter',
+        subject: 'What is new',
+        html: '<p>news</p>',
+      })
+
+      const body = JSON.parse(fetchMock.mock.calls[0]![1].body)
+      expect(body.sender).toEqual({ email: 'news@isad.academy', name: 'isad.academy news' })
+      expect(body.sender.email).not.toBe(BASE_CONFIG.senderEmail)
+    })
+
+    it('falls back to the default address for an unconfigured category', async () => {
+      fetchMock.mockResolvedValueOnce(jsonResponse({ messageId: 'x' }, { status: 201 }))
+
+      // BASE_CONFIG carries no per-category addresses — the real launch state for
+      // `notification`. It must still resolve to a valid sender, never an empty one.
+      await createBrevoMailer(BASE_CONFIG).sendTransactional({
+        to: 'silviu@isad.academy',
+        subject: 'New lead',
+        html: '<p>lead</p>',
+        text: 'lead',
+        sender: 'notification',
+      })
+
+      const body = JSON.parse(fetchMock.mock.calls[0]![1].body)
+      expect(body.sender).toEqual({ email: 'hello@isad.academy', name: 'isad.academy' })
     })
   })
 })

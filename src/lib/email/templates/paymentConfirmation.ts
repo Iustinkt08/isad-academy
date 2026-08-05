@@ -46,7 +46,9 @@ export const renderPaymentConfirmationEmail = (data: PaymentConfirmationData): R
   const courseTitle = data.courseTitle || 'your course'
   const startDate = formatDate(data.startDate)
   const participantsList = data.participants.map((p) => p.name).filter(Boolean).join(', ') || '—'
-  const supportEmail = data.supportEmail || 'support@isad.academy'
+  // Vezi nota din ./orderReceived — `support@` din documentul clientului e mapat pe
+  // `contact@`, singurul inbox monitorizat și sender verificat (owner 2026-08-05).
+  const supportEmail = data.supportEmail || 'contact@isad.academy'
 
   const subject = 'Your isad.academy course order is confirmed'
   const preheader = 'Payment received. Your enrolment is now confirmed.'

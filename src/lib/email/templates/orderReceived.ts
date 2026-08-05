@@ -39,7 +39,11 @@ export const renderOrderReceivedEmail = (data: OrderReceivedData): RenderedEmail
   const courseTitle = data.courseTitle || 'your course'
   const startDate = formatDate(data.startDate)
   const participantsList = data.participants.map((p) => p.name).filter(Boolean).join(', ') || '—'
-  const supportEmail = data.supportEmail || 'support@isad.academy'
+  // Documentul clientului scrie `support@isad.academy`, dar adresa aia nu e sender verificat
+  // în Brevo — mapată pe `contact@`, inboxul monitorizat (decizie owner 2026-08-05).
+  // ATENȚIE: textele legale (Termeni §retragere/reclamații, Privacy, Cookies) promit în
+  // continuare `support@` — dacă adresa nu se creează, acolo rămâne o promisiune neonorată.
+  const supportEmail = data.supportEmail || 'contact@isad.academy'
 
   const subject = 'We’ve received your isad.academy order'
   const preheader = 'Your course order has been recorded and is awaiting payment confirmation.'

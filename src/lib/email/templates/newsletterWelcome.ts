@@ -12,6 +12,21 @@ import type { RenderedEmail } from './paymentConfirmation'
  *
  * Brand note: the client's document writes "ISAD.academy"; CLAUDE.md §12 mandates the
  * lowercase wordmark "isad.academy" everywhere, so the copy is reproduced with that casing.
+ *
+ * NOT DEAD CODE — and deliberately not called from anywhere (2026-08-05). This email is sent
+ * by a Brevo Automation ("contact added to list"), not by us: Brevo redirects the confirming
+ * browser to /newsletter/confirmed without telling the server who confirmed, so there is no
+ * event in our code to hang the send on. A Brevo webhook + endpoint would buy the same
+ * visible result for hours of work.
+ *
+ * This module is therefore the SOURCE OF TRUTH for the copy. The HTML pasted into Brevo is
+ * generated from it into `docs/email-templates/newsletter-welcome.html`. After changing the
+ * copy here, regenerate and re-paste it into the Brevo template:
+ *
+ *   npx tsx -e "import { renderNewsletterWelcomeEmail } from './src/lib/email/templates/newsletterWelcome'; \
+ *     import fs from 'fs'; fs.writeFileSync('docs/email-templates/newsletter-welcome.html', renderNewsletterWelcomeEmail().html)"
+ *
+ * See docs/EMAIL.md §1 for the full picture.
  */
 export const renderNewsletterWelcomeEmail = (): RenderedEmail => {
   const subject = 'You’re subscribed to isad.academy'

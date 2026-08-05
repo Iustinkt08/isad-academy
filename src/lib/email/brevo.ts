@@ -27,18 +27,21 @@
  * a network error and a 10s timeout (`AbortController`, below) all collapse to
  * `{ ok: false, error }`.
  */
+import { DEFAULT_LOCALE, localePath } from '../i18n/config'
+import { pickSender, readSendersFromEnv, type SenderFields } from './senders'
 import { renderBlogBroadcastEmail } from './templates/blogBroadcast'
 import type { BroadcastCampaignInput, BroadcastNewPostInput, Mailer, MailerResult, SendTransactionalInput, SubscribeDoubleOptInInput } from './types'
 
 const BREVO_API_BASE = 'https://api.brevo.com/v3'
 const REQUEST_TIMEOUT_MS = 10_000
 
-export type BrevoConfig = {
+export type BrevoConfig = SenderFields & {
   apiKey: string
-  senderEmail: string
-  senderName: string
   newsletterListId: string
+  /** EN template — the canonical one, and the fallback for any locale without its own. */
   doiTemplateId: string
+  /** RO template. Empty = Romanian subscribers get the EN email rather than none at all. */
+  doiTemplateIdRo: string
   siteUrl: string
   /** Adresa citită de client (ex. contact@isad.academy) — Reply-urile la orice email
    * trimis de pe noreply@ ajung aici. Gol = nu se trimite antetul replyTo. */
@@ -49,11 +52,11 @@ export type BrevoConfig = {
  * `getPaymentProvider`'s contract in `src/lib/payments/index.ts`, so an env change takes
  * effect on the very next `getMailer()` call without re-importing anything). */
 const readConfigFromEnv = (): BrevoConfig => ({
+  ...readSendersFromEnv(),
   apiKey: process.env.BREVO_API_KEY?.trim() || '',
-  senderEmail: process.env.BREVO_SENDER_EMAIL?.trim() || '',
-  senderName: process.env.BREVO_SENDER_NAME?.trim() || 'isad.academy',
   newsletterListId: process.env.BREVO_NEWSLETTER_LIST_ID?.trim() || '',
   doiTemplateId: process.env.BREVO_DOI_TEMPLATE_ID?.trim() || '',
+  doiTemplateIdRo: process.env.BREVO_DOI_TEMPLATE_ID_RO?.trim() || '',
   replyToEmail: process.env.BREVO_REPLY_TO_EMAIL?.trim() || '',
   siteUrl: (process.env.NEXT_PUBLIC_SITE_URL?.trim() || 'http://localhost:3000').replace(/\/+$/, ''),
 })
@@ -128,7 +131,9 @@ export const createBrevoMailer = (overrides: Partial<BrevoConfig> = {}): Mailer 
         // Brevo rejects duplicate campaign names; the timestamp keeps re-sends distinct.
         name: `${input.name} — ${new Date().toISOString()}`,
         subject: input.subject,
-        sender: { email: config.senderEmail, name: config.senderName },
+        // Campaigns are newsletter by definition — always the marketing sender, so a
+        // complaint on a broadcast never touches the transactional address's reputation.
+        sender: pickSender(config, 'newsletter'),
         ...(config.replyToEmail ? { replyTo: config.replyToEmail } : {}),
         type: 'classic',
         htmlContent: input.html,
@@ -156,7 +161,7 @@ export const createBrevoMailer = (overrides: Partial<BrevoConfig> = {}): Mailer 
       const response = await postJson(
         '/smtp/email',
         {
-          sender: { email: config.senderEmail, name: config.senderName },
+          sender: pickSender(config, input.sender ?? 'transactional'),
           to: [{ email: input.to }],
           subject: input.subject,
           htmlContent: input.html,
@@ -182,8 +187,17 @@ export const createBrevoMailer = (overrides: Partial<BrevoConfig> = {}): Mailer 
         {
           email: input.email,
           includeListIds: [Number(config.newsletterListId)],
-          templateId: Number(config.doiTemplateId),
-          redirectionUrl: `${config.siteUrl}/newsletter/confirmed`,
+          // Brevo takes one template per call, so the language is chosen here. An unset RO
+          // template falls back to EN — a missing translation must not cost a subscriber.
+          templateId: Number(
+            input.locale === 'ro' && config.doiTemplateIdRo
+              ? config.doiTemplateIdRo
+              : config.doiTemplateId,
+          ),
+          // Land the confirmation click on the page in the visitor's own language — an RO
+          // subscriber used to be dropped on the English page even though /ro/newsletter/
+          // confirmed exists and is translated.
+          redirectionUrl: `${config.siteUrl}${localePath(input.locale ?? DEFAULT_LOCALE, '/newsletter/confirmed')}`,
         },
         config.apiKey,
       )

@@ -242,7 +242,7 @@ export function NewsletterMobile({ locale }: { locale: Locale }) {
       const response = await fetch('/api/newsletter', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, locale }),
       });
       const data = (await response.json().catch(() => null)) as ApiOkEnvelope | null;
       if (response.ok && data?.ok) {

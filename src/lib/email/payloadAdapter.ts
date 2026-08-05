@@ -1,6 +1,7 @@
 import type { EmailAdapter } from 'payload'
 
 import { getMailer } from './index'
+import { pickSender, readSendersFromEnv } from './senders'
 
 /**
  * Payload email adapter that delegates to the project's own `Mailer` (CLAUDE.md §11/§15 —
@@ -12,43 +13,50 @@ import { getMailer } from './index'
  * `getMailer()` is resolved per send, not at init, so flipping `BREVO_API_KEY` takes effect
  * without a restart — same contract as everywhere else in the email module.
  */
-export const payloadMailerAdapter: EmailAdapter<{ ok: boolean }> = () => ({
-  name: 'isad-mailer',
-  defaultFromAddress: process.env.BREVO_SENDER_EMAIL?.trim() || 'no-reply@isad.academy',
-  defaultFromName: process.env.BREVO_SENDER_NAME?.trim() || 'isad.academy',
-  async sendEmail(message) {
-    // Payload's `to` is nodemailer-shaped (string | Address | array); the Mailer takes a
-    // plain address list, so flatten whatever arrives into comma-separated addresses.
-    const toAddress = (Array.isArray(message.to) ? message.to : [message.to])
-      .map((entry) =>
-        typeof entry === 'string' ? entry : ((entry as { address?: string })?.address ?? ''),
-      )
-      .filter(Boolean)
-      .join(',')
+export const payloadMailerAdapter: EmailAdapter<{ ok: boolean }> = () => {
+  // Admin account mail (password reset) is transactional — the same address customers get
+  // receipts from, never the newsletter one. Payload wants these as static strings on the
+  // adapter, so they're read once at init; the send below still resolves env fresh.
+  const sender = pickSender(readSendersFromEnv(), 'transactional')
 
-    if (!toAddress) return { ok: false }
+  return {
+    name: 'isad-mailer',
+    defaultFromAddress: sender.email || 'no-reply@isad.academy',
+    defaultFromName: sender.name,
+    async sendEmail(message) {
+      // Payload's `to` is nodemailer-shaped (string | Address | array); the Mailer takes a
+      // plain address list, so flatten whatever arrives into comma-separated addresses.
+      const toAddress = (Array.isArray(message.to) ? message.to : [message.to])
+        .map((entry) =>
+          typeof entry === 'string' ? entry : ((entry as { address?: string })?.address ?? ''),
+        )
+        .filter(Boolean)
+        .join(',')
 
-    const html = typeof message.html === 'string' ? message.html : ''
-    const text = typeof message.text === 'string' ? message.text : ''
+      if (!toAddress) return { ok: false }
 
-    const mailer = getMailer()
-    const result = await mailer.sendTransactional({
-      to: toAddress,
-      subject: message.subject ?? '',
-      html: html || text,
-      // Brevo wants a text part; derive one from the HTML when Payload only sends HTML.
-      text: text || html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(),
-    })
+      const html = typeof message.html === 'string' ? message.html : ''
+      const text = typeof message.text === 'string' ? message.text : ''
 
-    // Payload swallows the adapter's return value, so a provider rejection (bad key, IP
-    // restriction, unverified sender, quota) would otherwise vanish without a trace and
-    // look exactly like a successful send. Log it loudly — same contract as NoopMailer.
-    if (!result.ok) {
-      console.error(
-        `[email] ${mailer.name} REJECTED "${message.subject ?? ''}" to="${toAddress}": ${result.error}`,
-      )
-    }
+      const mailer = getMailer()
+      const result = await mailer.sendTransactional({
+        to: toAddress,
+        subject: message.subject ?? '',
+        html: html || text,
+        // Brevo wants a text part; derive one from the HTML when Payload only sends HTML.
+        text: text || html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(),
+      })
 
-    return { ok: result.ok }
-  },
-})
+      // Payload swallows the adapter's return value, so a provider rejection (bad key, IP
+      // restriction, unverified sender, quota) would otherwise vanish without a trace and
+      // look exactly like a successful send. Log it loudly — same contract as NoopMailer.
+      if (!result.ok) {
+        console.error(
+          `[email] ${mailer.name} REJECTED "${message.subject ?? ''}" to="${toAddress}": ${result.error}`,
+        )
+      }
+
+      return { ok: result.ok }
+    },
+  }
+}

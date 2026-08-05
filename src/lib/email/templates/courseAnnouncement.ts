@@ -56,7 +56,8 @@ const subjectFor = (courseName: string, variant: CourseAnnouncementData['subject
 
 export const renderCourseAnnouncementEmail = (data: CourseAnnouncementData): RenderedEmail => {
   const courseName = data.courseName || 'our new programme'
-  const contactEmail = data.contactEmail || 'support@isad.academy'
+  // Vezi nota din ./orderReceived — `support@` mapat pe `contact@` (owner 2026-08-05).
+  const contactEmail = data.contactEmail || 'contact@isad.academy'
   const subject = subjectFor(courseName, data.subjectVariant)
   const preheader =
     'A practical programme for professionals responsible for AI readiness, governance and organisational implementation.'

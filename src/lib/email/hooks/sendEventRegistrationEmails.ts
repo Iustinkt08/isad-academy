@@ -58,7 +58,11 @@ export const sendEventRegistrationEmails: CollectionAfterChangeHook<EventRegistr
     }
 
     const notification = renderEventRegistrationNotification(doc, event)
-    const notified = await mailer.sendTransactional({ to: notifyEmail, ...notification })
+    const notified = await mailer.sendTransactional({
+      to: notifyEmail,
+      ...notification,
+      sender: 'notification',
+    })
     if (!notified.ok) {
       req.payload.logger.warn(
         `[email] event registration ${doc.id} owner notification failed: ${notified.error}`,

@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it } from 'vitest'
 
 import { setMailerForTesting } from '../../../src/lib/email'
+import type { SubscribeDoubleOptInInput } from '../../../src/lib/email/types'
 import { POST } from '../../../src/app/(frontend)/api/newsletter/route'
 
 const jsonRequest = (body: unknown): Request =>
@@ -12,6 +13,42 @@ const jsonRequest = (body: unknown): Request =>
 describe('POST /api/newsletter (unit) — T7', () => {
   afterEach(() => {
     setMailerForTesting(null)
+  })
+
+  /** Installs a fake mailer that records what `subscribeDoubleOptIn` was called with. */
+  const recordingMailer = () => {
+    const calls: SubscribeDoubleOptInInput[] = []
+    setMailerForTesting({
+      name: 'fake',
+      sendTransactional: async () => ({ ok: true }),
+      subscribeDoubleOptIn: async (input) => {
+        calls.push(input)
+        return { ok: true }
+      },
+      broadcastNewPost: async () => ({ ok: true }),
+      broadcastCampaign: async () => ({ ok: true }),
+    })
+    return calls
+  }
+
+  it('forwards the locale so the confirmation link lands on the right language', async () => {
+    const calls = recordingMailer()
+
+    const response = await POST(jsonRequest({ email: 'cititor@example.com', locale: 'ro' }))
+
+    expect(response.status).toBe(200)
+    expect(calls[0]).toEqual({ email: 'cititor@example.com', locale: 'ro' })
+  })
+
+  it('ignores an unrecognised locale instead of rejecting the subscription', async () => {
+    // A bogus locale is a caller bug, not a reason to lose a real subscriber — it must fall
+    // back to EN, never 400.
+    const calls = recordingMailer()
+
+    const response = await POST(jsonRequest({ email: 'reader@example.com', locale: 'de' }))
+
+    expect(response.status).toBe(200)
+    expect(calls[0]?.locale).toBeUndefined()
   })
 
   it('returns 200 { ok: true } when the mailer subscribes successfully', async () => {

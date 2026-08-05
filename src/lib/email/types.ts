@@ -9,6 +9,9 @@
  * log-and-continue without wrapping business logic in a try/catch just to survive an email
  * provider being down (CLAUDE.md §7/§15 — "email failure never breaks the request").
  */
+import type { Locale } from '../i18n/config'
+import type { SenderKind } from './senders'
+
 export type MailerResult = { ok: true } | { ok: false; error: string }
 
 export type SendTransactionalInput = {
@@ -16,6 +19,10 @@ export type SendTransactionalInput = {
   subject: string
   html: string
   text: string
+  /** Which sender address this email ships from (`./senders.ts`). Defaults to
+   * `'transactional'`; internal team alerts pass `'notification'`. Broadcasts don't use this
+   * — they are newsletter by definition, so the provider picks that sender itself. */
+  sender?: SenderKind
   /** Unde ajunge un Reply al destinatarului. Providerul cade înapoi pe adresa globală de
    * reply-to din env (BREVO_REPLY_TO_EMAIL) când lipsește; util per-mesaj la notificările
    * de lead, unde Reply trebuie să meargă direct la emailul lead-ului. */
@@ -24,6 +31,10 @@ export type SendTransactionalInput = {
 
 export type SubscribeDoubleOptInInput = {
   email: string
+  /** Language the visitor subscribed in. Decides where the confirmation link lands: EN is
+   * unprefixed, RO goes to `/ro/newsletter/confirmed`. Omitted → EN, so an older caller that
+   * doesn't send it keeps working. */
+  locale?: Locale
 }
 
 export type BroadcastNewPostInput = {

@@ -43,6 +43,7 @@ export const sendLeadNotificationEmail: CollectionAfterChangeHook<Lead> = async 
       subject,
       html,
       text,
+      sender: 'notification',
       replyTo: doc.email || undefined,
     })
 
