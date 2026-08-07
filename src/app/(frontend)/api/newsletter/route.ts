@@ -1,7 +1,9 @@
 import { parseJsonBody } from '../../../../lib/api/parseJsonBody'
 import { enforceRateLimit, RL_FORM } from '../../../../lib/api/rateLimit'
 import { getMailer } from '../../../../lib/email'
-import { isLocale } from '../../../../lib/i18n/config'
+import { renderNewsletterConfirmEmail } from '../../../../lib/email/templates/newsletterConfirm'
+import { DEFAULT_LOCALE, isLocale } from '../../../../lib/i18n/config'
+import { createConfirmToken } from '../../../../lib/newsletter/confirmToken'
 
 /** Guards against parsing an arbitrarily large request body — a real newsletter signup body
  * (just an email address) is well under 100 bytes; 2KB is generous headroom. */
@@ -40,14 +42,47 @@ export async function POST(request: Request): Promise<Response> {
     return Response.json({ ok: false, error: 'A valid e-mail address is required.' }, { status: 400 })
   }
 
-  // `locale` decides which confirmation page Brevo's email links back to. An unrecognised or
-  // missing value falls back to EN rather than 400 — a bad locale must never block an
-  // otherwise valid subscription.
+  // `locale` decides which language the confirmation email is written in and which page the
+  // link lands on. An unrecognised or missing value falls back to EN rather than 400 — a bad
+  // locale must never block an otherwise valid subscription.
   const rawLocale = (parsed.body as { locale?: unknown } | null)?.locale
+  const locale = isLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE
+  const address = email.trim()
 
-  const result = await getMailer().subscribeDoubleOptIn({
-    email: email.trim(),
-    locale: isLocale(rawLocale) ? rawLocale : undefined,
+  // Double opt-in, pasul 1 — emailul de confirmare îl trimitem NOI, ca email tranzacțional
+  // obișnuit. Funcția DOI nativă a Brevo a fost abandonată (owner 2026-08-06): acceptă doar
+  // template-uri din registrul ei DOI, care nu se pot crea prin API, și răspundea invariabil
+  // „An active DOI template does not exist". Vezi src/lib/newsletter/confirmToken.ts.
+  //
+  // ADRESA NU E SALVATĂ NICĂIERI acum — nici la noi, nici în Brevo. Există doar semnată în
+  // linkul din email. Abia clickul o adaugă în listă (/api/newsletter/confirm).
+  const token = createConfirmToken({ email: address, locale })
+  if (!token) {
+    // Fără secret de semnare am trimite un link pe care nu-l putem verifica la întoarcere.
+    console.error(
+      '[newsletter] PAYLOAD_SECRET / NEWSLETTER_TOKEN_SECRET missing — cannot sign the confirmation link.',
+    )
+    return Response.json(
+      { ok: false, error: 'Could not process your subscription. Please try again later.' },
+      { status: 500 },
+    )
+  }
+
+  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL?.trim() || 'http://localhost:3000').replace(
+    /\/+$/,
+    '',
+  )
+  const confirmUrl = `${siteUrl}/api/newsletter/confirm?token=${encodeURIComponent(token)}`
+  const { subject, html, text } = renderNewsletterConfirmEmail({ confirmUrl, locale })
+
+  const result = await getMailer().sendTransactional({
+    to: address,
+    subject,
+    html,
+    text,
+    // Categoria `newsletter` (news@isad.academy): e corespondență de marketing. O plângere de
+    // spam pe ea nu are voie să atingă reputația adresei de pe care pleacă chitanțele.
+    sender: 'newsletter',
   })
 
   if (!result.ok) {

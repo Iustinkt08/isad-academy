@@ -13,7 +13,7 @@ const RUN_ID = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
 let emailCounter = 0
 const uniqueEmail = (label: string): string => `${label}-${RUN_ID}-${emailCounter++}@example.com`
 
-type RecordedCall = { method: 'broadcastCampaign' | 'broadcastNewPost' | 'sendTransactional' | 'subscribeDoubleOptIn'; args: unknown }
+type RecordedCall = { method: 'broadcastCampaign' | 'broadcastNewPost' | 'sendTransactional' | 'subscribeDoubleOptIn' | 'addToNewsletterList'; args: unknown }
 
 /** A recording `Mailer` — never hits the network, just remembers every call so hooks can be
  * asserted on "exactly once"/"exactly zero" without any Brevo config. */
@@ -25,6 +25,10 @@ const createFakeMailer = (result: MailerResult = { ok: true }): Mailer & { calls
     async sendTransactional(input) {
       calls.push({ method: 'sendTransactional', args: input })
       return result
+    },
+    async addToNewsletterList(input) {
+      calls.push({ method: 'addToNewsletterList', args: input })
+      return { ok: true as const }
     },
     async subscribeDoubleOptIn(input) {
       calls.push({ method: 'subscribeDoubleOptIn', args: input })

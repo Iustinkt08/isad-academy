@@ -1,7 +1,7 @@
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
 import { setMailerForTesting } from '../../../src/lib/email'
-import type { SubscribeDoubleOptInInput } from '../../../src/lib/email/types'
+import type { Mailer, SendTransactionalInput } from '../../../src/lib/email/types'
 import { POST } from '../../../src/app/(frontend)/api/newsletter/route'
 
 const jsonRequest = (body: unknown): Request =>
@@ -10,55 +10,103 @@ const jsonRequest = (body: unknown): Request =>
     body: JSON.stringify(body),
   })
 
+/**
+ * Ruta trimite ACUM emailul de confirmare ea însăși (`sendTransactional`), nu prin funcția
+ * DOI a Brevo — v. src/lib/newsletter/confirmToken.ts. Stub-urile de aici verifică exact
+ * asta: ce pleacă, către cine, în ce limbă.
+ */
+const stubMailer = (overrides: Partial<Mailer> = {}): Mailer => ({
+  name: 'fake',
+  sendTransactional: async () => ({ ok: true }),
+  subscribeDoubleOptIn: async () => ({ ok: true }),
+  addToNewsletterList: async () => ({ ok: true }),
+  broadcastNewPost: async () => ({ ok: true }),
+  broadcastCampaign: async () => ({ ok: true }),
+  ...overrides,
+})
+
 describe('POST /api/newsletter (unit) — T7', () => {
-  afterEach(() => {
-    setMailerForTesting(null)
+  let originalSecret: string | undefined
+
+  beforeEach(() => {
+    // Fără secret, ruta refuză să emită un link nesemnat (500). Producția are PAYLOAD_SECRET.
+    originalSecret = process.env.PAYLOAD_SECRET
+    process.env.PAYLOAD_SECRET = 'test-secret-for-newsletter-tokens'
   })
 
-  /** Installs a fake mailer that records what `subscribeDoubleOptIn` was called with. */
+  afterEach(() => {
+    setMailerForTesting(null)
+    if (originalSecret === undefined) delete process.env.PAYLOAD_SECRET
+    else process.env.PAYLOAD_SECRET = originalSecret
+  })
+
+  /** Instalează un mailer fals care înregistrează ce email s-ar fi trimis. */
   const recordingMailer = () => {
-    const calls: SubscribeDoubleOptInInput[] = []
-    setMailerForTesting({
-      name: 'fake',
-      sendTransactional: async () => ({ ok: true }),
-      subscribeDoubleOptIn: async (input) => {
-        calls.push(input)
-        return { ok: true }
-      },
-      broadcastNewPost: async () => ({ ok: true }),
-      broadcastCampaign: async () => ({ ok: true }),
-    })
-    return calls
+    const sent: SendTransactionalInput[] = []
+    setMailerForTesting(
+      stubMailer({
+        sendTransactional: async (input) => {
+          sent.push(input)
+          return { ok: true }
+        },
+      }),
+    )
+    return sent
   }
 
-  it('forwards the locale so the confirmation link lands on the right language', async () => {
-    const calls = recordingMailer()
+  it('sends the confirmation email in the visitor’s language, to their address', async () => {
+    const sent = recordingMailer()
 
     const response = await POST(jsonRequest({ email: 'cititor@example.com', locale: 'ro' }))
 
     expect(response.status).toBe(200)
-    expect(calls[0]).toEqual({ email: 'cititor@example.com', locale: 'ro' })
+    expect(sent[0]?.to).toBe('cititor@example.com')
+    expect(sent[0]?.subject).toContain('Confirmă abonarea')
+    // Marketing, deci expeditorul de newsletter — nu adresa de pe care pleacă chitanțele.
+    expect(sent[0]?.sender).toBe('newsletter')
   })
 
-  it('ignores an unrecognised locale instead of rejecting the subscription', async () => {
-    // A bogus locale is a caller bug, not a reason to lose a real subscriber — it must fall
-    // back to EN, never 400.
-    const calls = recordingMailer()
+  it('carries a signed confirmation link pointing at the confirm route', async () => {
+    const sent = recordingMailer()
+
+    await POST(jsonRequest({ email: 'reader@example.com' }))
+
+    const rawToken = sent[0]?.html.match(/\/api\/newsletter\/confirm\?token=([^"&]+)/)?.[1]
+    expect(rawToken).toBeTruthy()
+    // body.signature — două segmente separate de punct, ambele nevide.
+    const [body, signature] = decodeURIComponent(rawToken ?? '').split('.')
+    expect(body).toBeTruthy()
+    expect(signature).toBeTruthy()
+  })
+
+  it('falls back to English for an unrecognised locale instead of rejecting', async () => {
+    // A bogus locale is a caller bug, not a reason to lose a real subscriber — never 400.
+    const sent = recordingMailer()
 
     const response = await POST(jsonRequest({ email: 'reader@example.com', locale: 'de' }))
 
     expect(response.status).toBe(200)
-    expect(calls[0]?.locale).toBeUndefined()
+    expect(sent[0]?.subject).toContain('Confirm your subscription')
   })
 
-  it('returns 200 { ok: true } when the mailer subscribes successfully', async () => {
-    setMailerForTesting({
-      name: 'fake',
-      sendTransactional: async () => ({ ok: true }),
-      subscribeDoubleOptIn: async () => ({ ok: true }),
-      broadcastNewPost: async () => ({ ok: true }),
-      broadcastCampaign: async () => ({ ok: true }),
-    })
+  it('does NOT subscribe anyone at this step — the address is only in the signed link', async () => {
+    let added = 0
+    setMailerForTesting(
+      stubMailer({
+        addToNewsletterList: async () => {
+          added += 1
+          return { ok: true }
+        },
+      }),
+    )
+
+    await POST(jsonRequest({ email: 'reader@example.com' }))
+
+    expect(added).toBe(0)
+  })
+
+  it('returns 200 { ok: true } when the confirmation email goes out', async () => {
+    setMailerForTesting(stubMailer())
 
     const response = await POST(jsonRequest({ email: 'reader@example.com' }))
     const body = await response.json()
@@ -119,18 +167,23 @@ describe('POST /api/newsletter (unit) — T7', () => {
   })
 
   it('returns 502 { ok: false } when the mailer reports a real failure', async () => {
-    setMailerForTesting({
-      name: 'fake',
-      sendTransactional: async () => ({ ok: true }),
-      subscribeDoubleOptIn: async () => ({ ok: false, error: 'Brevo is down' }),
-      broadcastNewPost: async () => ({ ok: true }),
-      broadcastCampaign: async () => ({ ok: true }),
-    })
+    setMailerForTesting(
+      stubMailer({ sendTransactional: async () => ({ ok: false, error: 'Brevo is down' }) }),
+    )
 
     const response = await POST(jsonRequest({ email: 'reader@example.com' }))
     const body = await response.json()
 
     expect(response.status).toBe(502)
     expect(body.ok).toBe(false)
+  })
+
+  it('returns 500 rather than mailing an unverifiable link when no signing secret exists', async () => {
+    setMailerForTesting(stubMailer())
+    delete process.env.PAYLOAD_SECRET
+
+    const response = await POST(jsonRequest({ email: 'reader@example.com' }))
+
+    expect(response.status).toBe(500)
   })
 })

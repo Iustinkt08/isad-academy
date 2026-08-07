@@ -30,7 +30,7 @@
 import { DEFAULT_LOCALE, localePath } from '../i18n/config'
 import { pickSender, readSendersFromEnv, type SenderFields } from './senders'
 import { renderBlogBroadcastEmail } from './templates/blogBroadcast'
-import type { BroadcastCampaignInput, BroadcastNewPostInput, Mailer, MailerResult, SendTransactionalInput, SubscribeDoubleOptInInput } from './types'
+import type { AddToNewsletterListInput, BroadcastCampaignInput, BroadcastNewPostInput, Mailer, MailerResult, SendTransactionalInput, SubscribeDoubleOptInInput } from './types'
 
 const BREVO_API_BASE = 'https://api.brevo.com/v3'
 const REQUEST_TIMEOUT_MS = 10_000
@@ -198,6 +198,30 @@ export const createBrevoMailer = (overrides: Partial<BrevoConfig> = {}): Mailer 
           // subscriber used to be dropped on the English page even though /ro/newsletter/
           // confirmed exists and is translated.
           redirectionUrl: `${config.siteUrl}${localePath(input.locale ?? DEFAULT_LOCALE, '/newsletter/confirmed')}`,
+        },
+        config.apiKey,
+      )
+      return toMailerResult(response)
+    },
+
+    async addToNewsletterList(input: AddToNewsletterListInput): Promise<MailerResult> {
+      if (!config.newsletterListId) {
+        return {
+          ok: false,
+          error: 'Brevo newsletter list is not configured (BREVO_NEWSLETTER_LIST_ID missing).',
+        }
+      }
+
+      // `updateEnabled: true` face apelul idempotent: dacă adresa există deja (re-abonare, sau
+      // omul a dat click de două ori pe linkul de confirmare), Brevo o ADAUGĂ în listă în loc
+      // să răspundă „duplicate" cu 400. A doua confirmare trebuie să fie un no-op liniștit,
+      // nu o pagină de eroare pentru cineva care tocmai și-a dat consimțământul.
+      const response = await postJson(
+        '/contacts',
+        {
+          email: input.email,
+          listIds: [Number(config.newsletterListId)],
+          updateEnabled: true,
         },
         config.apiKey,
       )

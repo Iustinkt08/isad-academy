@@ -21,7 +21,7 @@ const DAY_MS = 24 * 60 * 60 * 1000
  * suite actually runs, never an absolute date. */
 const isoOffset = (days: number): string => new Date(Date.now() + days * DAY_MS).toISOString()
 
-type RecordedCall = { method: 'broadcastCampaign' | 'broadcastNewPost' | 'sendTransactional' | 'subscribeDoubleOptIn'; args: unknown }
+type RecordedCall = { method: 'broadcastCampaign' | 'broadcastNewPost' | 'sendTransactional' | 'subscribeDoubleOptIn' | 'addToNewsletterList'; args: unknown }
 
 /** A recording `Mailer` — never hits the network, just remembers every call (mirrors
  * tests/int/email-hooks.int.spec.ts's `createFakeMailer`). */
@@ -33,6 +33,10 @@ const createFakeMailer = (result: MailerResult = { ok: true }): Mailer & { calls
     async sendTransactional(input) {
       calls.push({ method: 'sendTransactional', args: input })
       return result
+    },
+    async addToNewsletterList(input) {
+      calls.push({ method: 'addToNewsletterList', args: input })
+      return { ok: true as const }
     },
     async subscribeDoubleOptIn(input) {
       calls.push({ method: 'subscribeDoubleOptIn', args: input })

@@ -37,6 +37,11 @@ export type SubscribeDoubleOptInInput = {
   locale?: Locale
 }
 
+/** Confirmarea a fost deja dovedită de ruta care cheamă — aici nu mai există „poate". */
+export type AddToNewsletterListInput = {
+  email: string
+}
+
 export type BroadcastNewPostInput = {
   title: string
   excerpt: string
@@ -59,8 +64,17 @@ export interface Mailer {
   /** A single transactional email — payment confirmation, lead notification. */
   sendTransactional(input: SendTransactionalInput): Promise<MailerResult>
   /** Newsletter double opt-in: sends the confirmation email; the contact is only actually
-   * subscribed once the recipient clicks through. */
+   * subscribed once the recipient clicks through.
+   *
+   * NEFOLOSIT în fluxul curent (owner 2026-08-06): funcția DOI nativă a Brevo cere un
+   * template din registrul lor DOI, care nu se poate crea prin API, așa că trimitem noi
+   * emailul de confirmare (`renderNewsletterConfirmEmail` + `sendTransactional`) și chemăm
+   * `addToNewsletterList` la click. Metoda rămâne în interfață pentru că e proprietatea
+   * unui PROVIDER, nu a Brevo: un provider viitor cu DOI funcțional o poate folosi. */
   subscribeDoubleOptIn(input: SubscribeDoubleOptInInput): Promise<MailerResult>
+  /** Adaugă contactul în lista de newsletter — se cheamă DOAR după ce consimțământul a fost
+   * dovedit (click pe linkul semnat). Idempotentă: o a doua confirmare nu e o eroare. */
+  addToNewsletterList(input: AddToNewsletterListInput): Promise<MailerResult>
   /** Broadcasts a "new blog post" campaign to the newsletter list. */
   broadcastNewPost(input: BroadcastNewPostInput): Promise<MailerResult>
   /** Broadcasts an ad-hoc newsletter (composed in the admin) to the same list. */

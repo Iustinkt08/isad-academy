@@ -26,6 +26,9 @@ const createFakeMailer = (result: MailerResult = { ok: true }): Mailer & { sent:
       sent.push(input)
       return result
     },
+    async addToNewsletterList() {
+      return { ok: true as const }
+    },
     async subscribeDoubleOptIn() {
       return result
     },

@@ -654,6 +654,15 @@ const en = {
     confirmedMetaDescription: 'Your isad.academy newsletter subscription is confirmed.',
     confirmedBody:
       'Thanks for confirming your e-mail address — you are now subscribed to the isad.academy newsletter. We will let you know about new courses, articles and certification updates.',
+    /* Link invalid sau expirat. Formulat NEUTRU intenționat: pagina nu confirmă și nu infirmă
+       că vreo adresă anume aștepta confirmarea — altfel ar deveni un oracol de adrese. */
+    invalidTitle: 'This link is no longer valid',
+    invalidBody:
+      'Confirmation links expire after 48 hours. Please subscribe again and we will send you a fresh one.',
+    /* Consimțământ dovedit, dar providerul a refuzat. Nu spunem „ești abonat" când nu e. */
+    failedTitle: 'We could not complete your subscription',
+    failedBody:
+      'Something went wrong on our side while confirming your address. Please try subscribing again in a few minutes, or contact us if it keeps happening.',
     backHome: 'Back to home',
   },
   checkout: {
@@ -1559,6 +1568,12 @@ const ro: Dictionary = {
   newsletter: {
     confirmedTitle: 'Abonare confirmată',
     confirmedMetaDescription: 'Abonarea ta la newsletterul isad.academy este confirmată.',
+    invalidTitle: 'Linkul nu mai este valabil',
+    invalidBody:
+      'Linkurile de confirmare expiră după 48 de ore. Te rugăm să te abonezi din nou și îți trimitem unul nou.',
+    failedTitle: 'Nu am putut finaliza abonarea',
+    failedBody:
+      'Ceva n-a mers la noi în timp ce îți confirmam adresa. Te rugăm să încerci din nou peste câteva minute sau scrie-ne dacă se repetă.',
     confirmedBody:
       'Îți mulțumim că ți-ai confirmat adresa de e-mail — ești acum abonat(ă) la newsletterul isad.academy. Te anunțăm despre cursuri noi, articole și noutăți legate de certificare.',
     backHome: 'Înapoi acasă',

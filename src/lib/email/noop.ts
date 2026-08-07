@@ -1,4 +1,4 @@
-import type { BroadcastCampaignInput, BroadcastNewPostInput, Mailer, MailerResult, SendTransactionalInput, SubscribeDoubleOptInInput } from './types'
+import type { AddToNewsletterListInput, BroadcastCampaignInput, BroadcastNewPostInput, Mailer, MailerResult, SendTransactionalInput, SubscribeDoubleOptInInput } from './types'
 
 const ok = (): MailerResult => ({ ok: true })
 
@@ -23,6 +23,13 @@ export const createNoopMailer = (): Mailer => ({
   async subscribeDoubleOptIn(input: SubscribeDoubleOptInInput): Promise<MailerResult> {
     console.warn(
       `[NoopMailer] BREVO_API_KEY is not set — subscribeDoubleOptIn email="${input.email}" was NOT actually subscribed.`,
+    )
+    return ok()
+  },
+
+  async addToNewsletterList(input: AddToNewsletterListInput): Promise<MailerResult> {
+    console.warn(
+      `[NoopMailer] BREVO_API_KEY is not set — addToNewsletterList email="${input.email}" was NOT actually added to any list.`,
     )
     return ok()
   },

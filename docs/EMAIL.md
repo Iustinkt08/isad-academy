@@ -28,12 +28,40 @@ Categoria se alege în cod (`SenderKind` din `src/lib/email/senders.ts`), adresa
 inevitabil marcaje „spam"; dacă pleacă de pe aceeași adresă ca și confirmările de plată,
 degradează livrabilitatea exact acolo unde doare — omul a plătit și nu primește chitanța.
 
-### ⚠️ Excepția: double opt-in
+### Double opt-in — implementat de noi, NU de Brevo
 
-Emailul de confirmare a abonării **nu trece prin `senders.ts`**. Brevo îl trimite prin
-`POST /contacts/doubleOptinConfirmation`, care nu acceptă un câmp `sender` — expeditorul vine
-din **template-ul** `BREVO_DOI_TEMPLATE_ID`. Se setează în Brevo → Campaigns → Templates,
-alegând `news@isad.academy`. Nu-l căuta în cod.
+**Istoric, ca să nu se reîncerce drumul greșit (2026-08-06).** Fluxul folosea
+`POST /contacts/doubleOptinConfirmation`. În producție răspundea invariabil
+`400 invalid_parameter: "An active DOI template does not exist"`, deși template-urile
+existau, erau active și conțineau `{{ doubleoptin }}`. Cauza: Brevo ține template-urile DOI
+într-un **registru separat**, alimentat doar prin Contacts → Forms; cele create prin API-ul
+de template-uri ajung în registrul *tranzacțional*, iar endpoint-ul DOI nu se uită acolo.
+API-ul de creare nu are niciun parametru prin care să marchezi un template ca DOI, deci
+fluxul nu era reparabil din cod. **Nu reintroduce `subscribeDoubleOptIn` fără să retestezi
+ipoteza asta** — metoda a rămas în interfața `Mailer` doar pentru un provider viitor.
+
+Fluxul curent, două rute, fără nicio dependență de funcția DOI:
+
+1. `POST /api/newsletter` — validează, semnează un token HMAC-SHA256 cu adresa, limba și o
+   expirare de 48h (`src/lib/newsletter/confirmToken.ts`), și trimite emailul de confirmare
+   ca **email tranzacțional obișnuit**, categoria `newsletter` (`news@isad.academy`).
+   Template bilingv: `src/lib/email/templates/newsletterConfirm.ts`.
+2. `GET /api/newsletter/confirm?token=…` — verifică semnătura (comparație în timp constant)
+   și expirarea, apoi cheamă `addToNewsletterList` → `POST /contacts` cu
+   `updateEnabled: true` (idempotent: dublu-click nu e eroare). Redirect 303 către
+   `/newsletter/confirmed`, în limba din token.
+
+**Adresa nu e scrisă nicăieri până la click** — nici la noi, nici în Brevo. Trăiește doar
+semnată, în linkul din email. Nu există abonări în așteptare de curățat, iar site-ul nu poate
+fi folosit ca depozit de adrese.
+
+Tokenul se semnează cu `NEWSLETTER_TOKEN_SECRET`, cu fallback pe `PAYLOAD_SECRET` — anume ca
+abonarea să nu depindă de încă o variabilă pe care cineva ar uita s-o pună pe server. Fără
+niciun secret, ruta răspunde 500 în loc să trimită un link neverificabil.
+
+Pagina de confirmare tratează trei stări pe aceeași adresă: confirmat, `?status=invalid`
+(link expirat/cârpit — text neutru, ca pagina să nu devină un oracol de adrese) și
+`?status=failed` (consimțământ dovedit, dar providerul a refuzat).
 
 Redirectul după confirmare respectă limba: EN → `/newsletter/confirmed`, RO →
 `/ro/newsletter/confirmed`. Limba vine din formular (`POST /api/newsletter { email, locale }`);

@@ -46,6 +46,7 @@ describe('getMailer (unit)', () => {
       name: 'fake',
       sendTransactional: async () => ({ ok: true as const }),
       subscribeDoubleOptIn: async () => ({ ok: true as const }),
+      addToNewsletterList: async () => ({ ok: true as const }),
       broadcastNewPost: async () => ({ ok: true as const }),
       broadcastCampaign: async () => ({ ok: true as const }),
     }
@@ -60,6 +61,7 @@ describe('getMailer (unit)', () => {
       name: 'fake',
       sendTransactional: async () => ({ ok: true as const }),
       subscribeDoubleOptIn: async () => ({ ok: true as const }),
+      addToNewsletterList: async () => ({ ok: true as const }),
       broadcastNewPost: async () => ({ ok: true as const }),
       broadcastCampaign: async () => ({ ok: true as const }),
     })
