@@ -92,6 +92,38 @@ public                → ~/apps/isad/public
 Apoi în cPanel → Setup Node.js App → **Restart**. (Semnătura unui deploy reușit: site-ul
 răspunde și `/admin` se încarcă.)
 
+⚠️ **Capcană dovedită (2026-08-07) — 503 cu TREI cauze suprapuse.** O seară întreagă pierdută
+(inclusiv de suportul Hosterion, care a diagnosticat greșit „procesul nu rămâne asociat
+socket-ului Passenger"). Simptomul-momeală: aplicația pornea perfect manual pe :3000, dar
+extern dădea 503. Cauzele, în ordinea în care au fost decojite:
+
+1. **Loader-ul LiteSpeed nu ascultă de „Setup Node.js App".** `/usr/local/lsws/fcgi-bin/lsnode.js`
+   face `require()` pe `PassengerStartupFile` din **blocul CloudLinux al lui
+   `~/public_html/.htaccess`** — care cerea `app_wrapper.cjs`, un fișier generat de selector,
+   dispărut de pe server. `stderr.log`: `Cannot find module .../app_wrapper.cjs`. După destule
+   eșecuri, Passenger intră în refuz (503 în ~0,08 s, log mut). Bundle-ul livrează acum ambele
+   punți (`app_wrapper.cjs` + `app.js`), generate de `scripts/deploy-cpanel.sh`.
+2. **`server.js` din Next 15.4 standalone e ESM**, dar scriptul de deploy ștergea
+   `"type": "module"` din `package.json` — fix-ul incidentului INVERS din 2026-07-30, când
+   server.js era CommonJS. Rezultat: `Cannot use import statement outside a module`, de 16 ori
+   în log. Scriptul deduce acum câmpul din forma reală a lui `server.js`, la fiecare build —
+   nu-l mai șterge și nu-l mai păstrează „din principiu".
+3. **Cea mai perfidă: un rând `name='dev', batch=-1` în `payload_migrations`** (marcajul
+   modului push, lăsat de o rulare dev pe baza de producție). Cu `RUN_MIGRATIONS=true`,
+   Payload cere la boot confirmare interactivă („data loss will occur, proceed? y/N"). Sub
+   Passenger nu există TTY: promptul primește EOF → „N" → **procesul iese cu cod 0, fără nicio
+   eroare**, la ~1,6 s după un `listen()` reușit. Diagnostic posibil doar cu o punte
+   instrumentată (handlere pe exit/semnale) + rularea manuală a punții, care a AFIȘAT promptul.
+   Fix: `DELETE FROM payload_migrations WHERE name='dev' AND batch=-1;` — sigur doar când
+   toate migrațiile reale sunt aplicate (verifică `SELECT name FROM payload_migrations`).
+   **Regula care previne recidiva: nu rula NICIODATĂ `npm run dev` cu `DATABASE_URI` pe baza
+   de producție** — push-ul lasă marcajul `dev` și următorul boot de producție se blochează.
+
+Lecția de diagnostic: „merge manual, deci nu e codul" e o concluzie falsă — manual ≠ sub
+loader (alt startup file, alt cwd, stdin fără TTY, stdout în /dev/null). Iar un proces care
+moare cu exit 0 și log curat înseamnă aproape sigur un prompt interactiv înghițit de lipsa
+TTY-ului.
+
 ⚠️ **Capcană dovedită (2026-07-30):** în dev, schema se sincronizează cu `push`, nu cu migrații.
 `payload migrate:create` scrie doar *diferența* față de ultimul snapshot `.json` din
 `src/migrations/`, deci un tabel creat prin push și nesurprins într-un snapshot NU ajunge
