@@ -1,10 +1,7 @@
 import { parseJsonBody } from '../../../../lib/api/parseJsonBody'
 import { enforceRateLimit, RL_FORM } from '../../../../lib/api/rateLimit'
-import { getMailer } from '../../../../lib/email'
-import { readNewsletterReplyTo } from '../../../../lib/email/senders'
-import { renderNewsletterConfirmEmail } from '../../../../lib/email/templates/newsletterConfirm'
 import { DEFAULT_LOCALE, isLocale } from '../../../../lib/i18n/config'
-import { createConfirmToken } from '../../../../lib/newsletter/confirmToken'
+import { sendNewsletterConfirmation } from '../../../../lib/newsletter/sendConfirmation'
 
 /** Guards against parsing an arbitrarily large request body — a real newsletter signup body
  * (just an email address) is well under 100 bytes; 2KB is generous headroom. */
@@ -50,16 +47,15 @@ export async function POST(request: Request): Promise<Response> {
   const locale = isLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE
   const address = email.trim()
 
-  // Double opt-in, pasul 1 — emailul de confirmare îl trimitem NOI, ca email tranzacțional
-  // obișnuit. Funcția DOI nativă a Brevo a fost abandonată (owner 2026-08-06): acceptă doar
-  // template-uri din registrul ei DOI, care nu se pot crea prin API, și răspundea invariabil
-  // „An active DOI template does not exist". Vezi src/lib/newsletter/confirmToken.ts.
+  // Double opt-in, pasul 1. Mecanica trăiește în `sendNewsletterConfirmation` — o folosește
+  // și înscrierea la evenimente (bifa de newsletter din pop-up), ca să existe UN SINGUR loc
+  // în care se decide cum arată și de pe ce adresă pleacă emailul de confirmare.
   //
-  // ADRESA NU E SALVATĂ NICĂIERI acum — nici la noi, nici în Brevo. Există doar semnată în
-  // linkul din email. Abia clickul o adaugă în listă (/api/newsletter/confirm).
-  const token = createConfirmToken({ email: address, locale })
-  if (!token) {
-    // Fără secret de semnare am trimite un link pe care nu-l putem verifica la întoarcere.
+  // ADRESA NU E SALVATĂ NICĂIERI la pasul ăsta — nici la noi, nici în Brevo. Există doar
+  // semnată în linkul din email. Abia clickul o adaugă în listă (/api/newsletter/confirm).
+  const outcome = await sendNewsletterConfirmation({ email: address, locale })
+
+  if (!outcome.ok && outcome.reason === 'unsigned') {
     console.error(
       '[newsletter] PAYLOAD_SECRET / NEWSLETTER_TOKEN_SECRET missing — cannot sign the confirmation link.',
     )
@@ -69,35 +65,7 @@ export async function POST(request: Request): Promise<Response> {
     )
   }
 
-  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL?.trim() || 'http://localhost:3000').replace(
-    /\/+$/,
-    '',
-  )
-  const confirmUrl = `${siteUrl}/api/newsletter/confirm?token=${encodeURIComponent(token)}`
-  const { subject, html, text } = renderNewsletterConfirmEmail({ confirmUrl, locale })
-
-  const result = await getMailer().sendTransactional({
-    to: address,
-    subject,
-    html,
-    text,
-    // `transactional` (no-reply@isad.academy), NU `newsletter` — decizie owner 2026-08-07.
-    // Confirmarea abonării e declanșată de o acțiune punctuală a unei persoane, nu e o
-    // campanie: e tranzacțională prin natură, iar `news@` rămâne pentru ce chiar e marketing
-    // (broadcasturi, anunțuri de curs).
-    //
-    // Compromisul asumat: emailul ajunge inevitabil și la adrese tastate greșit sau introduse
-    // de altcineva, iar un „Spam" de acolo atinge acum adresa de pe care pleacă și chitanțele.
-    // Ține-l sub control prin rate limiting (deja activ mai sus); dacă rata de plângeri crește,
-    // mută-l înapoi pe `newsletter` — e o singură linie.
-    sender: 'transactional',
-    // Explicit, NU global: fără câmpul ăsta Brevo pune adresa cu care a fost creat contul
-    // (una personală, pe alt domeniu). Iar `BREVO_REPLY_TO_EMAIL` — inboxul monitorizat — e
-    // pentru emailurile la care oamenii chiar trebuie să poată răspunde, nu pentru ăsta.
-    replyTo: readNewsletterReplyTo() || undefined,
-  })
-
-  if (!result.ok) {
+  if (!outcome.ok) {
     return Response.json(
       { ok: false, error: 'Could not process your subscription. Please try again later.' },
       { status: 502 },

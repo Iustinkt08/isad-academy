@@ -20,7 +20,6 @@ import type {
   CourseSession,
   ExpertBio,
   Homepage,
-  Partner,
   Review,
 } from '@/payload-types'
 
@@ -34,7 +33,6 @@ type HomeData = {
   /** faqItems mapped to the FAQ section's shape (question / plain-text answer / tab label). */
   faqEntries: FaqEntry[]
   reviews: Review[]
-  partners: Partner[]
   featuredCourses: Course[]
   earlyBirdCourseIds: Set<number>
   /** courseId → preview-card chip data (start date + seats left) for "Explore our courses". */
@@ -53,7 +51,6 @@ async function getHomeData(locale: Locale): Promise<HomeData> {
     expert: null,
     faqEntries: [],
     reviews: [],
-    partners: [],
     featuredCourses: [],
     earlyBirdCourseIds: new Set(),
     courseChips: {},
@@ -61,7 +58,7 @@ async function getHomeData(locale: Locale): Promise<HomeData> {
 
   try {
     const payload = await getPayload({ config })
-    const [homepage, expert, faqResult, reviewsResult, partnersResult] = await Promise.all([
+    const [homepage, expert, faqResult, reviewsResult] = await Promise.all([
       payload.findGlobal({
         slug: 'homepage',
         depth: 1,
@@ -91,15 +88,6 @@ async function getHomeData(locale: Locale): Promise<HomeData> {
         // Max 5 testimonials on Home — enforced in the query (§4, §6)
         limit: 5,
         sort: '-createdAt',
-        depth: 1,
-        overrideAccess: false,
-        locale,
-        fallbackLocale: 'en',
-      }),
-      payload.find({
-        collection: 'partners',
-        sort: 'order',
-        pagination: false,
         depth: 1,
         overrideAccess: false,
         locale,
@@ -154,7 +142,6 @@ async function getHomeData(locale: Locale): Promise<HomeData> {
       expert,
       faqEntries,
       reviews: reviewsResult.docs,
-      partners: partnersResult.docs,
       featuredCourses,
       earlyBirdCourseIds,
       courseChips,

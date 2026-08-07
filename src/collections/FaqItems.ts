@@ -8,7 +8,7 @@ export const FaqItems: CollectionConfig = {
   slug: 'faqItems',
   admin: {
     useAsTitle: 'question',
-    group: 'Content',
+    group: 'Site',
     defaultColumns: ['question', 'order'],
     description: 'Q&A shown in the FAQ section on the homepage, grouped by journey tab.',
   },

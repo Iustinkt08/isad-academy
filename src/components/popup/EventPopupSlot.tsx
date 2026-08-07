@@ -1,51 +1,49 @@
-import { getPayload } from 'payload'
+'use client'
 
-import config from '@payload-config'
+import { useEffect, useState } from 'react'
+
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import type { Locale } from '@/lib/i18n/config'
 import EventPopup, { type EventPopupData } from './EventPopup'
 
 /**
- * Site-wide mount for the event popup — rendered from the [locale] layout, after the page
- * content. Server component: reads the `eventPopup` global (owner-editable, localized with
- * EN fallback) and hands a display-safe slice to the client `EventPopup`, which decides on
- * its own whether to show (active + future date + not seen by this visitor).
+ * Montarea site-wide a pop-up-ului de eveniment — din layout-ul [locale], după conținut.
  *
- * The event "identity" is its DATE: dismissals are remembered per `eventDate`, so
- * scheduling a new event re-shows the popup to everyone while a copy fix does not.
+ * CLIENT, nu server, și asta e o decizie, nu o scăpare (2026-08-07): paginile sunt statice și
+ * se regenerează doar la salvările din dashboard. Un pop-up cu `startShowingAt` peste trei
+ * zile n-ar apărea niciodată de la sine dintr-o pagină prerandată — fereastra de afișare se
+ * deschide după ceas, nu la o salvare. Aducerea datelor de pe client rezolvă asta; costul e
+ * o cerere JSON mică, făcută oricum după încărcare, iar răspunsul e cache-abil 60s.
+ *
+ * Înainte citea globalul `eventPopup`. Globalul rămâne în cod până la migrarea de la pasul 7,
+ * dar NU mai alimentează nimic: sursa e colecția `eventPopups`, prin `/api/event-popups/active`.
  */
-export default async function EventPopupSlot({ locale }: { locale: Locale }) {
-  let g
-  try {
-    const payload = await getPayload({ config })
-    g = await payload.findGlobal({ slug: 'eventPopup', locale, fallbackLocale: 'en' })
-  } catch {
-    return null // CMS unreachable — the site degrades gracefully, no popup
-  }
+export default function EventPopupSlot({ locale }: { locale: Locale }) {
+  const [data, setData] = useState<EventPopupData | null>(null)
 
-  // The popup exists ONLY when the owner explicitly turned it on AND there is a real,
-  // future event with a title behind it — an empty/leftover global must never surface.
-  if (!g?.active || !g.eventDate) return null
-  if (new Date(g.eventDate).getTime() < Date.now()) return null
-  if (!`${g.titlePlain ?? ''}${g.titleGradient ?? ''}`.trim()) return null
+  useEffect(() => {
+    // `ignore` previne setState după unmount (schimbare de limbă în timpul cererii).
+    let ignore = false
 
-  const data: EventPopupData = {
-    id: String(g.eventDate),
-    active: g.active,
-    titlePlain: g.titlePlain ?? '',
-    titleGradient: g.titleGradient ?? '',
-    description: g.description ?? '',
-    eventDate: String(g.eventDate),
-    metaLine: g.metaLine ?? '',
-    speakers: (g.speakers ?? []).map((s) => ({
-      name: s.name,
-      role: s.role ?? '',
-      photo: typeof s.photo === 'object' && s.photo?.url ? s.photo.url : null,
-    })),
-    ctaLabel: g.ctaLabel || undefined,
-    joinLabel: g.joinLabel || undefined,
-    occupations: (g.occupations ?? []).map((o) => o.label),
-  }
+    fetch(`/api/event-popups/active?locale=${locale}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((body: { popup?: EventPopupData | null } | null) => {
+        if (ignore || !body?.popup) return
+        // Fără titlu nu există pop-up. Se întâmplă real: conținutul e localizat, iar dacă
+        // limba curentă (și fallback-ul EN) sunt goale, am afișa un modal gol peste site.
+        const hasTitle = `${body.popup.titlePlain}${body.popup.titleGradient}`.trim().length > 0
+        if (hasTitle) setData(body.popup)
+      })
+      .catch(() => {
+        // CMS/rețea indisponibile — site-ul merge mai departe fără pop-up.
+      })
 
-  return <EventPopup data={data} labels={getDictionary(locale).eventPopup} />
+    return () => {
+      ignore = true
+    }
+  }, [locale])
+
+  if (!data) return null
+
+  return <EventPopup data={data} labels={getDictionary(locale).eventPopup} locale={locale} />
 }

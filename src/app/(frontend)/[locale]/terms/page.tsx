@@ -5,22 +5,32 @@ import LegalPageLayout from '@/components/legal/LegalPage'
 import { termsEn } from '@/components/legal/content/terms-en'
 import { termsRo } from '@/components/legal/content/terms-ro'
 import { getDictionary, resolveLocale } from '@/lib/i18n'
+import { getLegalDoc } from '@/lib/legal/getLegalDoc'
 
 type Args = { params: Promise<{ locale: string }> }
 
+/**
+ * Conținutul vine din CMS (colecția `legalPages`, editabilă din dashboard — owner
+ * 2026-08-07). Textele din `@/components/legal/content/` rămân ca PLASĂ DE SIGURANȚĂ, pentru
+ * cazul în care baza de date nu răspunde sau documentul lipsește: o pagină legală albă e mai
+ * rea decât una ușor învechită. Ele au fost sursa importului, deci sunt identice cu ce e în
+ * CMS la momentul mutării.
+ */
+const load = async (locale: 'en' | 'ro') =>
+  (await getLegalDoc('terms', locale)) ?? (locale === 'ro' ? termsRo : termsEn)
+
 export async function generateMetadata({ params }: Args): Promise<Metadata> {
   const locale = resolveLocale((await params).locale)
-  const content = locale === 'ro' ? termsRo : termsEn
+  const content = await load(locale)
   return {
     title: content.metaTitle,
     description: getDictionary(locale).legal.termsMetaDescription,
   }
 }
 
-/** Content transcribed 1:1 from the owner's "terms and conditions EN/RO.docx" (repo root). */
 export default async function Page({ params }: Args) {
   const locale = resolveLocale((await params).locale)
-  const content = locale === 'ro' ? termsRo : termsEn
+  const content = await load(locale)
   return (
     <LegalPageLayout
       titlePlain={content.titlePlain}

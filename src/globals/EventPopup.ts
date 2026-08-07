@@ -18,8 +18,18 @@ export const EventPopup: GlobalConfig = {
   slug: 'eventPopup',
   admin: {
     group: 'Site',
+    // ASCUNS din meniu (2026-08-07). Nu mai alimentează nimic: pop-up-urile vin din colecția
+    // `eventPopups`, care permite mai multe evenimente, fiecare cu înscrișii lui. Lăsat vizibil,
+    // era pur și simplu derutant — două locuri care păreau că fac același lucru, dintre care
+    // unul mort.
+    //
+    // NU e șters încă, deliberat: câmpurile lui sunt singura copie a conținutului ultimului
+    // eveniment configurat pe mecanismul vechi. Se elimină la pasul 7, după ce migrarea
+    // înscrierilor e confirmată — atunci dispar și globalul, și `createEventRegistration`,
+    // și `eventId`.
+    hidden: true,
     description:
-      'The event popup shown once per visitor when entering the site. Toggle "Active" off to hide it everywhere; a new Event date re-shows it to everyone.',
+      'DEPRECATED — superseded by the "Event Popups" collection (Sales). Nothing on the site reads this any more. Kept only until the old registrations are migrated.',
   },
   access: {
     read: () => true,

@@ -14,11 +14,18 @@ const BASE_SECURITY_HEADERS = [
   { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(), payment=(), browsing-topics=()' },
 ]
 
+// `next dev` compilează cu eval() pentru source maps și HMR. Fără excepția asta, CSP-ul
+// blochează TOT codul de client în local — componentele nu se hidratează, iar simptomul e
+// înșelător: pagina arată bine, dar nimic interactiv nu funcționează (2026-08-07, pop-up-ul
+// de eveniment nu apărea deloc). În producție webpack nu folosește eval, deci antetul livrat
+// rămâne exact cel de dinainte.
+const DEV_SCRIPT_SRC = process.env.NODE_ENV === 'production' ? '' : " 'unsafe-eval'"
+
 // CSP-ul site-ului public. `'unsafe-inline'` pe script e necesar pentru bootstrap-ul GTM +
 // scripturile inline Next; se poate strânge la nonce-uri ulterior.
 const SITE_CSP =
   `default-src 'self'; ` +
-  `script-src 'self' 'unsafe-inline' ${GA_HOSTS}; ` +
+  `script-src 'self' 'unsafe-inline'${DEV_SCRIPT_SRC} ${GA_HOSTS}; ` +
   `style-src 'self' 'unsafe-inline'; ` +
   `img-src 'self' data: blob: ${GA_HOSTS}; ` +
   `font-src 'self' data:; ` +

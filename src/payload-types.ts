@@ -74,14 +74,14 @@ export interface Config {
     orders: Order;
     discountCodes: DiscountCode;
     reviews: Review;
-    partners: Partner;
-    corporateClients: CorporateClient;
     blogPosts: BlogPost;
     faqItems: FaqItem;
     leads: Lead;
     legalPages: LegalPage;
     newsletters: Newsletter;
+    eventPopups: EventPopup;
     eventRegistrations: EventRegistration;
+    eventEmails: EventEmail;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
@@ -101,14 +101,14 @@ export interface Config {
     orders: OrdersSelect<false> | OrdersSelect<true>;
     discountCodes: DiscountCodesSelect<false> | DiscountCodesSelect<true>;
     reviews: ReviewsSelect<false> | ReviewsSelect<true>;
-    partners: PartnersSelect<false> | PartnersSelect<true>;
-    corporateClients: CorporateClientsSelect<false> | CorporateClientsSelect<true>;
     blogPosts: BlogPostsSelect<false> | BlogPostsSelect<true>;
     faqItems: FaqItemsSelect<false> | FaqItemsSelect<true>;
     leads: LeadsSelect<false> | LeadsSelect<true>;
     legalPages: LegalPagesSelect<false> | LegalPagesSelect<true>;
     newsletters: NewslettersSelect<false> | NewslettersSelect<true>;
+    eventPopups: EventPopupsSelect<false> | EventPopupsSelect<true>;
     eventRegistrations: EventRegistrationsSelect<false> | EventRegistrationsSelect<true>;
+    eventEmails: EventEmailsSelect<false> | EventEmailsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -123,15 +123,13 @@ export interface Config {
     siteSettings: SiteSetting;
     homepage: Homepage;
     expertBio: ExpertBio;
-    certificationInfo: CertificationInfo;
-    eventPopup: EventPopup;
+    eventPopup: EventPopup1;
     'payload-jobs-stats': PayloadJobsStat;
   };
   globalsSelect: {
     siteSettings: SiteSettingsSelect<false> | SiteSettingsSelect<true>;
     homepage: HomepageSelect<false> | HomepageSelect<true>;
     expertBio: ExpertBioSelect<false> | ExpertBioSelect<true>;
-    certificationInfo: CertificationInfoSelect<false> | CertificationInfoSelect<true>;
     eventPopup: EventPopupSelect<false> | EventPopupSelect<true>;
     'payload-jobs-stats': PayloadJobsStatsSelect<false> | PayloadJobsStatsSelect<true>;
   };
@@ -518,52 +516,6 @@ export interface Review {
   createdAt: string;
 }
 /**
- * Logos shown on the homepage partners strip.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "partners".
- */
-export interface Partner {
-  id: number;
-  name: string;
-  logo?: (number | null) | Media;
-  /**
-   * External link the logo opens when clicked.
-   */
-  url?: string | null;
-  /**
-   * Display order, ascending.
-   */
-  order?: number | null;
-  /**
-   * Optional grouping — reserved for future use.
-   */
-  type?: ('accreditation' | 'client' | 'trainingPartner') | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * Client logos shown in the /corporate page hero strip.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "corporateClients".
- */
-export interface CorporateClient {
-  id: number;
-  name: string;
-  logo?: (number | null) | Media;
-  /**
-   * Optional external link the logo opens when clicked.
-   */
-  url?: string | null;
-  /**
-   * Display order, ascending.
-   */
-  order?: number | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
  * Blog articles — rich text supports named colors, link chips and downloadable resources.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -731,43 +683,99 @@ export interface Lead {
   createdAt: string;
 }
 /**
- * Legal page content (Privacy / Cookie Policy / Delivery Policy / Terms). The "Last updated" tag on the site updates automatically when you save.
+ * The full text of the legal pages. What you save here is what visitors read — nothing is hard-coded any more.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "legalPages".
  */
 export interface LegalPage {
   id: number;
-  title: string;
   /**
    * Which route this document renders on. One document per page.
    */
-  page: 'privacy' | 'cookies' | 'terms';
+  page: 'terms' | 'privacy' | 'cookies';
   /**
-   * Short line under the page title.
+   * Browser tab / SEO title, e.g. "Terms and Conditions".
    */
-  intro?: string | null;
+  metaTitle: string;
   /**
-   * Numbered sections — include the number in the heading (e.g. "1. General").
+   * First part of the on-page heading, in plain ink — e.g. "Terms and " (mind the trailing space).
+   */
+  titlePlain?: string | null;
+  /**
+   * Last part of the heading, rendered in the brand gradient — e.g. "Conditions."
+   */
+  titleGradient?: string | null;
+  /**
+   * Shown verbatim under the title, e.g. "Last updated: 21.07.2026". Free text on purpose — it is the date OF THE DOCUMENT, not of the last save, and those two must not be confused.
+   */
+  lastUpdated?: string | null;
+  /**
+   * Numbered sections. Put the number in the heading, e.g. "1. General information". Leave the heading empty for the preamble.
    */
   sections?:
     | {
-        heading: string;
-        body?: {
-          root: {
-            type: string;
-            children: {
-              type: any;
-              version: number;
-              [k: string]: unknown;
-            }[];
-            direction: ('ltr' | 'rtl') | null;
-            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-            indent: number;
-            version: number;
-          };
-          [k: string]: unknown;
-        } | null;
+        /**
+         * Verbatim from the document. Empty = no heading (preamble).
+         */
+        heading?: string | null;
+        blocks?:
+          | (
+              | {
+                  text: string;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'paragraph';
+                }
+              | {
+                  /**
+                   * e.g. "3.1. Provider" or "Identification data".
+                   */
+                  text: string;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'subheading';
+                }
+              | {
+                  items?:
+                    | {
+                        text: string;
+                        id?: string | null;
+                      }[]
+                    | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'list';
+                }
+              | {
+                  headLeft: string;
+                  headRight: string;
+                  rows?:
+                    | {
+                        left: string;
+                        right: string;
+                        id?: string | null;
+                      }[]
+                    | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'table';
+                }
+              | {
+                  /**
+                   * e.g. the legal name and registration numbers.
+                   */
+                  line1: string;
+                  /**
+                   * e.g. contact e-mails, phone, website.
+                   */
+                  line2: string;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'entity';
+                }
+            )[]
+          | null;
         id?: string | null;
       }[]
     | null;
@@ -824,7 +832,103 @@ export interface Newsletter {
   createdAt: string;
 }
 /**
- * Sign-ups from the event popup. Public create only — read/update/delete are admin-only.
+ * One entry per live event. A pop-up shows on the site only while it is "Published" AND the clock is between "Start showing at" and the event date — after the event it disappears on its own. "Registrations" counts the people who signed up for THAT event; their details are in Event Registrations.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "eventPopups".
+ */
+export interface EventPopup {
+  id: number;
+  /**
+   * Only visible here, to tell events apart. Not shown to visitors.
+   */
+  internalName: string;
+  /**
+   * Auto-generated from "internalName" on first save. Edit to override — must stay unique.
+   */
+  slug?: string | null;
+  /**
+   * Only "Published" is ever shown on the site.
+   */
+  status: 'draft' | 'published' | 'archived';
+  /**
+   * Bumped by "Force re-show". Visitors who dismissed an older version see it again.
+   */
+  displayVersion?: number | null;
+  /**
+   * Tick and save to show this pop-up again to people who dismissed it. Those who already registered never see it again.
+   */
+  forceReshow?: boolean | null;
+  /**
+   * Event title — the part rendered in plain ink, e.g. "AI Governance ".
+   */
+  titlePlain?: string | null;
+  /**
+   * Event title — the segment rendered in the brand gradient, e.g. "in Practice.".
+   */
+  titleGradient?: string | null;
+  description?: string | null;
+  /**
+   * E.g. "Thu 14 Aug 2026 · 18:00 (EEST) · Live on Zoom".
+   */
+  metaLine?: string | null;
+  /**
+   * Shown with photo, or initials when no photo is uploaded.
+   */
+  speakers?:
+    | {
+        name: string;
+        role?: string | null;
+        photo?: (number | null) | Media;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Main button label. Empty = "Secure your spot".
+   */
+  ctaLabel?: string | null;
+  /**
+   * Form submit label. Empty = "Join us".
+   */
+  joinLabel?: string | null;
+  /**
+   * Options offered in the registration form (visitors can also type their own).
+   */
+  occupations?:
+    | {
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Countdown target. The pop-up disappears on its own after this moment — no need to unpublish it.
+   */
+  eventDate: string;
+  /**
+   * From when the pop-up may appear. Must be before the event date.
+   */
+  startShowingAt: string;
+  /**
+   * Seconds on the page before the pop-up appears.
+   */
+  showDelaySeconds?: number | null;
+  /**
+   * Show the (unticked) newsletter opt-in in the registration form.
+   */
+  newsletterOptInEnabled?: boolean | null;
+  /**
+   * Wording shown next to the opt-in. Stored as a snapshot on every registration — GDPR proof of what exactly was agreed to.
+   */
+  newsletterConsentText?: string | null;
+  /**
+   * How many people signed up for this event.
+   */
+  registrationsCount?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Everyone who signed up through an event pop-up. Each row belongs to ONE event — see the "Popup" column. Use Filters → Popup to see a single event’s list. Signing up for one event never signs anyone up for another, and it does not subscribe them to the newsletter unless they ticked that box.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "eventRegistrations".
@@ -832,7 +936,11 @@ export interface Newsletter {
 export interface EventRegistration {
   id: number;
   /**
-   * Which event this registration belongs to — the popup event's date key (a new event date starts a fresh list).
+   * Which event pop-up this sign-up came from.
+   */
+  popup?: (number | null) | EventPopup;
+  /**
+   * DEPRECATED — legacy event key (the event date). Kept for registrations made before pop-ups became a collection. Use "Popup" instead.
    */
   eventId: string;
   firstName: string;
@@ -842,6 +950,87 @@ export interface EventRegistration {
    * Picked from the configured list or typed freely.
    */
   occupation?: string | null;
+  /**
+   * Ticked the newsletter box when registering. This alone does NOT make them a subscriber — they still have to confirm the double opt-in e-mail.
+   */
+  newsletterOptIn?: boolean | null;
+  /**
+   * GDPR proof: the exact wording agreed to, and when. Kept as a snapshot because the pop-up’s consent text can be edited later — the proof must not change with it.
+   */
+  consentSnapshot?: {
+    consentText?: string | null;
+    consentedAt?: string | null;
+    ip?: string | null;
+    userAgent?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Write an e-mail and send it to everyone registered for ONE event. Tick "Send test to me" first to see how it looks; then "Send now" delivers it to the whole list — once, and it cannot be re-sent.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "eventEmails".
+ */
+export interface EventEmail {
+  id: number;
+  /**
+   * Which event’s registrants receive this. Nobody else gets it.
+   */
+  popup: number | EventPopup;
+  /**
+   * Subject line. Variables work here too, e.g. {{firstName}}.
+   */
+  subject: string;
+  /**
+   * Variables: {{firstName}}, {{lastName}}, {{eventTitle}}, {{eventDate}}, {{joinUrl}} — replaced per recipient. Headings, bold, links and lists carry into the e-mail; images and embeds do not.
+   */
+  body: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * Zoom/Meet link, filled in per e-mail rather than on the event (owner 2026-08-07): the link often does not exist yet when the pop-up is created, and a reminder may point somewhere different from the invitation. Becomes the {{joinUrl}} variable. Leave empty if the e-mail does not need it.
+   */
+  joinUrl?: string | null;
+  /**
+   * Sends ONE copy to your own account e-mail, with sample names filled into the variables. Changes nothing else — use it as the preview.
+   */
+  sendTestNow?: boolean | null;
+  /**
+   * Tick and save to send to every registrant of the selected event. Works ONCE — re-saving afterwards sends nothing. If some addresses failed, ticking it again retries only those.
+   */
+  sendNow?: boolean | null;
+  status?: ('draft' | 'sent' | 'failed') | null;
+  /**
+   * What happened on the last attempt — read this after ticking a box.
+   */
+  lastResult?: string | null;
+  sentAt?: string | null;
+  sentBy?: (number | null) | User;
+  recipientCount?: number | null;
+  successCount?: number | null;
+  /**
+   * Addresses the provider refused, with the reason. Retry targets exactly these.
+   */
+  failures?:
+    | {
+        email?: string | null;
+        error?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -999,14 +1188,6 @@ export interface PayloadLockedDocument {
         value: number | Review;
       } | null)
     | ({
-        relationTo: 'partners';
-        value: number | Partner;
-      } | null)
-    | ({
-        relationTo: 'corporateClients';
-        value: number | CorporateClient;
-      } | null)
-    | ({
         relationTo: 'blogPosts';
         value: number | BlogPost;
       } | null)
@@ -1027,8 +1208,16 @@ export interface PayloadLockedDocument {
         value: number | Newsletter;
       } | null)
     | ({
+        relationTo: 'eventPopups';
+        value: number | EventPopup;
+      } | null)
+    | ({
         relationTo: 'eventRegistrations';
         value: number | EventRegistration;
+      } | null)
+    | ({
+        relationTo: 'eventEmails';
+        value: number | EventEmail;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1269,31 +1458,6 @@ export interface ReviewsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "partners_select".
- */
-export interface PartnersSelect<T extends boolean = true> {
-  name?: T;
-  logo?: T;
-  url?: T;
-  order?: T;
-  type?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "corporateClients_select".
- */
-export interface CorporateClientsSelect<T extends boolean = true> {
-  name?: T;
-  logo?: T;
-  url?: T;
-  order?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "blogPosts_select".
  */
 export interface BlogPostsSelect<T extends boolean = true> {
@@ -1367,14 +1531,68 @@ export interface LeadsSelect<T extends boolean = true> {
  * via the `definition` "legalPages_select".
  */
 export interface LegalPagesSelect<T extends boolean = true> {
-  title?: T;
   page?: T;
-  intro?: T;
+  metaTitle?: T;
+  titlePlain?: T;
+  titleGradient?: T;
+  lastUpdated?: T;
   sections?:
     | T
     | {
         heading?: T;
-        body?: T;
+        blocks?:
+          | T
+          | {
+              paragraph?:
+                | T
+                | {
+                    text?: T;
+                    id?: T;
+                    blockName?: T;
+                  };
+              subheading?:
+                | T
+                | {
+                    text?: T;
+                    id?: T;
+                    blockName?: T;
+                  };
+              list?:
+                | T
+                | {
+                    items?:
+                      | T
+                      | {
+                          text?: T;
+                          id?: T;
+                        };
+                    id?: T;
+                    blockName?: T;
+                  };
+              table?:
+                | T
+                | {
+                    headLeft?: T;
+                    headRight?: T;
+                    rows?:
+                      | T
+                      | {
+                          left?: T;
+                          right?: T;
+                          id?: T;
+                        };
+                    id?: T;
+                    blockName?: T;
+                  };
+              entity?:
+                | T
+                | {
+                    line1?: T;
+                    line2?: T;
+                    id?: T;
+                    blockName?: T;
+                  };
+            };
         id?: T;
       };
   updatedAt?: T;
@@ -1396,14 +1614,90 @@ export interface NewslettersSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "eventPopups_select".
+ */
+export interface EventPopupsSelect<T extends boolean = true> {
+  internalName?: T;
+  slug?: T;
+  status?: T;
+  displayVersion?: T;
+  forceReshow?: T;
+  titlePlain?: T;
+  titleGradient?: T;
+  description?: T;
+  metaLine?: T;
+  speakers?:
+    | T
+    | {
+        name?: T;
+        role?: T;
+        photo?: T;
+        id?: T;
+      };
+  ctaLabel?: T;
+  joinLabel?: T;
+  occupations?:
+    | T
+    | {
+        label?: T;
+        id?: T;
+      };
+  eventDate?: T;
+  startShowingAt?: T;
+  showDelaySeconds?: T;
+  newsletterOptInEnabled?: T;
+  newsletterConsentText?: T;
+  registrationsCount?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "eventRegistrations_select".
  */
 export interface EventRegistrationsSelect<T extends boolean = true> {
+  popup?: T;
   eventId?: T;
   firstName?: T;
   lastName?: T;
   email?: T;
   occupation?: T;
+  newsletterOptIn?: T;
+  consentSnapshot?:
+    | T
+    | {
+        consentText?: T;
+        consentedAt?: T;
+        ip?: T;
+        userAgent?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "eventEmails_select".
+ */
+export interface EventEmailsSelect<T extends boolean = true> {
+  popup?: T;
+  subject?: T;
+  body?: T;
+  joinUrl?: T;
+  sendTestNow?: T;
+  sendNow?: T;
+  status?: T;
+  lastResult?: T;
+  sentAt?: T;
+  sentBy?: T;
+  recipientCount?: T;
+  successCount?: T;
+  failures?:
+    | T
+    | {
+        email?: T;
+        error?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1639,51 +1933,12 @@ export interface ExpertBio {
   createdAt?: string | null;
 }
 /**
- * Certification page content. Keep wording conservative (CLAUDE.md §9 R2) — never imply accreditation isad/APCF does not hold.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "certificationInfo".
- */
-export interface CertificationInfo {
-  id: number;
-  issuer?: string | null;
-  apcfLogo?: (number | null) | Media;
-  /**
-   * What the certification / CPD credits are. Conservative wording (CLAUDE.md §9 R2).
-   */
-  description?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  process?:
-    | {
-        title?: string | null;
-        description?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  certificateSample?: (number | null) | Media;
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
- * The event popup shown once per visitor when entering the site. Toggle "Active" off to hide it everywhere; a new Event date re-shows it to everyone.
+ * DEPRECATED — superseded by the "Event Popups" collection (Sales). Nothing on the site reads this any more. Kept only until the old registrations are migrated.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "eventPopup".
  */
-export interface EventPopup {
+export interface EventPopup1 {
   id: number;
   /**
    * Show the popup on the site. It also hides itself automatically once the event date has passed.
@@ -1859,26 +2114,6 @@ export interface ExpertBioSelect<T extends boolean = true> {
         value?: T;
         id?: T;
       };
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "certificationInfo_select".
- */
-export interface CertificationInfoSelect<T extends boolean = true> {
-  issuer?: T;
-  apcfLogo?: T;
-  description?: T;
-  process?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-        id?: T;
-      };
-  certificateSample?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

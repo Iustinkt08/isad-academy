@@ -28,22 +28,33 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
-import { HONEYPOT_FIELD } from '@/lib/events/createEventRegistration'
+import {
+  decideVisibility,
+  isKillSwitchOn,
+  markDismissed,
+  markRegistered,
+  readPopupState,
+} from '@/lib/events/popupStorage'
+import { HONEYPOT_FIELD } from '@/lib/events/honeypot'
+import type { Locale } from '@/lib/i18n/config'
 
 export type EventSpeaker = { name: string; role: string; photo?: string | null }
 
 export type EventPopupData = {
-  id: string //             id-ul evenimentului — cheia de „văzut deja"
-  active: boolean
+  slug: string //           cheia din localStorage și din URL-ul de înscriere
+  displayVersion: number // crescut de „Force re-show" — reafișează celor care l-au închis
+  showDelaySeconds: number
   titlePlain: string //     ex. „AI Governance "
   titleGradient: string //  ex. „in Practice."
   description: string
   eventDate: string //      ISO — ținta timerului
   metaLine: string //       ex. „Thu 14 Aug 2026 · 18:00 (EEST) · Live on Zoom"
   speakers: EventSpeaker[]
-  ctaLabel?: string //      default labels.ctaDefault
-  joinLabel?: string //     default labels.joinDefault
+  ctaLabel?: string | null //  default labels.ctaDefault
+  joinLabel?: string | null // default labels.joinDefault
   occupations: string[] //  opțiunile din dropdown
+  newsletterOptInEnabled: boolean
+  newsletterConsentText: string
 }
 
 /** UI microcopy (dicționarul `eventPopup` — EN/RO). Conținutul de EVENIMENT nu e aici. */
@@ -70,10 +81,6 @@ export type EventPopupLabels = {
   done: string
   errorGeneric: string
 }
-
-const SHOW_DELAY_MS = 2500
-/** Kill-switch pentru e2e/QA — vezi playwright.config.ts (storageState). */
-const KILL_SWITCH_KEY = 'isad-event-popup-off'
 
 function useCountdown(target: string, labels: EventPopupLabels['timer']) {
   const [now, setNow] = useState(() => Date.now())
@@ -114,9 +121,12 @@ const inputCls =
 export default function EventPopup({
   data,
   labels,
+  locale,
 }: {
   data: EventPopupData
   labels: EventPopupLabels
+  /** Trimis la înscriere ca emailul de confirmare la newsletter să fie în limba potrivită. */
+  locale: Locale
 }) {
   const [open, setOpen] = useState(false)
   const [phase, setPhase] = useState<'info' | 'form' | 'success'>('info')
@@ -124,34 +134,24 @@ export default function EventPopup({
   const [submitError, setSubmitError] = useState<string | null>(null)
   const modalRef = useRef<HTMLDivElement>(null)
   const countdown = useCountdown(data.eventDate, labels.timer)
-  const storageKey = `isad-event-popup-${data.id}`
 
-  /* Apare o dată per vizitator per eveniment, după un scurt delay.
-     `?event-popup=preview` (QA/owner) forțează afișarea, ignorând „văzut deja". */
+  /* Regulile de afișare stau în `decideVisibility` (lib/events/popupStorage) — pure și
+     testate acolo. Aici doar le aplicăm, după delay-ul configurat din dashboard.
+     `?event-popup=preview` (QA/owner) forțează afișarea, ignorând tot. */
   useEffect(() => {
-    if (!data.active) return
-    if (new Date(data.eventDate).getTime() < Date.now()) return // event trecut
-    const preview =
-      new URLSearchParams(window.location.search).get('event-popup') === 'preview'
+    const preview = new URLSearchParams(window.location.search).get('event-popup') === 'preview'
     if (!preview) {
-      try {
-        if (localStorage.getItem(KILL_SWITCH_KEY) || localStorage.getItem(storageKey)) return
-      } catch {
-        return // storage indisponibil (private mode) — nu insistăm
-      }
+      if (isKillSwitchOn()) return
+      if (!decideVisibility(readPopupState(data.slug), data)) return
     }
-    const t = setTimeout(() => setOpen(true), SHOW_DELAY_MS)
+    const t = setTimeout(() => setOpen(true), Math.max(0, data.showDelaySeconds) * 1000)
     return () => clearTimeout(t)
-  }, [data.active, data.eventDate, storageKey])
+  }, [data])
 
   const dismiss = useCallback(() => {
-    try {
-      localStorage.setItem(storageKey, '1')
-    } catch {
-      // storage indisponibil — popup-ul va reapărea la vizita următoare
-    }
+    markDismissed(data.slug, data.displayVersion)
     setOpen(false)
-  }, [storageKey])
+  }, [data.slug, data.displayVersion])
 
   /* Escape + scroll-lock + focus în modal (a11y) cât timp e deschis */
   useEffect(() => {
@@ -192,29 +192,32 @@ export default function EventPopup({
     setSending(true)
     setSubmitError(null)
     try {
-      const response = await fetch('/api/event-registrations', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          eventId: data.id,
-          firstName: String(f.get('firstName') ?? ''),
-          lastName: String(f.get('lastName') ?? ''),
-          email: String(f.get('email') ?? ''),
-          occupation: String(f.get('occupation') ?? ''),
-          [HONEYPOT_FIELD]: String(f.get(HONEYPOT_FIELD) ?? ''),
-        }),
-      })
+      const response = await fetch(
+        `/api/event-popups/${encodeURIComponent(data.slug)}/register`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            firstName: String(f.get('firstName') ?? ''),
+            lastName: String(f.get('lastName') ?? ''),
+            email: String(f.get('email') ?? ''),
+            occupation: String(f.get('occupation') ?? ''),
+            // Bifa lipsește din FormData când nu e bifată — de aceea comparația explicită,
+            // nu o conversie truthy care ar trimite `""` ca „nu".
+            newsletterOptIn: f.get('newsletterOptIn') === 'on',
+            locale,
+            [HONEYPOT_FIELD]: String(f.get(HONEYPOT_FIELD) ?? ''),
+          }),
+        },
+      )
       if (!response.ok) {
         const body = (await response.json().catch(() => null)) as { error?: string } | null
         setSubmitError(body?.error ?? labels.errorGeneric)
         return
       }
       setPhase('success')
-      try {
-        localStorage.setItem(storageKey, '1')
-      } catch {
-        // storage indisponibil — nu blocăm succesul
-      }
+      // Oprire definitivă: nu-i mai arătăm pop-up-ul nimănui care s-a înscris.
+      markRegistered(data.slug, data.displayVersion)
     } catch {
       setSubmitError(labels.errorGeneric)
     } finally {
@@ -233,10 +236,14 @@ export default function EventPopup({
       {/* Overlay */}
       <button aria-label={labels.close} onClick={dismiss} className="absolute inset-0 bg-black/45" />
 
-      {/* Modalul — 350 mobil / 720 desktop */}
+      {/* Modalul — 350 mobil / 720 desktop.
+          `lg:max-w-[720px]` NU e redundant lângă `lg:w-[720px]`: fără el, `max-w-[350px]` de
+          pe mobil rămâne în vigoare și pe desktop, iar `max-width` bate `width` — modalul
+          rămânea la 350px pe ecran mare, cu ultima casetă din countdown tăiată
+          (bug preexistent, raportat de owner 2026-08-07). */}
       <div
         ref={modalRef}
-        className="relative max-h-[90dvh] w-full max-w-[350px] overflow-y-auto rounded-[24px] border-[6px] border-[#f6f6f6] bg-white px-5 py-6 shadow-[24px_80px_50px_rgba(77,77,77,0.02),10px_36px_37px_rgba(77,77,77,0.03),3px_9px_20px_rgba(77,77,77,0.03)] lg:w-[720px] lg:p-10"
+        className="relative max-h-[90dvh] w-full max-w-[350px] overflow-y-auto rounded-[24px] border-[6px] border-[#f6f6f6] bg-white px-5 py-6 shadow-[24px_80px_50px_rgba(77,77,77,0.02),10px_36px_37px_rgba(77,77,77,0.03),3px_9px_20px_rgba(77,77,77,0.03)] lg:w-[720px] lg:max-w-[720px] lg:p-10"
       >
         {/* Close X */}
         <button
@@ -248,8 +255,10 @@ export default function EventPopup({
           ✕
         </button>
 
+        {/* Pe desktop conținutul se centrează (owner 2026-08-07). Pe mobil rămâne la stânga:
+            la 350px lățime centrarea ar rupe rândurile de text în trepte inegale. */}
         {phase === 'info' && (
-          <div className="flex flex-col gap-3.5 lg:gap-[18px]">
+          <div className="flex flex-col gap-3.5 lg:items-center lg:gap-[18px] lg:text-center">
             <Pill label={labels.livePill} />
             <h2 className="text-[22px] font-semibold leading-7 tracking-[-0.8px] text-[#222222] lg:text-[32px] lg:leading-10 lg:tracking-[-1px]">
               {data.titlePlain}
@@ -283,7 +292,7 @@ export default function EventPopup({
               <p className="text-[11.5px] font-medium tracking-[0.2px] text-[#959595] lg:text-[12px]">
                 {labels.speakers}
               </p>
-              <div className="flex flex-col gap-2 lg:flex-row lg:gap-7">
+              <div className="flex flex-col gap-2 lg:flex-row lg:justify-center lg:gap-7">
                 {data.speakers.map((s) => (
                   <div key={s.name} className="flex items-center gap-2.5">
                     {s.photo ? (
@@ -375,6 +384,23 @@ export default function EventPopup({
                 <option key={o} value={o} />
               ))}
             </datalist>
+
+            {/* Newsletter — NEBIFAT din construcție (spec §8). O bifă pre-bifată nu e
+                consimțământ, e o capcană: GDPR cere o acțiune afirmativă. Textul vine din
+                CMS (localizat) și se salvează ca snapshot pe înscriere. Bifa NU abonează pe
+                nimeni — declanșează doar emailul de double opt-in. */}
+            {data.newsletterOptInEnabled && (
+              <label className="flex cursor-pointer items-start gap-2.5 pt-0.5">
+                <input
+                  type="checkbox"
+                  name="newsletterOptIn"
+                  className="mt-[3px] h-4 w-4 shrink-0 cursor-pointer accent-[#1c5d99]"
+                />
+                <span className="text-[12.5px] leading-[18px] text-[#595959] lg:text-[13px]">
+                  {data.newsletterConsentText}
+                </span>
+              </label>
+            )}
 
             {/* Honeypot anti-spam — invizibil pentru oameni, auto-completat de boți */}
             <input

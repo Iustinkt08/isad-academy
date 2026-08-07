@@ -1,28 +1,36 @@
 import type { Metadata } from 'next'
 
-import { CookiePreferencesButton } from '@/components/consent/CookiePreferencesButton'
 import { LegalSections } from '@/components/legal/LegalContent'
 import LegalPageLayout from '@/components/legal/LegalPage'
 import { cookiesEn } from '@/components/legal/content/cookies-en'
 import { cookiesRo } from '@/components/legal/content/cookies-ro'
 import { getDictionary, resolveLocale } from '@/lib/i18n'
+import { getLegalDoc } from '@/lib/legal/getLegalDoc'
 
 type Args = { params: Promise<{ locale: string }> }
 
+/**
+ * Conținutul vine din CMS (colecția `legalPages`, editabilă din dashboard — owner
+ * 2026-08-07). Textele din `@/components/legal/content/` rămân ca PLASĂ DE SIGURANȚĂ, pentru
+ * cazul în care baza de date nu răspunde sau documentul lipsește: o pagină legală albă e mai
+ * rea decât una ușor învechită. Ele au fost sursa importului, deci sunt identice cu ce e în
+ * CMS la momentul mutării.
+ */
+const load = async (locale: 'en' | 'ro') =>
+  (await getLegalDoc('cookies', locale)) ?? (locale === 'ro' ? cookiesRo : cookiesEn)
+
 export async function generateMetadata({ params }: Args): Promise<Metadata> {
   const locale = resolveLocale((await params).locale)
-  const content = locale === 'ro' ? cookiesRo : cookiesEn
+  const content = await load(locale)
   return {
     title: content.metaTitle,
     description: getDictionary(locale).legal.cookiesMetaDescription,
   }
 }
 
-/** Content transcribed 1:1 from the owner's "cookies EN.docx" / "cookies RO.docx" (repo root). */
 export default async function Page({ params }: Args) {
   const locale = resolveLocale((await params).locale)
-  const dict = getDictionary(locale)
-  const content = locale === 'ro' ? cookiesRo : cookiesEn
+  const content = await load(locale)
   return (
     <LegalPageLayout
       titlePlain={content.titlePlain}
@@ -30,14 +38,6 @@ export default async function Page({ params }: Args) {
       lastUpdated={content.lastUpdated}
     >
       <LegalSections sections={content.sections} />
-
-      {/* Fixed UI control (re-opens the consent banner, doc §8) — stays outside the transcribed content */}
-      <div>
-        <CookiePreferencesButton
-          label={dict.consent.preferences}
-          className="inline-flex items-center justify-center rounded-full bg-[#f6f6f6] px-6 py-2.5 text-[13px] font-medium text-[#1c5d99] transition-colors duration-200 hover:bg-[#eef2f7] lg:text-[14px]"
-        />
-      </div>
     </LegalPageLayout>
   )
 }

@@ -12,10 +12,11 @@ import { buildConfig } from 'payload'
 import sharp from 'sharp'
 
 import { BlogPosts } from './collections/BlogPosts'
-import { CorporateClients } from './collections/CorporateClients'
 import { CourseSessions } from './collections/CourseSessions'
 import { Courses } from './collections/Courses'
 import { DiscountCodes } from './collections/DiscountCodes'
+import { EventEmails } from './collections/EventEmails'
+import { EventPopups } from './collections/EventPopups'
 import { EventRegistrations } from './collections/EventRegistrations'
 import { FaqItems } from './collections/FaqItems'
 import { Leads } from './collections/Leads'
@@ -23,10 +24,8 @@ import { LegalPages } from './collections/LegalPages'
 import { Media } from './collections/Media'
 import { Newsletters } from './collections/Newsletters'
 import { Orders } from './collections/Orders'
-import { Partners } from './collections/Partners'
 import { Reviews } from './collections/Reviews'
 import { Users } from './collections/Users'
-import { CertificationInfo } from './globals/CertificationInfo'
 import { EventPopup } from './globals/EventPopup'
 import { ExpertBio } from './globals/ExpertBio'
 import { Homepage } from './globals/Homepage'
@@ -112,16 +111,16 @@ export default buildConfig({
     Orders,
     DiscountCodes,
     Reviews,
-    Partners,
-    CorporateClients,
     BlogPosts,
     FaqItems,
     Leads,
     LegalPages,
     Newsletters,
+    EventPopups,
     EventRegistrations,
+    EventEmails,
   ],
-  globals: [SiteSettings, Homepage, ExpertBio, CertificationInfo, EventPopup],
+  globals: [SiteSettings, Homepage, ExpertBio, EventPopup],
   // T14 (CLAUDE.md §7 + docs/PLAN.md locked SEO decision): per-page meta/OG via
   // @payloadcms/plugin-seo. Fields live at `meta.*` (meta.title / meta.description /
   // meta.image), grouped into an "SEO" tab (`tabbedUI`). The frontend `generateMetadata`
