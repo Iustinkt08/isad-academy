@@ -62,8 +62,9 @@ describe('POST /api/newsletter (unit) — T7', () => {
     expect(response.status).toBe(200)
     expect(sent[0]?.to).toBe('cititor@example.com')
     expect(sent[0]?.subject).toContain('Confirmă abonarea')
-    // Marketing, deci expeditorul de newsletter — nu adresa de pe care pleacă chitanțele.
-    expect(sent[0]?.sender).toBe('newsletter')
+    // `transactional` (no-reply@), nu `newsletter` (news@) — owner 2026-08-07: confirmarea e
+    // declanșată de o acțiune punctuală, nu e o campanie. `news@` rămâne pentru broadcasturi.
+    expect(sent[0]?.sender).toBe('transactional')
   })
 
   it('carries a signed confirmation link pointing at the confirm route', async () => {

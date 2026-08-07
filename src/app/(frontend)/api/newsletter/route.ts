@@ -81,9 +81,16 @@ export async function POST(request: Request): Promise<Response> {
     subject,
     html,
     text,
-    // Categoria `newsletter` (news@isad.academy): e corespondență de marketing. O plângere de
-    // spam pe ea nu are voie să atingă reputația adresei de pe care pleacă chitanțele.
-    sender: 'newsletter',
+    // `transactional` (no-reply@isad.academy), NU `newsletter` — decizie owner 2026-08-07.
+    // Confirmarea abonării e declanșată de o acțiune punctuală a unei persoane, nu e o
+    // campanie: e tranzacțională prin natură, iar `news@` rămâne pentru ce chiar e marketing
+    // (broadcasturi, anunțuri de curs).
+    //
+    // Compromisul asumat: emailul ajunge inevitabil și la adrese tastate greșit sau introduse
+    // de altcineva, iar un „Spam" de acolo atinge acum adresa de pe care pleacă și chitanțele.
+    // Ține-l sub control prin rate limiting (deja activ mai sus); dacă rata de plângeri crește,
+    // mută-l înapoi pe `newsletter` — e o singură linie.
+    sender: 'transactional',
     // Explicit, NU global: fără câmpul ăsta Brevo pune adresa cu care a fost creat contul
     // (una personală, pe alt domeniu). Iar `BREVO_REPLY_TO_EMAIL` — inboxul monitorizat — e
     // pentru emailurile la care oamenii chiar trebuie să poată răspunde, nu pentru ăsta.

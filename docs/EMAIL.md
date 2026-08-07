@@ -21,7 +21,7 @@ Categoria se alege în cod (`SenderKind` din `src/lib/email/senders.ts`), adresa
 | 8 | `payloadAdapter.ts` (reset parolă admin) | `transactional` | admin | `BREVO_REPLY_TO_EMAIL` |
 | 9 | `hooks/sendNewsletterCampaign.ts` | **`newsletter`** | lista de abonați | `BREVO_REPLY_TO_EMAIL` |
 | 10 | `hooks/broadcastNewPostOnPublish.ts` | **`newsletter`** | lista de abonați | `BREVO_REPLY_TO_EMAIL` |
-| 11 | newsletter double opt-in | **vezi excepția** | abonat nou | — |
+| 11 | `api/newsletter` (confirmare abonare) | `transactional` | abonat nou | `BREVO_REPLY_TO_NEWSLETTER_EMAIL` → `BREVO_SENDER_EMAIL` |
 | 12 | „You're subscribed" (bun-venit) | **trimis de Brevo**, nu de noi | abonat confirmat | — |
 
 **De ce separate:** reputația de expeditor se acumulează per adresă. Newsletterul strânge
@@ -44,8 +44,12 @@ Fluxul curent, două rute, fără nicio dependență de funcția DOI:
 
 1. `POST /api/newsletter` — validează, semnează un token HMAC-SHA256 cu adresa, limba și o
    expirare de 48h (`src/lib/newsletter/confirmToken.ts`), și trimite emailul de confirmare
-   ca **email tranzacțional obișnuit**, categoria `newsletter` (`news@isad.academy`).
-   Template bilingv: `src/lib/email/templates/newsletterConfirm.ts`.
+   ca **email tranzacțional obișnuit**, de pe `no-reply@isad.academy` (owner 2026-08-07:
+   confirmarea e declanșată de o acțiune punctuală, nu e campanie; `news@` rămâne pentru
+   broadcasturi). Template bilingv: `src/lib/email/templates/newsletterConfirm.ts`.
+   **Compromis asumat:** emailul ajunge și la adrese tastate greșit, iar un „Spam" de acolo
+   atinge adresa de pe care pleacă și chitanțele. Dacă rata de plângeri crește, mută-l înapoi
+   pe categoria `newsletter` — o singură linie în rută.
 2. `GET /api/newsletter/confirm?token=…` — verifică semnătura (comparație în timp constant)
    și expirarea, apoi cheamă `addToNewsletterList` → `POST /contacts` cu
    `updateEnabled: true` (idempotent: dublu-click nu e eroare). Redirect 303 către
