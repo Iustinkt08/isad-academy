@@ -1,6 +1,6 @@
-import path from 'path'
-
 import type { CollectionConfig } from 'payload'
+
+import { uploadsDir } from '../lib/media/uploadsDir'
 
 export const Media: CollectionConfig = {
   slug: 'media',
@@ -11,11 +11,10 @@ export const Media: CollectionConfig = {
     read: () => true,
   },
   upload: {
-    // Project-root /media — gitignored. Rezolvat prin cwd, NU prin dirname:
-    // în bundle-ul standalone modulul compilat trăiește în .next/server/, deci
-    // dirname-relative ar fi indicat un folder inexistent (upload + servire 500
-    // în producție, 2026-07-26). cwd = rădăcina proiectului în ambele moduri.
-    staticDir: path.resolve(process.cwd(), 'media'),
+    // Calea se rezolvă în `lib/media/uploadsDir` — citește nota de acolo înainte s-o schimbi.
+    // Pe scurt: NICI `__dirname` (indică `.next/server/` în standalone), NICI `process.cwd()`
+    // (sub Passenger e home-ul contului, nu rădăcina aplicației) nu sunt de încredere aici.
+    staticDir: uploadsDir,
   },
   fields: [
     {
