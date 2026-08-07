@@ -75,7 +75,9 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE TYPE "public"."enum_legal_pages_page" AS ENUM('terms', 'privacy', 'cookies');
   ALTER TABLE "legal_pages" ALTER COLUMN "page" SET DATA TYPE "public"."enum_legal_pages_page" USING "page"::"public"."enum_legal_pages_page";
   ALTER TABLE "legal_pages_sections" ALTER COLUMN "heading" DROP NOT NULL;
-  ALTER TABLE "legal_pages_locales" ADD COLUMN "meta_title" varchar NOT NULL;
+  ALTER TABLE "legal_pages_locales" ADD COLUMN "meta_title" varchar;
+  UPDATE "legal_pages_locales" SET "meta_title" = COALESCE(NULLIF("title", ''), 'Legal') WHERE "meta_title" IS NULL;
+  ALTER TABLE "legal_pages_locales" ALTER COLUMN "meta_title" SET NOT NULL;
   ALTER TABLE "legal_pages_locales" ADD COLUMN "title_plain" varchar;
   ALTER TABLE "legal_pages_locales" ADD COLUMN "title_gradient" varchar;
   ALTER TABLE "legal_pages_locales" ADD COLUMN "last_updated" varchar;
@@ -139,7 +141,9 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   ALTER TABLE "legal_pages" ALTER COLUMN "page" SET DATA TYPE "public"."enum_legal_pages_page" USING "page"::"public"."enum_legal_pages_page";
   ALTER TABLE "legal_pages_sections" ALTER COLUMN "heading" SET NOT NULL;
   ALTER TABLE "legal_pages_sections" ADD COLUMN "body" jsonb;
-  ALTER TABLE "legal_pages_locales" ADD COLUMN "title" varchar NOT NULL;
+  ALTER TABLE "legal_pages_locales" ADD COLUMN "title" varchar;
+  UPDATE "legal_pages_locales" SET "title" = COALESCE(NULLIF("meta_title", ''), 'Legal') WHERE "title" IS NULL;
+  ALTER TABLE "legal_pages_locales" ALTER COLUMN "title" SET NOT NULL;
   ALTER TABLE "legal_pages_locales" ADD COLUMN "intro" varchar;
   ALTER TABLE "legal_pages_locales" DROP COLUMN "meta_title";
   ALTER TABLE "legal_pages_locales" DROP COLUMN "title_plain";

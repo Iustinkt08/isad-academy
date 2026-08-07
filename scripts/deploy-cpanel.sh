@@ -70,8 +70,13 @@ if [[ ! -f "$SSH_KEY" ]]; then
 fi
 
 # Sesiuni scurte, fără multiplexare: ControlMaster e exact ce omoară firewall-ul Hosterion.
-SSH_OPTS=(-i "$SSH_KEY" -p "$SSH_PORT" -o ControlMaster=no -o ControlPath=none
-          -o ConnectTimeout=20 -o StrictHostKeyChecking=accept-new -o BatchMode=yes)
+SSH_COMMON=(-i "$SSH_KEY" -o ControlMaster=no -o ControlPath=none
+            -o ConnectTimeout=20 -o StrictHostKeyChecking=accept-new -o BatchMode=yes)
+SSH_OPTS=(-p "$SSH_PORT" "${SSH_COMMON[@]}")
+# `scp` cere portul cu -P MARE. Cu `-p` (ca la ssh) îl citește ca „păstrează timestamp-urile",
+# iar numărul portului devine un nume de fișier: „scp: stat local 8888: No such file or
+# directory". Nu se vedea cu portul implicit 22, unde flag-ul lipsește cu totul (2026-08-07).
+SCP_OPTS=(-P "$SSH_PORT" "${SSH_COMMON[@]}")
 TARGET="${SSH_USER}@${SSH_HOST}"
 
 step() { printf '\n\033[1;34m▶ %s\033[0m\n' "$1"; }
@@ -152,10 +157,36 @@ NEXT_PUBLIC_SITE_URL="$SITE_URL" \
 # ------------------------------------------------------- 4. sharp pentru Linux
 
 step "Înlocuire binare sharp cu varianta linux-x64"
-( cd .next/standalone && npm install --os=linux --cpu=x64 --force sharp >/dev/null 2>&1 ) \
-  || fail "instalarea sharp pentru linux-x64 a eșuat"
-ls .next/standalone/node_modules/@img 2>/dev/null | grep -q linux \
-  || fail "binarele linux ale sharp nu au apărut în bundle — upload-urile de imagini ar crăpa în producție"
+# `--ignore-scripts` NU e opțional: fără el, npm rulează postinstall-urile din bundle, iar
+# `@esbuild-kit/core-utils` verifică versiunea binarului esbuild pe care-l găsește în PATH și
+# eșuează dacă nu se potrivește („Expected 0.18.20 but got …"). N-are nicio legătură cu sharp,
+# dar oprea tot deploy-ul de pe o mașină de dezvoltare (2026-08-07). Aici doar descărcăm
+# binare precompilate — nu e nimic de compilat.
+#
+# Pachetul de platformă se cere EXPLICIT: `--os/--cpu` singure nu au adus optional dependency-ul
+# pe macOS, iar verificarea de mai jos ar fi picat.
+SHARP_VERSION=$(node -p "require('./.next/standalone/node_modules/sharp/package.json').version" 2>/dev/null || echo "")
+[[ -n "$SHARP_VERSION" ]] || fail "nu am putut citi versiunea sharp din bundle"
+LIBVIPS_VERSION=$(node -p "require('./.next/standalone/node_modules/sharp/package.json').optionalDependencies['@img/sharp-libvips-linux-x64']" 2>/dev/null || echo "")
+[[ -n "$LIBVIPS_VERSION" ]] || fail "nu am putut citi versiunea @img/sharp-libvips-linux-x64"
+
+# Cele DOUA pachete se cer EXPLICIT si cu versiunea FIXATA a lui sharp din bundle. Lectii din
+# 2026-08-07, platite cu productia cazuta:
+#   - `--os/--cpu` singure nu aduc dependinta pe macOS; a lipsit libvips si aplicatia a murit
+#     la boot cu "libvips-cpp.so...: cannot open shared object file";
+#   - fara versiune, npm ia `latest`, care aduce alt ABI decat cere sharp-ul din bundle
+#     (8.18.3 vs 8.17.3) => aceeasi cadere;
+#   - `@img/colour` vine din build-ul normal si NU trebuie sters: fara el, `Cannot find
+#     module '@img/colour'` la pornire.
+( cd .next/standalone \
+  && npm install --os=linux --cpu=x64 --force --ignore-scripts \
+       "@img/sharp-linux-x64@${SHARP_VERSION}" "@img/sharp-libvips-linux-x64@${LIBVIPS_VERSION}" >/dev/null 2>&1 ) \
+  || fail "instalarea sharp pentru linux-x64 a esuat"
+
+ls .next/standalone/node_modules/@img/sharp-libvips-linux-x64/lib/libvips-cpp.so.* >/dev/null 2>&1 \
+  || fail "biblioteca nativa libvips lipseste din bundle — aplicatia ar muri la boot"
+[[ -d .next/standalone/node_modules/@img/colour ]] \
+  || fail "@img/colour lipseste din bundle — aplicatia ar muri la boot"
 echo "  ok: $(ls .next/standalone/node_modules/@img | tr '\n' ' ')"
 
 # ---------------------------------------------------------------- 5. assemble
@@ -188,7 +219,7 @@ echo "  bundle.tar.gz: $(du -h bundle.tar.gz | cut -f1)"
 # ------------------------------------------------------------------ 6. upload
 
 step "Upload pe server"
-scp "${SSH_OPTS[@]}" bundle.tar.gz "$TARGET:~/bundle.tar.gz" >/dev/null \
+scp "${SCP_OPTS[@]}" bundle.tar.gz "$TARGET:~/bundle.tar.gz" >/dev/null \
   || fail "scp a eșuat"
 
 step "Extract pe server (media/ și tmp/ rămân neatinse)"
