@@ -213,6 +213,18 @@ node -e '
   }
 ' || fail "nu am putut normaliza deploy/package.json"
 
+# Puntea pentru loader-ul LiteSpeed. `lsnode.js` cere `app.js`, chiar daca in Setup Node.js
+# App scrie `server.js` — desincronizare care a tinut productia jos ore intregi pe 2026-08-07,
+# cu "Cannot find module .../app.js" in stderr.log si 503 pe tot site-ul, desi aplicatia
+# pornea perfect manual. Fisierul e inofensiv daca loader-ul cere `server.js`: nu-l citeste
+# nimeni. Costa o linie si scuteste o vanatoare de cateva ore.
+cat > deploy/app.js <<'APPJS'
+// Punte pentru loader-ul LiteSpeed (lsnode.js), care poate cere `app.js` in loc de
+// `server.js`. Generat de scripts/deploy-cpanel.sh — nu edita in bundle.
+require('./server.js')
+APPJS
+echo "  app.js: punte pentru lsnode.js"
+
 tar czf bundle.tar.gz -C deploy .
 echo "  bundle.tar.gz: $(du -h bundle.tar.gz | cut -f1)"
 
