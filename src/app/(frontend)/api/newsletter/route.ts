@@ -1,6 +1,7 @@
 import { parseJsonBody } from '../../../../lib/api/parseJsonBody'
 import { enforceRateLimit, RL_FORM } from '../../../../lib/api/rateLimit'
 import { getMailer } from '../../../../lib/email'
+import { readNewsletterReplyTo } from '../../../../lib/email/senders'
 import { renderNewsletterConfirmEmail } from '../../../../lib/email/templates/newsletterConfirm'
 import { DEFAULT_LOCALE, isLocale } from '../../../../lib/i18n/config'
 import { createConfirmToken } from '../../../../lib/newsletter/confirmToken'
@@ -83,6 +84,10 @@ export async function POST(request: Request): Promise<Response> {
     // Categoria `newsletter` (news@isad.academy): e corespondență de marketing. O plângere de
     // spam pe ea nu are voie să atingă reputația adresei de pe care pleacă chitanțele.
     sender: 'newsletter',
+    // Explicit, NU global: fără câmpul ăsta Brevo pune adresa cu care a fost creat contul
+    // (una personală, pe alt domeniu). Iar `BREVO_REPLY_TO_EMAIL` — inboxul monitorizat — e
+    // pentru emailurile la care oamenii chiar trebuie să poată răspunde, nu pentru ăsta.
+    replyTo: readNewsletterReplyTo() || undefined,
   })
 
   if (!result.ok) {

@@ -12,10 +12,9 @@
  * split off later with a single env var, no code change (CLAUDE.md §15 — open decisions are
  * config, never hardcoded).
  *
- * EXCEPTION — the newsletter double opt-in email does NOT go through here. Brevo sends it
- * via `POST /contacts/doubleOptinConfirmation`, which takes no `sender` field: the from
- * address comes from the `BREVO_DOI_TEMPLATE_ID` template, so it is set in the Brevo
- * dashboard, not from env. Don't look for it in this file.
+ * Emailul de confirmare a abonării trece PRIN aici, categoria `newsletter` (din 2026-08-06:
+ * îl trimitem noi, nu funcția DOI a Brevo — v. docs/EMAIL.md). Nota veche care spunea că e o
+ * excepție nu mai e valabilă.
  */
 
 export type SenderKind =
@@ -54,6 +53,22 @@ export const readSendersFromEnv = (): SenderFields => ({
   newsletterSenderEmail: process.env.BREVO_SENDER_NEWSLETTER_EMAIL?.trim() || '',
   newsletterSenderName: process.env.BREVO_SENDER_NEWSLETTER_NAME?.trim() || '',
 })
+
+/**
+ * Reply-To pentru emailurile automate de newsletter (confirmarea abonării).
+ *
+ * De ce separat de `BREVO_REPLY_TO_EMAIL`: aceea e adresa monitorizată (`contact@`) și e
+ * corectă pentru chitanțe și confirmări de comandă — cine răspunde la factură TREBUIE să
+ * ajungă la un om. Confirmarea abonării e însă un email de mașină: nu are sens ca un „Reply"
+ * la el să deschidă un fir de discuție.
+ *
+ * Fallback pe `BREVO_SENDER_EMAIL` (`no-reply@isad.academy`) — și e important că NU întoarce
+ * niciodată gol degeaba: dacă nu trimitem deloc câmpul, Brevo pune tăcut adresa cu care a
+ * fost creat contul (`silviu.gresoi@isad.ai`), adică o adresă personală, pe alt domeniu,
+ * neautentificat. Exact asta s-a și întâmplat în producție (owner 2026-08-07).
+ */
+export const readNewsletterReplyTo = (): string =>
+  process.env.BREVO_REPLY_TO_NEWSLETTER_EMAIL?.trim() || process.env.BREVO_SENDER_EMAIL?.trim() || ''
 
 /**
  * Resolves the `{ email, name }` pair for a category, applying the fallback chain. An empty

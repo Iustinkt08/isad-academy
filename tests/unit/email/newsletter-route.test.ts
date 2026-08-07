@@ -79,6 +79,29 @@ describe('POST /api/newsletter (unit) — T7', () => {
     expect(signature).toBeTruthy()
   })
 
+  it('always sets an explicit Reply-To, so Brevo cannot substitute the account owner’s address', async () => {
+    // Regresie reală (owner 2026-08-07): fără câmpul `replyTo`, Brevo punea tăcut adresa cu
+    // care a fost creat contul — una personală, pe un domeniu neautentificat.
+    const sent = recordingMailer()
+    process.env.BREVO_SENDER_EMAIL = 'no-reply@isad.academy'
+    delete process.env.BREVO_REPLY_TO_NEWSLETTER_EMAIL
+
+    await POST(jsonRequest({ email: 'reader@example.com' }))
+
+    expect(sent[0]?.replyTo).toBe('no-reply@isad.academy')
+  })
+
+  it('lets BREVO_REPLY_TO_NEWSLETTER_EMAIL override the no-reply fallback', async () => {
+    const sent = recordingMailer()
+    process.env.BREVO_SENDER_EMAIL = 'no-reply@isad.academy'
+    process.env.BREVO_REPLY_TO_NEWSLETTER_EMAIL = 'hello@isad.academy'
+
+    await POST(jsonRequest({ email: 'reader@example.com' }))
+
+    expect(sent[0]?.replyTo).toBe('hello@isad.academy')
+    delete process.env.BREVO_REPLY_TO_NEWSLETTER_EMAIL
+  })
+
   it('falls back to English for an unrecognised locale instead of rejecting', async () => {
     // A bogus locale is a caller bug, not a reason to lose a real subscriber — never 400.
     const sent = recordingMailer()
