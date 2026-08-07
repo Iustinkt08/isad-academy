@@ -58,6 +58,10 @@ describe('BrevoMailer (unit)', () => {
         subject: 'Your enrolment is confirmed',
         htmlContent: '<p>hi</p>',
         textContent: 'hi',
+        // `replyTo` e trimis ÎNTOTDEAUNA, chiar și fără BREVO_REPLY_TO_EMAIL — aici cade pe
+        // expeditor. Absența câmpului ar face Brevo să pună tăcut adresa contului
+        // (personală, domeniu neautentificat) — regresie reală, 2026-08-07.
+        replyTo: { email: 'hello@isad.academy' },
       })
     })
 

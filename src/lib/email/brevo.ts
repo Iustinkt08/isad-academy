@@ -125,16 +125,21 @@ export const createBrevoMailer = (overrides: Partial<BrevoConfig> = {}): Mailer 
       return { ok: false, error: 'Brevo broadcast is not configured (BREVO_NEWSLETTER_LIST_ID missing).' }
     }
 
+    // Campaigns are newsletter by definition — always the marketing sender, so a complaint
+    // on a broadcast never touches the transactional address's reputation.
+    const sender = pickSender(config, 'newsletter')
+
     const created = await postJson(
       '/emailCampaigns',
       {
         // Brevo rejects duplicate campaign names; the timestamp keeps re-sends distinct.
         name: `${input.name} — ${new Date().toISOString()}`,
         subject: input.subject,
-        // Campaigns are newsletter by definition — always the marketing sender, so a
-        // complaint on a broadcast never touches the transactional address's reputation.
-        sender: pickSender(config, 'newsletter'),
-        ...(config.replyToEmail ? { replyTo: config.replyToEmail } : {}),
+        sender,
+        // TRIMIS ÎNTOTDEAUNA. Un câmp `replyTo` absent nu înseamnă „fără reply-to": Brevo îl
+        // completează tăcut cu adresa cu care a fost creat contul (una personală, pe alt
+        // domeniu). Fallback-ul pe expeditor e mereu preferabil acelei substituiri.
+        replyTo: config.replyToEmail || sender.email,
         type: 'classic',
         htmlContent: input.html,
         recipients: { listIds: [Number(config.newsletterListId)] },
@@ -157,11 +162,15 @@ export const createBrevoMailer = (overrides: Partial<BrevoConfig> = {}): Mailer 
     name: 'brevo',
 
     async sendTransactional(input: SendTransactionalInput): Promise<MailerResult> {
-      const replyTo = input.replyTo?.trim() || config.replyToEmail
+      const sender = pickSender(config, input.sender ?? 'transactional')
+      // Ultimul fallback e expeditorul însuși, ca `replyTo` să NU lipsească niciodată din
+      // cerere: Brevo interpretează absența câmpului ca „pune adresa contului" — adresa
+      // personală cu care a fost deschis contul, pe un domeniu neautentificat (2026-08-07).
+      const replyTo = input.replyTo?.trim() || config.replyToEmail || sender.email
       const response = await postJson(
         '/smtp/email',
         {
-          sender: pickSender(config, input.sender ?? 'transactional'),
+          sender,
           to: [{ email: input.to }],
           subject: input.subject,
           htmlContent: input.html,
