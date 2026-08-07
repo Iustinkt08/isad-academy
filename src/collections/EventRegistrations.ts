@@ -29,44 +29,29 @@ export const EventRegistrations: CollectionConfig = {
   defaultSort: '-createdAt',
   access: {
     read: isAdmin,
-    // Same as `leads`: public sign-ups flow through the hardened
-    // `/api/event-registrations` service (`overrideAccess: true` after honeypot + dedupe +
-    // eventId validation). The raw Payload create endpoint must not be a public bypass.
+    // Ca la `leads`: înscrierile publice trec prin serviciul întărit
+    // `registerForEventPopup` (honeypot + validare + dedupe, scris cu `overrideAccess`).
+    // Endpoint-ul brut de create din Payload nu are voie să fie un ocol public al lor.
     create: ({ req }) => Boolean(req.user),
     update: isAdmin,
     delete: isAdmin,
   },
   // Un om nu se poate înscrie de două ori la același eveniment. Dedupe-ul din
-  // `createEventRegistration` e la nivel de aplicație și pierde cursa la două cereri
+  // `registerForEventPopup` e la nivel de aplicație și pierde cursa la două cereri
   // simultane; indexul îl garantează în baza de date.
   //
-  // NU e `unique` încă: înregistrările migrate din `eventId` (pasul 7) au `popup` null, iar
-  // Postgres tratează fiecare NULL ca distinct — indexul ar trece, dar ar fi o promisiune
-  // falsă cât timp există rânduri nelegate. Se ridică la `unique: true` odată cu migrarea,
-  // când `popup` devine `required`.
-  indexes: [{ fields: ['popup', 'email'] }],
+  // Unic din 2026-08-07, după retragerea mecanismului vechi: nu mai există rânduri fără
+  // `popup`, deci garanția e reală, nu o promisiune ocolită de NULL-uri.
+  indexes: [{ fields: ['popup', 'email'], unique: true }],
   fields: [
     {
       name: 'popup',
       type: 'relationship',
       relationTo: 'eventPopups',
-      index: true,
-      admin: {
-        description: 'Which event pop-up this sign-up came from.',
-      },
-    },
-    {
-      name: 'eventId',
-      type: 'text',
-      // DEPRECATED — înlocuit de `popup`. Rămâne populat (cu `String(eventDate)`) până când
-      // migrarea de la pasul 7 e confirmată; nu-l șterge înainte, e singura legătură a
-      // înregistrărilor vechi cu evenimentul lor.
       required: true,
       index: true,
       admin: {
-        readOnly: true,
-        description:
-          'DEPRECATED — legacy event key (the event date). Kept for registrations made before pop-ups became a collection. Use "Popup" instead.',
+        description: 'Which event pop-up this sign-up came from.',
       },
     },
     { name: 'firstName', type: 'text', required: true },

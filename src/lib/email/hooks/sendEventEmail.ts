@@ -171,6 +171,10 @@ export const sendEventEmail: CollectionAfterChangeHook<EventEmail> = async ({
               subject,
               html,
               text,
+              // `newsletter` => news@isad.academy (owner 2026-08-07). Fără categorie explicită
+              // se folosea expeditorul tranzacțional (no-reply@), adresa chitanțelor — iar un
+              // anunț despre eveniment nu are ce căuta pe reputația aceleia.
+              sender: 'newsletter',
             })
             if (result.ok) {
               success += 1

@@ -19,11 +19,10 @@ export type RegisterForEventPopupResult = {
 /**
  * Înscriere la un eveniment din colecția `eventPopups` (spec §4).
  *
- * Separat de `./createEventRegistration`, care validează împotriva GLOBALULUI `eventPopup` și
- * încă deservește pop-up-ul live. Cele două coexistă deliberat până la pasul 3, când
- * frontend-ul comută pe colecție; abia atunci cel vechi se retrage. Ce era refolosibil —
- * trimiterea emailului de confirmare la newsletter — a fost extras în
- * `lib/newsletter/sendConfirmation`, nu copiat.
+ * Singura cale de înscriere. A înlocuit `createEventRegistration`, care valida împotriva
+ * globalului `eventPopup` — un singur eveniment odată — și a fost șters odată cu el
+ * (2026-08-07). Trimiterea emailului de confirmare la newsletter e refolosită din
+ * `lib/newsletter/sendConfirmation`, nu duplicată.
  *
  * Ordinea contează: pop-up-ul se încarcă și se validează ÎNAINTE de orice scriere, altfel un
  * slug inventat ar crea rânduri legate de nimic.
@@ -113,16 +112,13 @@ export const registerForEventPopup = async (
     return { status: 200, body: { ok: true, registered: true } }
   }
 
-  // 5. Creare. `eventId` rămâne populat cu data evenimentului cât timp câmpul e `required` —
-  // se scoate la pasul 7, după migrarea înregistrărilor vechi.
-  // Emailurile (confirmare participant + notificare owner) pleacă din hook-ul `afterChange`
-  // al colecției, niciodată de aici.
+  // 5. Creare. Emailurile (confirmare participant + notificare owner) pleacă din hook-ul
+  // `afterChange` al colecției, niciodată de aici.
   await payload.create({
     collection: 'eventRegistrations',
     overrideAccess: true,
     data: {
       popup: popup.id,
-      eventId: String(popup.eventDate),
       firstName,
       lastName,
       email,

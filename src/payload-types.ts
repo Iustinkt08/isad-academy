@@ -123,14 +123,12 @@ export interface Config {
     siteSettings: SiteSetting;
     homepage: Homepage;
     expertBio: ExpertBio;
-    eventPopup: EventPopup1;
     'payload-jobs-stats': PayloadJobsStat;
   };
   globalsSelect: {
     siteSettings: SiteSettingsSelect<false> | SiteSettingsSelect<true>;
     homepage: HomepageSelect<false> | HomepageSelect<true>;
     expertBio: ExpertBioSelect<false> | ExpertBioSelect<true>;
-    eventPopup: EventPopupSelect<false> | EventPopupSelect<true>;
     'payload-jobs-stats': PayloadJobsStatsSelect<false> | PayloadJobsStatsSelect<true>;
   };
   locale: 'en' | 'ro';
@@ -938,11 +936,7 @@ export interface EventRegistration {
   /**
    * Which event pop-up this sign-up came from.
    */
-  popup?: (number | null) | EventPopup;
-  /**
-   * DEPRECATED — legacy event key (the event date). Kept for registrations made before pop-ups became a collection. Use "Popup" instead.
-   */
-  eventId: string;
+  popup: number | EventPopup;
   firstName: string;
   lastName: string;
   email: string;
@@ -1018,6 +1012,9 @@ export interface EventEmail {
    */
   lastResult?: string | null;
   sentAt?: string | null;
+  /**
+   * Which admin pressed send — an audit trail, NOT the sender address. E-mails always go out from the newsletter sender (news@isad.academy).
+   */
   sentBy?: (number | null) | User;
   recipientCount?: number | null;
   successCount?: number | null;
@@ -1657,7 +1654,6 @@ export interface EventPopupsSelect<T extends boolean = true> {
  */
 export interface EventRegistrationsSelect<T extends boolean = true> {
   popup?: T;
-  eventId?: T;
   firstName?: T;
   lastName?: T;
   email?: T;
@@ -1933,66 +1929,6 @@ export interface ExpertBio {
   createdAt?: string | null;
 }
 /**
- * DEPRECATED — superseded by the "Event Popups" collection (Sales). Nothing on the site reads this any more. Kept only until the old registrations are migrated.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "eventPopup".
- */
-export interface EventPopup1 {
-  id: number;
-  /**
-   * Show the popup on the site. It also hides itself automatically once the event date has passed.
-   */
-  active?: boolean | null;
-  /**
-   * Event title — the part rendered in plain ink, e.g. "AI Governance ".
-   */
-  titlePlain?: string | null;
-  /**
-   * Event title — the segment rendered in the brand gradient, e.g. "in Practice.".
-   */
-  titleGradient?: string | null;
-  description?: string | null;
-  /**
-   * Countdown target. After this moment the popup stops showing itself.
-   */
-  eventDate?: string | null;
-  /**
-   * E.g. "Thu 14 Aug 2026 · 18:00 (EEST) · Live on Zoom".
-   */
-  metaLine?: string | null;
-  /**
-   * Shown with photo, or initials when no photo is uploaded.
-   */
-  speakers?:
-    | {
-        name: string;
-        role?: string | null;
-        photo?: (number | null) | Media;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Main button label. Empty = "Secure your spot".
-   */
-  ctaLabel?: string | null;
-  /**
-   * Form submit label. Empty = "Join us".
-   */
-  joinLabel?: string | null;
-  /**
-   * Options offered in the registration form (visitors can also type their own).
-   */
-  occupations?:
-    | {
-        label: string;
-        id?: string | null;
-      }[]
-    | null;
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-jobs-stats".
  */
@@ -2112,37 +2048,6 @@ export interface ExpertBioSelect<T extends boolean = true> {
     | {
         label?: T;
         value?: T;
-        id?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "eventPopup_select".
- */
-export interface EventPopupSelect<T extends boolean = true> {
-  active?: T;
-  titlePlain?: T;
-  titleGradient?: T;
-  description?: T;
-  eventDate?: T;
-  metaLine?: T;
-  speakers?:
-    | T
-    | {
-        name?: T;
-        role?: T;
-        photo?: T;
-        id?: T;
-      };
-  ctaLabel?: T;
-  joinLabel?: T;
-  occupations?:
-    | T
-    | {
-        label?: T;
         id?: T;
       };
   updatedAt?: T;

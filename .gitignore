@@ -45,3 +45,7 @@ npm-debug.log*
 /deploy/
 isad-deploy.tar.gz
 .vercel
+
+# artefacte de deploy manual (scripts/deploy-cpanel.sh)
+bundle.tar.gz
+deploy/

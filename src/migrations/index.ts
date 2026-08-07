@@ -6,6 +6,7 @@ import * as migration_20260807_112103_move_join_url_to_email from './20260807_11
 import * as migration_20260807_120039_drop_unused_collections from './20260807_120039_drop_unused_collections';
 import * as migration_20260807_121320_drop_partners from './20260807_121320_drop_partners';
 import * as migration_20260807_125555_legal_pages_blocks from './20260807_125555_legal_pages_blocks';
+import * as migration_20260807_142339_retire_legacy_event_popup from './20260807_142339_retire_legacy_event_popup';
 
 export const migrations = [
   {
@@ -46,6 +47,11 @@ export const migrations = [
   {
     up: migration_20260807_125555_legal_pages_blocks.up,
     down: migration_20260807_125555_legal_pages_blocks.down,
-    name: '20260807_125555_legal_pages_blocks'
+    name: '20260807_125555_legal_pages_blocks',
+  },
+  {
+    up: migration_20260807_142339_retire_legacy_event_popup.up,
+    down: migration_20260807_142339_retire_legacy_event_popup.down,
+    name: '20260807_142339_retire_legacy_event_popup'
   },
 ];

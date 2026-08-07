@@ -111,7 +111,16 @@ export const EventEmails: CollectionConfig = {
       name: 'sentBy',
       type: 'relationship',
       relationTo: 'users',
-      admin: { readOnly: true, position: 'sidebar' },
+      label: 'Triggered by (admin account)',
+      admin: {
+        readOnly: true,
+        position: 'sidebar',
+        // Eticheta veche era doar „Sent By" și a fost citită drept ADRESA EXPEDITORULUI
+        // (owner 2026-08-07). E doar urma de audit: cine a apăsat trimite. Expeditorul real
+        // e news@isad.academy, decis în cod prin categoria `newsletter`.
+        description:
+          'Which admin pressed send — an audit trail, NOT the sender address. E-mails always go out from the newsletter sender (news@isad.academy).',
+      },
     },
     { name: 'recipientCount', type: 'number', admin: { readOnly: true } },
     { name: 'successCount', type: 'number', admin: { readOnly: true } },

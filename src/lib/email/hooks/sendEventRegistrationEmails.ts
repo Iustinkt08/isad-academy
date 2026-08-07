@@ -25,15 +25,23 @@ export const sendEventRegistrationEmails: CollectionAfterChangeHook<EventRegistr
   if (operation !== 'create') return doc
 
   try {
-    const [eventPopup, siteSettings] = await Promise.all([
-      req.payload.findGlobal({ slug: 'eventPopup', overrideAccess: true }).catch(() => null),
+    // Titlul vine de pe pop-up-ul ÎNSCRIERII, nu dintr-un global. Înainte exista un singur
+    // eveniment odată; acum coexistă mai multe, iar un global ar fi trimis tuturor numele
+    // ultimului configurat (retragerea mecanismului vechi, 2026-08-07).
+    const popupId = typeof doc.popup === 'object' ? doc.popup?.id : doc.popup
+    const [popup, siteSettings] = await Promise.all([
+      popupId
+        ? req.payload
+            .findByID({ collection: 'eventPopups', id: popupId, overrideAccess: true, depth: 0 })
+            .catch(() => null)
+        : Promise.resolve(null),
       req.payload.findGlobal({ slug: 'siteSettings', overrideAccess: true }).catch(() => null),
     ])
 
     const event: EventEmailContext = {
       eventTitle:
-        `${eventPopup?.titlePlain ?? ''}${eventPopup?.titleGradient ?? ''}`.trim() || 'our live event',
-      metaLine: eventPopup?.metaLine,
+        `${popup?.titlePlain ?? ''}${popup?.titleGradient ?? ''}`.trim() || 'our live event',
+      metaLine: popup?.metaLine ?? undefined,
     }
     const mailer = getMailer()
 

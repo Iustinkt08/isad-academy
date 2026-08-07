@@ -26,7 +26,6 @@ import { Newsletters } from './collections/Newsletters'
 import { Orders } from './collections/Orders'
 import { Reviews } from './collections/Reviews'
 import { Users } from './collections/Users'
-import { EventPopup } from './globals/EventPopup'
 import { ExpertBio } from './globals/ExpertBio'
 import { Homepage } from './globals/Homepage'
 import { SiteSettings } from './globals/SiteSettings'
@@ -120,7 +119,7 @@ export default buildConfig({
     EventRegistrations,
     EventEmails,
   ],
-  globals: [SiteSettings, Homepage, ExpertBio, EventPopup],
+  globals: [SiteSettings, Homepage, ExpertBio],
   // T14 (CLAUDE.md §7 + docs/PLAN.md locked SEO decision): per-page meta/OG via
   // @payloadcms/plugin-seo. Fields live at `meta.*` (meta.title / meta.description /
   // meta.image), grouped into an "SEO" tab (`tabbedUI`). The frontend `generateMetadata`
