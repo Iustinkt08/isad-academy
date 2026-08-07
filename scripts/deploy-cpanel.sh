@@ -197,33 +197,70 @@ cp -R .next/standalone/. deploy/
 cp -R .next/static deploy/.next/static
 cp -R public deploy/public
 
-# Next copiază package.json-ul din rădăcină în .next/standalone, deci bundle-ul moștenește
-# "type": "module". Dar server.js generat de Next e CommonJS (`require('next')`): cu type
-# module lângă el, Node îl încarcă drept ESM și moare cu `Cannot find module 'next'` —
-# aplicația nu pornește deloc, 503 pe tot site-ul (incident 2026-07-30). Scripturile din acest
-# package.json nu se rulează niciodată pe server, deci câmpul se poate scoate în siguranță.
+# `package.json` trebuie sa declare ACELASI sistem de module ca `server.js`-ul generat de
+# Next, altfel aplicatia nu porneste deloc (503 pe tot site-ul). Ambele desincronizari au
+# costat cate o zi de productie:
+#   - 2026-07-30: server.js era CommonJS, dar package.json mostenit avea "type": "module"
+#     => Node il incarca drept ESM => `Cannot find module 'next'`;
+#   - 2026-08-07: Next 15.4 genereaza server.js ca ESM (`import path from 'node:path'`), dar
+#     scriptul stergea "type": "module" din reflex => `Cannot use import statement outside a
+#     module`, de 16 ori in stderr.log.
+# De aceea campul nu se mai sterge si nu se mai pastreaza „din principiu": se DEDUCE din
+# forma reala a lui server.js, la fiecare build.
 node -e '
   const fs = require("fs")
   const p = "deploy/package.json"
   const pkg = JSON.parse(fs.readFileSync(p, "utf8"))
-  if (pkg.type === "module") {
-    delete pkg.type
-    fs.writeFileSync(p, JSON.stringify(pkg, null, 2) + "\n")
-    console.log("  package.json: type=module eliminat (server.js e CommonJS)")
-  }
+  const server = fs.readFileSync("deploy/server.js", "utf8")
+  const isEsm = /^\s*import\s/m.test(server)
+  const before = pkg.type
+  if (isEsm) pkg.type = "module"
+  else delete pkg.type
+  if (before !== pkg.type) fs.writeFileSync(p, JSON.stringify(pkg, null, 2) + "\n")
+  console.log("  server.js e " + (isEsm ? "ESM" : "CommonJS") + " -> package.json type=" + (pkg.type || "(absent)"))
 ' || fail "nu am putut normaliza deploy/package.json"
 
-# Puntea pentru loader-ul LiteSpeed. `lsnode.js` cere `app.js`, chiar daca in Setup Node.js
-# App scrie `server.js` — desincronizare care a tinut productia jos ore intregi pe 2026-08-07,
-# cu "Cannot find module .../app.js" in stderr.log si 503 pe tot site-ul, desi aplicatia
-# pornea perfect manual. Fisierul e inofensiv daca loader-ul cere `server.js`: nu-l citeste
-# nimeni. Costa o linie si scuteste o vanatoare de cateva ore.
-cat > deploy/app.js <<'APPJS'
-// Punte pentru loader-ul LiteSpeed (lsnode.js), care poate cere `app.js` in loc de
-// `server.js`. Generat de scripts/deploy-cpanel.sh — nu edita in bundle.
+# Puntile pentru loader-ul LiteSpeed. `/usr/local/lsws/fcgi-bin/lsnode.js` face `require()` pe
+# fisierul din `PassengerStartupFile`, iar blocul CloudLinux din ~/public_html/.htaccess il
+# seteaza pe `app_wrapper.cjs` — un fisier generat de selectorul CloudLinux, care NU vine din
+# bundle-ul Next. Cand a disparut de pe server, lsnode a murit instant cu "Cannot find module
+# .../app_wrapper.cjs", Passenger a intrat in refuz (503 in 0,08 s) si aplicatia parea
+# „pornita, dar nelegata la socket" — desi porneste perfect manual pe :3000 (2026-08-07, o zi
+# de productie pierduta pe un diagnostic gresit).
+#
+# Bundle-ul aduce acum ambele punti, ca sa nu mai depinda de ce genereaza (sau sterge)
+# selectorul CloudLinux. Extensia `.cjs` forteaza CommonJS indiferent de "type", iar `import()`
+# dinamic incarca server.js ca ESM. lsnode nu are nevoie de valoarea returnata: patch-ul lui pe
+# `http.Server.prototype.listen` e global, deci listen()-ul de mai tarziu din `startServer` se
+# leaga corect la socketul LSAPI chiar daca incarcarea e asincrona.
+cat > deploy/app_wrapper.cjs <<'WRAPPER'
+// Punte CommonJS pentru loader-ul LiteSpeed (lsnode.js), cerut de PassengerStartupFile din
+// ~/public_html/.htaccess. Generat de scripts/deploy-cpanel.sh — nu edita in bundle.
+const path = require('node:path')
+const { pathToFileURL } = require('node:url')
+
+import(pathToFileURL(path.join(__dirname, 'server.js')).href).catch((err) => {
+  console.error(err)
+  process.exit(1)
+})
+WRAPPER
+
+# A doua punte, pentru configuratiile in care startup file-ul e `app.js`. Extensia e .js, deci
+# sistemul de module i-l da "type" din package.json — de aceea se scrie in forma potrivita.
+if grep -q '"type": "module"' deploy/package.json; then
+  cat > deploy/app.js <<'APPJS'
+// Punte ESM pentru loader-ul LiteSpeed, daca startup file-ul e `app.js`.
+// Generat de scripts/deploy-cpanel.sh — nu edita in bundle.
+import './server.js'
+APPJS
+else
+  cat > deploy/app.js <<'APPJS'
+// Punte CommonJS pentru loader-ul LiteSpeed, daca startup file-ul e `app.js`.
+// Generat de scripts/deploy-cpanel.sh — nu edita in bundle.
 require('./server.js')
 APPJS
-echo "  app.js: punte pentru lsnode.js"
+fi
+echo "  punti pentru lsnode.js: app_wrapper.cjs + app.js"
 
 tar czf bundle.tar.gz -C deploy .
 echo "  bundle.tar.gz: $(du -h bundle.tar.gz | cut -f1)"
@@ -236,7 +273,7 @@ scp "${SCP_OPTS[@]}" bundle.tar.gz "$TARGET:~/bundle.tar.gz" >/dev/null \
 
 step "Extract pe server (media/ și tmp/ rămân neatinse)"
 ssh "${SSH_OPTS[@]}" "$TARGET" \
-  "cd '$APP_DIR' && rm -rf .next node_modules public server.js package.json && tar xzf ~/bundle.tar.gz && rm ~/bundle.tar.gz" \
+  "cd '$APP_DIR' && rm -rf .next node_modules public server.js app.js app_wrapper.cjs package.json && tar xzf ~/bundle.tar.gz && rm ~/bundle.tar.gz" \
   || fail "extract-ul pe server a eșuat — aplicația poate fi într-o stare incompletă, repetă deploy-ul"
 
 step "Restart Passenger"
