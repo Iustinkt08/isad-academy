@@ -277,6 +277,11 @@ ssh "${SSH_OPTS[@]}" "$TARGET" \
   || fail "extract-ul pe server a eșuat — aplicația poate fi într-o stare incompletă, repetă deploy-ul"
 
 step "Restart Passenger"
+# ÎNTÂI omoară instanțele next-server rămase: Passenger NU le oprește la restart
+# (jobs.autoRun le ține event loop-ul viu), iar fiecare deploy ar lăsa una în plus —
+# pe 2026-08-08 se strânseseră 10 instanțe × ~11 threaduri ≈ 110/140 din limita LVE.
+# `|| true`: dacă nu rulează niciuna (sau pkill închide brusc sesiunea), nu e eroare.
+ssh "${SSH_OPTS[@]}" "$TARGET" "pkill -u \$(whoami) -f next-server || true" || true
 ssh "${SSH_OPTS[@]}" "$TARGET" "mkdir -p '$APP_DIR/tmp' && touch '$APP_DIR/tmp/restart.txt'" \
   || fail "restart-ul a eșuat"
 
