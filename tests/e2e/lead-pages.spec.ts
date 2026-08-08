@@ -112,7 +112,7 @@ test.describe('corporate page', () => {
 
 test.describe('about page', () => {
   test('renders the expert bio, credentials, stats and dual CTA', async ({ page }) => {
-    await page.goto('/despre')
+    await page.goto('/about')
 
     await expect(page.getByRole('heading', { name: 'Dr. Silviu Gresoi' })).toBeVisible()
     await expect(page.getByText('CFE (Certified Fraud Examiner), 2014')).toBeVisible()
@@ -130,7 +130,7 @@ test.describe('about page', () => {
 })
 
 test.describe('lead pages — headings and keyboard access', () => {
-  const PAGES = ['/contact', '/corporate', '/despre'] as const
+  const PAGES = ['/contact', '/corporate', '/about'] as const
 
   async function expectVisibleFocusAfterFirstTab(page: Page): Promise<void> {
     // First Tab lands on the skip link, which slides into view — a real, VISIBLE focus state.

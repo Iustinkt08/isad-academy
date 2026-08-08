@@ -72,7 +72,7 @@ export const scheduleSummary = (session: CourseSession, locale: Locale = 'en'): 
   const [first] = rows
   if (!first) return null
   const dayCount = getDictionary(locale).courseDetail.dayCount(rows.length)
-  return `${dayCount} · ${first.startTime}–${first.endTime}`
+  return `${dayCount} · ${first.startTime}-${first.endTime}`
 }
 
 /** Re-exported from the shared lib (T12 moved it so collection hooks can use it too). */

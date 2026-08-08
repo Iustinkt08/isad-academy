@@ -9,7 +9,7 @@ import { expect, test } from '@playwright/test'
  */
 test.describe('catalog', () => {
   test('cards are course-level teasers: no date, no price, no seats', async ({ page }) => {
-    await page.goto('/cursuri')
+    await page.goto('/courses')
 
     // 4 launch courses (E1) + "AI in Credit Risk & Fraud" (owner demo course, 2026-07-14)
     const cards = page.getByTestId('course-card')
@@ -33,12 +33,12 @@ test.describe('catalog', () => {
     const governanceCard = cards.filter({ hasText: 'AI Governance & Responsible AI' })
     await expect(governanceCard.getByRole('link', { name: 'View course' })).toHaveAttribute(
       'href',
-      '/cursuri/ai-governance-responsible-ai',
+      '/courses/ai-governance-responsible-ai',
     )
   })
 
   test('sort toggle flips the order by earliest upcoming start date', async ({ page }) => {
-    await page.goto('/cursuri')
+    await page.goto('/courses')
 
     const cardHeadings = page.getByTestId('course-card').getByRole('heading', { level: 3 })
 
@@ -57,7 +57,7 @@ test.describe('catalog', () => {
   })
 
   test('quiz CTA is the primary action and navigates to the quiz page', async ({ page }) => {
-    await page.goto('/cursuri')
+    await page.goto('/courses')
 
     await page.getByRole('link', { name: /Which course is right for me/ }).click()
     await expect(page).toHaveURL('/quiz')

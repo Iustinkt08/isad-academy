@@ -37,20 +37,22 @@ const DEFAULT_LABELS: HeaderLabels = {
   openMenu: 'Open menu',
   closeMenu: 'Close menu',
   language: 'Language',
-  brandHome: 'isad.academy — home',
+  brandHome: 'isad.academy home',
 }
 
 export type NavItem = { label: string; href: string; disabled?: boolean }
 
-/** Owner-decided nav: all four entries active (Blog + About enabled 2026-07-17, after the
- * blog redesign shipped); Home = the logo. `disabled: true` renders an entry visible but
- * non-navigable — kept as an option for future not-yet-ready pages. */
+/** Owner-decided nav: explicit Home entry (owner 2026-08-08) + the four content pages
+ * (Blog + About enabled 2026-07-17, after the blog redesign shipped); the logo still
+ * links home too. `disabled: true` renders an entry visible but non-navigable — kept
+ * as an option for future not-yet-ready pages. */
 const buildNavItems = (labels: HeaderLabels): readonly NavItem[] =>
   [
-    { label: labels.courses, href: '/cursuri' },
+    { label: labels.home, href: '/' },
+    { label: labels.courses, href: '/courses' },
     { label: labels.corporate, href: '/corporate' },
     { label: labels.blog, href: '/blog' },
-    { label: labels.about, href: '/despre' },
+    { label: labels.about, href: '/about' },
   ] as const
 
 function isActive(pathname: string, href: string): boolean {

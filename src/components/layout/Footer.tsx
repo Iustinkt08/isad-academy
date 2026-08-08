@@ -38,7 +38,7 @@ export function Footer({ settings, locale }: { settings: SiteSetting | null; loc
       label: dict.footer.explore,
       links: [
         { label: l.blog, href: '/blog' },
-        { label: l.about, href: '/despre' },
+        { label: l.about, href: '/about' },
         { label: l.corporate, href: '/corporate' },
       ],
     },
@@ -112,7 +112,7 @@ export function Footer({ settings, locale }: { settings: SiteSetting | null; loc
               >
                 <Image
                   src="/anpc/anpc-sal.svg"
-                  alt="ANPC — Soluționarea Alternativă a Litigiilor"
+                  alt="ANPC: Soluționarea Alternativă a Litigiilor"
                   width={193}
                   height={48}
                   unoptimized

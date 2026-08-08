@@ -27,7 +27,7 @@ const LAUNCH_COURSES: CatalogCourse[] = [
     subtitle: 'ISAD Academy',
     description:
       'Turn AI ethics, risk and accountability into practices you can apply from day one.',
-    href: '/cursuri/ai-governance-responsible-ai',
+    href: '/courses/ai-governance-responsible-ai',
     nextStartDate: '2026-07-28',
   },
   {
@@ -35,7 +35,7 @@ const LAUNCH_COURSES: CatalogCourse[] = [
     subtitle: 'PECB ISO/IEC 42001',
     description:
       'Grasp the core concepts and requirements of an AI Management System based on ISO/IEC 42001.',
-    href: '/cursuri/iso-iec-42001-foundation',
+    href: '/courses/iso-iec-42001-foundation',
     nextStartDate: '2026-07-28',
   },
   {
@@ -43,15 +43,15 @@ const LAUNCH_COURSES: CatalogCourse[] = [
     subtitle: 'PECB ISO/IEC 42001',
     description:
       'Gain the skills to plan, implement and manage a 42001-compliant AI Management System end to end.',
-    href: '/cursuri/iso-iec-42001-lead-implementer',
+    href: '/courses/iso-iec-42001-lead-implementer',
     nextStartDate: '2026-08-10',
   },
   {
     title: 'Lead Auditor',
     subtitle: 'PECB ISO/IEC 42001',
     description:
-      'Learn to audit an AI Management System against ISO/IEC 42001 — planning, conducting and reporting.',
-    href: '/cursuri/iso-iec-42001-lead-auditor',
+      'Learn to audit an AI Management System against ISO/IEC 42001: planning, conducting and reporting.',
+    href: '/courses/iso-iec-42001-lead-auditor',
     nextStartDate: '2026-09-14',
   },
 ];

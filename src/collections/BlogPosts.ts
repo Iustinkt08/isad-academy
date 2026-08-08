@@ -26,10 +26,13 @@ export const BlogPosts: CollectionConfig = {
   slug: 'blogPosts',
   admin: {
     useAsTitle: 'title',
-    group: 'Content',
+    group: { en: 'Content', ro: 'Conținut' },
     defaultColumns: ['title', '_status', 'createdAt'],
     listSearchableFields: ['title'],
-    description: 'Blog articles — rich text supports named colors, link chips and downloadable resources.',
+    description: {
+      en: 'Blog articles shown on the Blog page. The rich text editor supports named brand colors, link chips (pill-style external links) and downloadable resources. The first publish of an article can also email newsletter subscribers.',
+      ro: 'Articolele de blog afișate pe pagina Blog. Editorul de text suportă culori de brand predefinite, link chips (linkuri externe în formă de pastilă) și resurse descărcabile. Prima publicare a unui articol poate trimite și un email abonaților la newsletter.',
+    },
     preview: (doc) => {
       const slug = typeof doc?.slug === 'string' && doc.slug.length > 0 ? doc.slug : null
       if (!slug) return null
@@ -59,7 +62,10 @@ export const BlogPosts: CollectionConfig = {
       type: 'upload',
       relationTo: 'media',
       admin: {
-        description: 'Optional — articles may be published without a cover image.',
+        description: {
+          en: 'Cover image shown on the blog list card and at the top of the article. Optional: articles can be published without one and the layout adapts.',
+          ro: 'Imaginea de copertă afișată pe cardul din lista de blog și în partea de sus a articolului. Opțională: articolele pot fi publicate și fără imagine, iar aspectul se adaptează.',
+        },
       },
     },
     {
@@ -83,8 +89,10 @@ export const BlogPosts: CollectionConfig = {
         ],
       }),
       admin: {
-        description:
-          'Supports colored text, blockquotes, in-text images, link chips (external pill links) and downloadable resources.',
+        description: {
+          en: 'Article body shown on the article page. Supports colored text, blockquotes, images inside the text, link chips (pill-style external links) and downloadable resources.',
+          ro: 'Conținutul articolului afișat pe pagina acestuia. Suportă text colorat, citate evidențiate, imagini în text, link chips (linkuri externe tip pastilă) și resurse descărcabile.',
+        },
       },
     },
     {
@@ -92,20 +100,26 @@ export const BlogPosts: CollectionConfig = {
       type: 'text',
       defaultValue: 'Dr. Silviu Gresoi',
       admin: {
-        description: 'Defaults to Dr. Silviu Gresoi — editable per article.',
+        description: {
+          en: 'Author name shown under the article title. Pre-filled with Dr. Silviu Gresoi and editable per article.',
+          ro: 'Numele autorului afișat sub titlul articolului. Precompletat cu Dr. Silviu Gresoi și editabil pentru fiecare articol.',
+        },
       },
     },
     {
       name: 'category',
       type: 'select',
       admin: {
-        description: 'Reserved for future filtering — no filter UI at launch (CLAUDE.md §6).',
+        description: {
+          en: 'Reserved for future filtering of the blog list. The category is stored now, but the site shows no filter at launch.',
+          ro: 'Rezervat pentru filtrarea viitoare a listei de blog. Categoria se salvează de pe acum, dar site-ul nu afișează încă niciun filtru la lansare.',
+        },
       },
       options: [
-        { label: 'AI Governance', value: 'aiGovernance' },
-        { label: 'Anti-Fraud', value: 'antiFraud' },
-        { label: 'Risk Management', value: 'riskManagement' },
-        { label: 'Other', value: 'other' },
+        { label: { en: 'AI Governance', ro: 'Guvernanță AI' }, value: 'aiGovernance' },
+        { label: { en: 'Anti-Fraud', ro: 'Antifraudă' }, value: 'antiFraud' },
+        { label: { en: 'Risk Management', ro: 'Managementul riscului' }, value: 'riskManagement' },
+        { label: { en: 'Other', ro: 'Altele' }, value: 'other' },
       ],
     },
     {
@@ -114,16 +128,21 @@ export const BlogPosts: CollectionConfig = {
       localized: true,
       min: 0,
       admin: {
-        description:
-          'Minutes. Leave empty to auto-estimate from the body (~200 words/min); a manual value always wins.',
+        description: {
+          en: 'Reading time in minutes, shown on the blog card and on the article page. Leave empty to estimate it automatically from the body at about 200 words per minute; a value entered by hand always takes priority.',
+          ro: 'Timpul de citire în minute, afișat pe cardul de blog și pe pagina articolului. Lăsați gol pentru o estimare automată din conținut, la aproximativ 200 de cuvinte pe minut; o valoare introdusă manual are întotdeauna prioritate.',
+        },
       },
     },
     {
       name: 'leadMagnet',
-      label: 'Lead magnet',
+      label: { en: 'Lead magnet', ro: 'Lead magnet' },
       type: 'group',
       admin: {
-        description: 'If enabled, the article shows a gated email form that delivers the attached file.',
+        description: {
+          en: 'When enabled, the article shows an email form that delivers the attached file to the reader after they submit their address.',
+          ro: 'Când este activat, articolul afișează un formular de email care livrează cititorului fișierul atașat după ce își introduce adresa.',
+        },
       },
       fields: leadMagnetFields(),
     },
@@ -133,19 +152,23 @@ export const BlogPosts: CollectionConfig = {
       relationTo: 'courses',
       hasMany: false,
       admin: {
-        description: 'Toggle "related to a course" — shows a course callout at the end of the article.',
+        description: {
+          en: 'Links this article to a course. When set, a callout for that course appears at the end of the article; when empty, no callout is shown.',
+          ro: 'Leagă articolul de un curs. Când este setat, la finalul articolului apare o recomandare către acel curs; când este gol, recomandarea nu se afișează.',
+        },
       },
     },
     {
       name: 'sendNewsletterOnPublish',
-      label: 'Send newsletter on publish',
+      label: { en: 'Send newsletter on publish', ro: 'Trimite newsletter la publicare' },
       type: 'checkbox',
       defaultValue: true,
       admin: {
         position: 'sidebar',
-        description:
-          'Uncheck to publish WITHOUT emailing subscribers. First publish only — the broadcast is ever sent once. ' +
-          'Publishing unchecked keeps that one send available: unpublish, tick the box and publish again to send it later.',
+        description: {
+          en: 'Uncheck to publish WITHOUT emailing subscribers. Only the first publish can trigger the newsletter broadcast, and it is sent at most once. Publishing while unchecked keeps that one send available: unpublish, tick the box and publish again to send it later.',
+          ro: 'Debifați pentru a publica FĂRĂ a trimite email abonaților. Doar prima publicare poate declanșa trimiterea newsletterului, și se trimite cel mult o dată. Dacă publicați cu bifa scoasă, trimiterea rămâne disponibilă: retrageți articolul, bifați căsuța și publicați din nou pentru a o trimite mai târziu.',
+        },
       },
     },
     {
@@ -153,8 +176,10 @@ export const BlogPosts: CollectionConfig = {
       type: 'date',
       admin: {
         hidden: true,
-        description:
-          'Set automatically once the first-publish newsletter broadcast has been attempted (T7) — prevents re-sending on subsequent re-saves/re-publishes. Do not edit by hand.',
+        description: {
+          en: 'Set automatically once the first-publish newsletter broadcast has been attempted. Prevents the broadcast from being sent again on later saves or re-publishes. Do not edit by hand.',
+          ro: 'Se setează automat după prima încercare de trimitere a newsletterului de la publicare. Împiedică retrimiterea anunțului la salvările sau republicările ulterioare. Nu se editează manual.',
+        },
       },
     },
   ],

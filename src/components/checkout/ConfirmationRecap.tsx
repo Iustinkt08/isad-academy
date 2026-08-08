@@ -103,7 +103,7 @@ export function ConfirmationRecap({
         <h1 className="text-h2 text-ink">{t.noOrderTitle}</h1>
         <p className="mt-3 text-body text-ink/70">{t.noOrderMessage}</p>
         <div className="mt-6">
-          <Button href={localePath(locale, '/cursuri')}>{t.browseCourses}</Button>
+          <Button href={localePath(locale, '/courses')}>{t.browseCourses}</Button>
         </div>
       </div>
     )
@@ -117,7 +117,7 @@ export function ConfirmationRecap({
         <h1 className="text-h2 text-ink">{t.paymentFailedTitle}</h1>
         <p className="mt-3 text-body text-ink/70">{t.paymentFailedMessage}</p>
         <div className="mt-6">
-          <Button href={localePath(locale, '/cursuri')}>{t.browseCourses}</Button>
+          <Button href={localePath(locale, '/courses')}>{t.browseCourses}</Button>
         </div>
       </div>
     )

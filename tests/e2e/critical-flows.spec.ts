@@ -15,7 +15,7 @@ import { expect, test, type APIRequestContext, type Page } from '@playwright/tes
  */
 test.describe.configure({ mode: 'default' })
 
-const LEAD_IMPLEMENTER_URL = '/cursuri/lead-implementer'
+const LEAD_IMPLEMENTER_URL = '/courses/lead-implementer'
 const RUN_ID = `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`
 
 /** Resolve a course's Enrol link session id from the rendered page (T9/T10 contract) — never
@@ -115,7 +115,7 @@ test.describe('quiz nav (T15 gap 4)', () => {
   test('the courses-page Quiz CTA navigates to the quiz wizard', async ({ page }) => {
     // Quiz moved out of the navbar into the catalog page (owner decision 2026-07-12, §7);
     // the coming-soon placeholder was replaced by the real wizard on 2026-07-23.
-    await page.goto('/cursuri')
+    await page.goto('/courses')
     await page.getByRole('link', { name: /Which course is right for me/ }).click()
 
     await expect(page).toHaveURL('/quiz')
@@ -159,7 +159,7 @@ test.describe('critical-path smoke — CLAUDE.md §16 DoD (T15 gap 5)', () => {
       .getByRole('navigation', { name: 'Main' })
       .getByRole('link', { name: 'Courses' })
       .click()
-    await expect(page).toHaveURL('/cursuri')
+    await expect(page).toHaveURL('/courses')
 
     const courseCard = page.getByTestId('course-card').filter({ hasText: 'Lead Implementer' })
     await courseCard.getByRole('link', { name: 'View course' }).click()

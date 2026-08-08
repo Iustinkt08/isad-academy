@@ -1,4 +1,6 @@
-import type { Access, FieldAccess } from 'payload'
+import type { Access, ClientUser, FieldAccess } from 'payload'
+
+import type { User } from '../payload-types'
 
 /**
  * Strict "real admin" gate — only users whose `role` is `admin` (not `editor`).
@@ -11,3 +13,11 @@ import type { Access, FieldAccess } from 'payload'
 export const isAdminRole: Access = ({ req: { user } }) => user?.role === 'admin'
 
 export const isAdminRoleField: FieldAccess = ({ req: { user } }) => user?.role === 'admin'
+
+/**
+ * `admin.hidden` callback for admin-only collections/globals: editors neither see them in
+ * the nav nor open their list views. Access rules still enforce the actual permission —
+ * this is UX, not security.
+ */
+export const hiddenFromEditors = ({ user }: { user?: ClientUser | User | null }): boolean =>
+  (user as User | null | undefined)?.role !== 'admin'

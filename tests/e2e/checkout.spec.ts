@@ -16,7 +16,7 @@ import { expect, test, type Page } from '@playwright/test'
  */
 test.describe.configure({ mode: 'default' })
 
-const COURSE_URL = '/cursuri/lead-implementer'
+const COURSE_URL = '/courses/lead-implementer'
 const RUN_ID = `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`
 
 /** Resolve the Lead Implementer session id from the course page's Enrol link (T9 contract). */

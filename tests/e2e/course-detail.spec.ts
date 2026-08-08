@@ -7,16 +7,16 @@ import { expect, test } from '@playwright/test'
  * "Only X seats left" is a floating chip on the selected edition) → callout.
  *
  * Runs against the CURRENT seeded dev DB:
- *  - /cursuri/ai-governance-responsible-ai        — 28–29 Jul 2026, 12 seats (own course)
- *  - /cursuri/artificial-intelligence-management-system — 11 Aug 2026, 2 seats LEFT (threshold test)
- *  - /cursuri/lead-implementer                    — 15–19 Sep 2026, 5-day schedule (Programme test)
- *  - /cursuri/lead-auditor                        — 20–24 Oct 2026
+ *  - /courses/ai-governance-responsible-ai        — 28–29 Jul 2026, 12 seats (own course)
+ *  - /courses/artificial-intelligence-management-system — 11 Aug 2026, 2 seats LEFT (threshold test)
+ *  - /courses/lead-implementer                    — 15–19 Sep 2026, 5-day schedule (Programme test)
+ *  - /courses/lead-auditor                        — 20–24 Oct 2026
  * All editions: Early Bird €900 active until 01.12.2026, Standard €1,200.
  * NOTE: no exact-seat assertions on lead-implementer — checkout specs buy seats there.
  */
-const AI_GOVERNANCE_URL = '/cursuri/ai-governance-responsible-ai'
-const AIMS_FOUNDATION_URL = '/cursuri/artificial-intelligence-management-system'
-const LEAD_IMPLEMENTER_URL = '/cursuri/lead-implementer'
+const AI_GOVERNANCE_URL = '/courses/ai-governance-responsible-ai'
+const AIMS_FOUNDATION_URL = '/courses/artificial-intelligence-management-system'
+const LEAD_IMPLEMENTER_URL = '/courses/lead-implementer'
 
 test.describe('course detail', () => {
   test('header renders pill, gradient title and teaser — no chips, no share (v2)', async ({
@@ -100,7 +100,7 @@ test.describe('course detail', () => {
   })
 
   test('unknown slug returns 404', async ({ page }) => {
-    const response = await page.goto('/cursuri/does-not-exist')
+    const response = await page.goto('/courses/does-not-exist')
     expect(response?.status()).toBe(404)
   })
 })

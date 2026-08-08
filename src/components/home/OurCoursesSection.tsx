@@ -161,7 +161,7 @@ function CourseCard({
             card regardless of blurb length (owner 2026-07-12) */}
         <div className="mt-auto pt-5">
           <Link
-            href={localePath(locale, `/cursuri/${course.slug}`)}
+            href={localePath(locale, `/courses/${course.slug}`)}
             className="inline-flex rounded-[20px] bg-black px-4 py-2 text-[13px] font-semibold leading-normal text-white shadow-[0_0_0_1px_rgba(255,255,255,0.2),4px_6px_25px_rgba(0,0,0,0.25),8px_10px_45px_rgba(0,0,0,0.2)] transition-transform hover:scale-[1.03]"
           >
             {t.enroll}

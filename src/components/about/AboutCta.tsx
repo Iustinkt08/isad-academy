@@ -10,7 +10,7 @@ import { getDictionary } from '@/lib/i18n/dictionaries';
 
 export default function AboutCta({
   locale,
-  ctaHref = '/cursuri',
+  ctaHref = '/courses',
 }: {
   locale: Locale;
   ctaHref?: string;

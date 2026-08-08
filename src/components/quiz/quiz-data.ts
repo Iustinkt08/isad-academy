@@ -159,7 +159,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
       'Nivel intermediar',
       'Nivel avansat',
       'Specializare profesională',
-      'Nu știu încă — doresc o recomandare',
+      'Nu știu încă, doresc o recomandare',
     ],
   },
 ];
@@ -311,7 +311,7 @@ export const QUIZ_QUESTIONS_EN: QuizQuestion[] = [
       'Intermediate level',
       'Advanced level',
       'Professional specialization',
-      'I don’t know yet — I’d like a recommendation',
+      'I don’t know yet, I’d like a recommendation',
     ],
   },
 ];
@@ -330,7 +330,7 @@ export const QUIZ_UI = {
     titlePlain: 'Course ',
     titleGradient: 'quiz',
     titlePunctuation: '.',
-    sub: '12 short questions — we recommend the right course or learning path in under two minutes.',
+    sub: '12 short questions. We recommend the right course or learning path in under two minutes.',
     progress: (n: number, total: number) => `Question ${n} of ${total}`,
     back: '← Back',
     next: 'Continue',
@@ -353,7 +353,7 @@ export const QUIZ_UI = {
     titlePlain: 'Quiz de ',
     titleGradient: 'cursuri',
     titlePunctuation: '.',
-    sub: '12 întrebări scurte — îți recomandăm cursul sau parcursul potrivit, în mai puțin de două minute.',
+    sub: '12 întrebări scurte. Îți recomandăm cursul sau parcursul potrivit, în mai puțin de două minute.',
     progress: (n: number, total: number) => `Întrebarea ${n} din ${total}`,
     back: '← Înapoi',
     next: 'Continuă',
@@ -699,7 +699,7 @@ const RESULT_STATIC: Record<
       courseTitle: 'A custom solution for teams and organizations',
       courseSub: 'Corporate training · ISAD Academy',
       reason:
-        'You’re looking for training for several people: we build a programme tailored to your organization’s goals, level and calendar — from executive sessions to technical programmes.',
+        'You’re looking for training for several people: we build a programme tailored to your organization’s goals, level and calendar, from executive sessions to technical programmes.',
       href: '/corporate',
       ctaLabel: 'Corporate training',
     },
@@ -707,14 +707,14 @@ const RESULT_STATIC: Record<
       courseTitle: 'Explore the course catalog',
       courseSub: 'ISAD Academy',
       reason:
-        'Your answers don’t map clearly enough onto a single course in the current catalog. Have a look at all the courses — or write to us and we’ll guide you.',
-      href: '/cursuri',
+        'Your answers don’t map clearly enough onto a single course in the current catalog. Have a look at all the courses, or write to us and we’ll guide you.',
+      href: '/courses',
       ctaLabel: 'See the courses',
     },
     pathSub: 'Two courses, in order',
     pathTitle: (a, b) => `Learning path: ${a}, then ${b}`,
     pathReason: (a, b) =>
-      `You start with the big picture (${a}), then move to the next level (${b}) — same domain, in the order that fits you.`,
+      `You start with the big picture (${a}), then move to the next level (${b}): same domain, in the order that fits you.`,
     pathCta: 'Start with the first course',
     courseCta: 'See the course',
   },
@@ -723,7 +723,7 @@ const RESULT_STATIC: Record<
       courseTitle: 'Soluție personalizată pentru echipe și organizații',
       courseSub: 'Corporate training · ISAD Academy',
       reason:
-        'Cauți formare pentru mai mulți oameni: construim un program adaptat obiectivelor, nivelului și calendarului organizației tale — de la sesiuni executive la programe tehnice.',
+        'Cauți formare pentru mai mulți oameni: construim un program adaptat obiectivelor, nivelului și calendarului organizației tale, de la sesiuni executive la programe tehnice.',
       href: '/corporate',
       ctaLabel: 'Corporate training',
     },
@@ -731,14 +731,14 @@ const RESULT_STATIC: Record<
       courseTitle: 'Explorează catalogul de cursuri',
       courseSub: 'ISAD Academy',
       reason:
-        'Răspunsurile tale nu se potrivesc suficient de clar cu un singur curs din catalogul actual. Aruncă o privire peste toate cursurile — sau scrie-ne și te ghidăm noi.',
-      href: '/cursuri',
+        'Răspunsurile tale nu se potrivesc suficient de clar cu un singur curs din catalogul actual. Aruncă o privire peste toate cursurile sau scrie-ne și te ghidăm noi.',
+      href: '/courses',
       ctaLabel: 'Vezi cursurile',
     },
     pathSub: 'Două cursuri, în ordine',
     pathTitle: (a, b) => `Parcurs de învățare: ${a}, apoi ${b}`,
     pathReason: (a, b) =>
-      `Începi cu imaginea de ansamblu (${a}), apoi treci la nivelul următor (${b}) — același domeniu, în ordinea potrivită pentru tine.`,
+      `Începi cu imaginea de ansamblu (${a}), apoi treci la nivelul următor (${b}): același domeniu, în ordinea potrivită pentru tine.`,
     pathCta: 'Începe cu primul curs',
     courseCta: 'Vezi cursul',
   },
@@ -756,7 +756,7 @@ export function resultView(rec: QuizRecommendation, locale: QuizLocale = 'ro'): 
         courseTitle: s.pathTitle(rec.first.title, rec.second.title),
         courseSub: s.pathSub,
         reason: s.pathReason(rec.first.title, rec.second.title),
-        href: `/cursuri/${rec.first.slug}`,
+        href: `/courses/${rec.first.slug}`,
         ctaLabel: s.pathCta,
       };
     case 'course':
@@ -764,7 +764,7 @@ export function resultView(rec: QuizRecommendation, locale: QuizLocale = 'ro'): 
         courseTitle: rec.course.title,
         courseSub: LEVEL_LABEL[locale][rec.course.level],
         reason: rec.course.pitch ?? GENERIC_REASON[locale][rec.course.level],
-        href: `/cursuri/${rec.course.slug}`,
+        href: `/courses/${rec.course.slug}`,
         ctaLabel: s.courseCta,
       };
   }

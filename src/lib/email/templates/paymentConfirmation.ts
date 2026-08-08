@@ -45,7 +45,7 @@ const formatDate = (value: string | Date | null | undefined): string => {
 export const renderPaymentConfirmationEmail = (data: PaymentConfirmationData): RenderedEmail => {
   const courseTitle = data.courseTitle || 'your course'
   const startDate = formatDate(data.startDate)
-  const participantsList = data.participants.map((p) => p.name).filter(Boolean).join(', ') || '—'
+  const participantsList = data.participants.map((p) => p.name).filter(Boolean).join(', ') || '-'
   // Vezi nota din ./orderReceived — `support@` din documentul clientului e mapat pe
   // `contact@`, singurul inbox monitorizat și sender verificat (owner 2026-08-05).
   const supportEmail = data.supportEmail || 'contact@isad.academy'

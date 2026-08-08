@@ -88,19 +88,30 @@ export const computeSessionStatus = (session: DerivableSession, now: Date = new 
 }
 
 const priceWindowFields = (label: string): CollectionConfig['fields'] => [
-  { name: 'price', type: 'number', min: 0, label: 'Price (EUR)' },
+  { name: 'price', type: 'number', min: 0, label: { en: 'Price (EUR)', ro: 'Preț (EUR)' } },
   {
     name: 'priceRON',
     type: 'number',
     min: 0,
-    label: 'Price (RON)',
+    label: { en: 'Price (RON)', ro: 'Preț (RON)' },
     admin: {
-      description:
-        'Charged to visitors from Romania (B1 — geo-based currency). Leave empty to sell this window in EUR only.',
+      description: {
+        en: 'Price charged to visitors browsing from Romania (the currency is chosen by the visitor\'s location). Leave empty to sell this window in EUR only.',
+        ro: 'Prețul perceput vizitatorilor care accesează site-ul din România (moneda se alege după locația vizitatorului). Lăsați gol pentru a vinde această fereastră doar în EUR.',
+      },
     },
   },
   { name: 'startDate', type: 'date' },
-  { name: 'endDate', type: 'date', admin: { description: `Leave both dates empty if there is no ${label.toLowerCase()} window.` } },
+  {
+    name: 'endDate',
+    type: 'date',
+    admin: {
+      description: {
+        en: `Last day of the ${label} window. Leave both dates empty if this edition has no ${label} window.`,
+        ro: `Ultima zi a ferestrei ${label}. Lăsați ambele date goale dacă această ediție nu are fereastră ${label}.`,
+      },
+    },
+  },
 ]
 
 /**
@@ -117,9 +128,12 @@ const priceWindowFields = (label: string): CollectionConfig['fields'] => [
 export const CourseSessions: CollectionConfig = {
   slug: 'courseSessions',
   admin: {
-    group: 'Content',
+    group: { en: 'Content', ro: 'Conținut' },
     defaultColumns: ['course', 'startDate', 'capacity', 'seatsSold'],
-    description: 'Editions of a course — dates, schedule, capacity and price windows.',
+    description: {
+      en: 'Editions of a course: dates, schedule, capacity and price windows. Each edition sells separately; the seat counts and the Early Bird or Standard prices shown on the site come from here.',
+      ro: 'Edițiile unui curs: date, program, capacitate și ferestre de preț. Fiecare ediție se vinde separat; numărul de locuri și prețurile Early Bird sau Standard afișate pe site vin de aici.',
+    },
   },
   defaultSort: 'startDate',
   access: {
@@ -150,16 +164,39 @@ export const CourseSessions: CollectionConfig = {
       name: 'schedule',
       type: 'array',
       labels: {
-        singular: 'Schedule day',
-        plural: 'Schedule days',
+        singular: { en: 'Schedule day', ro: 'Zi de program' },
+        plural: { en: 'Schedule days', ro: 'Zile de program' },
       },
       admin: {
-        description: 'Concrete days and hours this edition meets.',
+        description: {
+          en: 'The concrete days and hours this edition meets, shown in the program section of the course page. The latest day here also decides when the edition counts as past.',
+          ro: 'Zilele și orele concrete în care se ține această ediție, afișate în secțiunea de program a paginii de curs. Cea mai târzie zi de aici decide și momentul din care ediția este considerată încheiată.',
+        },
       },
       fields: [
         { name: 'date', type: 'date', required: true },
-        { name: 'startTime', type: 'text', required: true, admin: { description: 'e.g. "09:00"' } },
-        { name: 'endTime', type: 'text', required: true, admin: { description: 'e.g. "17:00"' } },
+        {
+          name: 'startTime',
+          type: 'text',
+          required: true,
+          admin: {
+            description: {
+              en: 'Start time of that day, 24-hour format, for example "09:00".',
+              ro: 'Ora de început a zilei respective, în format de 24 de ore, de exemplu „09:00".',
+            },
+          },
+        },
+        {
+          name: 'endTime',
+          type: 'text',
+          required: true,
+          admin: {
+            description: {
+              en: 'End time of that day, 24-hour format, for example "17:00".',
+              ro: 'Ora de final a zilei respective, în format de 24 de ore, de exemplu „17:00".',
+            },
+          },
+        },
       ],
     },
     {
@@ -168,7 +205,10 @@ export const CourseSessions: CollectionConfig = {
       required: true,
       min: 1,
       admin: {
-        description: 'Total seats for this edition.',
+        description: {
+          en: 'Total seats for this edition. The site shows "X seats left" only when few remain, and sales stop automatically once every seat is sold.',
+          ro: 'Numărul total de locuri pentru această ediție. Site-ul afișează „X seats left" doar când rămân puține, iar vânzarea se oprește automat când toate locurile s-au vândut.',
+        },
       },
     },
     {
@@ -178,7 +218,10 @@ export const CourseSessions: CollectionConfig = {
       min: 0,
       admin: {
         readOnly: true,
-        description: 'Consumed only on a CONFIRMED order, atomically (T5). Do not edit by hand.',
+        description: {
+          en: 'Seats consumed by confirmed orders. Updated automatically and atomically when a payment is confirmed; a refund releases the seats again. Do not edit by hand.',
+          ro: 'Locurile consumate de comenzile confirmate. Se actualizează automat și atomic la confirmarea unei plăți; o rambursare eliberează locurile la loc. Nu se editează manual.',
+        },
       },
     },
     {
@@ -186,28 +229,33 @@ export const CourseSessions: CollectionConfig = {
       type: 'date',
       admin: {
         hidden: true,
-        description:
-          'Idempotency stamp for the daily review-request job (T13, CLAUDE.md §10) — set once ' +
-          'the post-session review-request emails have been sent for this edition (best-effort: ' +
-          'stamped even if some individual sends failed, so the job never re-mails everyone on a ' +
-          'retry). Never set by hand.',
+        description: {
+          en: 'Timestamp set once the review-request emails have gone out to participants after this edition ended. The daily job checks it so nobody is emailed twice, even when a retry follows partial failures. Never set by hand.',
+          ro: 'Marcaj de timp setat după trimiterea emailurilor de cerere de recenzie către participanți, la finalul acestei ediții. Jobul zilnic îl verifică pentru ca nimeni să nu primească emailul de două ori, nici măcar la o reîncercare după eșecuri parțiale. Nu se setează niciodată manual.',
+        },
       },
     },
     {
       name: 'earlyBird',
-      label: 'Early Bird',
+      label: { en: 'Early Bird', ro: 'Early Bird' },
       type: 'group',
       admin: {
-        description: 'Early Bird price window. Leave empty if this edition has none.',
+        description: {
+          en: 'Early Bird price window. While the current date is inside this window, the site sells at this price. Leave everything empty if this edition has no Early Bird offer.',
+          ro: 'Fereastra de preț Early Bird. Cât timp data curentă este în această fereastră, site-ul vinde la acest preț. Lăsați totul gol dacă această ediție nu are ofertă Early Bird.',
+        },
       },
       fields: priceWindowFields('Early Bird'),
     },
     {
       name: 'standard',
-      label: 'Standard',
+      label: { en: 'Standard', ro: 'Standard' },
       type: 'group',
       admin: {
-        description: 'Standard price window.',
+        description: {
+          en: 'Standard price window, used when the Early Bird window is not active. If neither window is active, the edition cannot be purchased and the site shows "Enrolment coming soon".',
+          ro: 'Fereastra de preț Standard, folosită când fereastra Early Bird nu este activă. Dacă niciuna dintre ferestre nu este activă, ediția nu poate fi cumpărată, iar site-ul afișează „Enrolment coming soon".',
+        },
       },
       fields: priceWindowFields('Standard'),
     },
@@ -217,7 +265,10 @@ export const CourseSessions: CollectionConfig = {
       virtual: true,
       admin: {
         readOnly: true,
-        description: 'Computed: capacity − seatsSold. Not stored.',
+        description: {
+          en: 'Calculated automatically as capacity minus seats sold. Read-only and never stored; a negative number means the edition was oversold and needs attention.',
+          ro: 'Calculat automat drept capacitate minus locuri vândute. Doar pentru citire, nu se stochează; un număr negativ înseamnă că ediția a fost suprarezervată și necesită atenție.',
+        },
       },
       hooks: {
         afterRead: [
@@ -230,14 +281,17 @@ export const CourseSessions: CollectionConfig = {
       type: 'select',
       virtual: true,
       options: [
-        { label: 'Upcoming', value: 'upcoming' },
-        { label: 'Past', value: 'past' },
-        { label: 'Sold out', value: 'soldOut' },
-        { label: 'No active price window', value: 'noActiveWindow' },
+        { label: { en: 'Upcoming', ro: 'Urmează' }, value: 'upcoming' },
+        { label: { en: 'Past', ro: 'Încheiată' }, value: 'past' },
+        { label: { en: 'Sold out', ro: 'Locuri epuizate' }, value: 'soldOut' },
+        { label: { en: 'No active price window', ro: 'Fără fereastră de preț activă' }, value: 'noActiveWindow' },
       ],
       admin: {
         readOnly: true,
-        description: 'Computed from dates, seats and price windows. Not stored.',
+        description: {
+          en: 'Derived automatically from the dates, the remaining seats and the price windows. Read-only and never stored; it changes on its own as time passes or seats sell.',
+          ro: 'Derivat automat din date, locurile rămase și ferestrele de preț. Doar pentru citire, nu se stochează; se schimbă de la sine pe măsură ce trece timpul sau se vând locuri.',
+        },
       },
       hooks: {
         afterRead: [

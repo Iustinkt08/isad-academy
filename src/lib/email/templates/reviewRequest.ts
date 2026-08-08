@@ -34,7 +34,7 @@ export const renderReviewRequestEmail = (data: ReviewRequestData): RenderedEmail
     <p style="margin:0 0 16px;line-height:1.6;">Hi ${escapeHtml(greetingName)},</p>
     <p style="margin:0 0 16px;line-height:1.6;">
       Thanks for attending <strong>${escapeHtml(courseTitle)}</strong> (${escapeHtml(editionDate)}). We would
-      love to hear what you thought — it takes less than two minutes and really helps future
+      love to hear what you thought. It takes less than two minutes and really helps future
       participants decide.
     </p>
     <p style="margin:0 0 24px;">

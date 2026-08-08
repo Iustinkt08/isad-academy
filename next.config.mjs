@@ -80,6 +80,14 @@ const nextConfig = {
     return [
       // /certificare retired 2026-07-11 — certification lives on Home as a section
       { source: '/certificare', destination: '/#certification', permanent: true },
+      // Catalog + about moved to English slugs on BOTH locales (owner 2026-08-08) —
+      // old RO slugs 308 → new slugs, deep course links included.
+      { source: '/cursuri', destination: '/courses', permanent: true },
+      { source: '/cursuri/:slug', destination: '/courses/:slug', permanent: true },
+      { source: '/despre', destination: '/about', permanent: true },
+      { source: '/ro/cursuri', destination: '/ro/courses', permanent: true },
+      { source: '/ro/cursuri/:slug', destination: '/ro/courses/:slug', permanent: true },
+      { source: '/ro/despre', destination: '/ro/about', permanent: true },
       // Legal routes moved to English slugs (2026-07) — old RO slugs 308 → new slugs.
       { source: '/politica-cookie', destination: '/cookies', permanent: true },
       { source: '/gdpr', destination: '/privacy', permanent: true },

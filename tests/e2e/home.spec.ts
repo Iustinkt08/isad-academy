@@ -38,7 +38,7 @@ test.describe('home page', () => {
 
     // Expert presence (expertBio global) + the way to the About page
     await expect(page.getByText('Silviu Gresoi').first()).toBeVisible()
-    expect(await page.locator('a[href="/despre"]').count()).toBeGreaterThan(0)
+    expect(await page.locator('a[href="/about"]').count()).toBeGreaterThan(0)
   })
 
   test('testimonials show curated reviews only, capped at 5, without ratings', async ({

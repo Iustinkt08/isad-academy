@@ -21,9 +21,12 @@ export const Reviews: CollectionConfig = {
   slug: 'reviews',
   admin: {
     useAsTitle: 'authorName',
-    group: 'Content',
+    group: { en: 'Content', ro: 'Conținut' },
     defaultColumns: ['authorName', 'course', 'source', 'showOnHome'],
-    description: 'Testimonials. No rating — curate homepage placement with "Show on home" (max 5 shown).',
+    description: {
+      en: 'Participant testimonials, collected by email after a course edition ends or added manually. There is no star rating. Curate homepage placement with "Show on home"; at most 5 appear there.',
+      ro: 'Testimoniale ale participanților, colectate prin email după încheierea unei ediții de curs sau adăugate manual. Nu există rating cu stele. Alege ce apare pe pagina principală cu "Afișează pe pagina principală"; acolo apar cel mult 5.',
+    },
   },
   access: {
     read: ({ req }) => (req.user ? true : { showOnHome: { equals: true } }),
@@ -49,7 +52,7 @@ export const Reviews: CollectionConfig = {
     },
     {
       name: 'roleCompany',
-      label: 'Role / Company',
+      label: { en: 'Role / Company', ro: 'Rol / Companie' },
       type: 'text',
     },
     {
@@ -63,7 +66,10 @@ export const Reviews: CollectionConfig = {
       relationTo: 'courses',
       hasMany: false,
       admin: {
-        description: 'Which course this review refers to, if any.',
+        description: {
+          en: 'The course this testimonial refers to, if any. Optional; used for context in the dashboard.',
+          ro: 'Cursul la care se referă acest testimonial, dacă există. Opțional; folosit pentru context în dashboard.',
+        },
       },
     },
     {
@@ -72,17 +78,20 @@ export const Reviews: CollectionConfig = {
       required: true,
       defaultValue: 'manual',
       options: [
-        { label: 'Email form (post-session)', value: 'emailForm' },
-        { label: 'Added manually', value: 'manual' },
+        { label: { en: 'Email form (post-session)', ro: 'Formular pe email (după sesiune)' }, value: 'emailForm' },
+        { label: { en: 'Added manually', ro: 'Adăugat manual' }, value: 'manual' },
       ],
     },
     {
       name: 'showOnHome',
-      label: 'Show on home',
+      label: { en: 'Show on home', ro: 'Afișează pe pagina principală' },
       type: 'checkbox',
       defaultValue: false,
       admin: {
-        description: 'Silviu curates which testimonials appear on Home — max 5 are shown, enforced in the query.',
+        description: {
+          en: 'Tick to feature this testimonial on the homepage. At most 5 ticked testimonials are displayed there; the rest stay hidden from visitors.',
+          ro: 'Bifează pentru a afișa acest testimonial pe pagina principală. Cel mult 5 testimoniale bifate apar acolo; restul rămân ascunse vizitatorilor.',
+        },
       },
     },
     {
@@ -91,11 +100,10 @@ export const Reviews: CollectionConfig = {
       unique: true,
       admin: {
         hidden: true,
-        description:
-          'T13 duplicate-submission guard — sha256(sessionId + ":" + lowercased email), set only ' +
-          'by the public /api/reviews/submit route so the same (session, email) pair can submit ' +
-          'at most once. Left empty for manually-added reviews (a nullable unique column allows ' +
-          'any number of empty values in Postgres — effectively "sparse").',
+        description: {
+          en: 'Duplicate-submission guard: sha256 of the session id and the lowercased email, set only by the public review submission route so the same (session, email) pair can submit at most once. Left empty for manually added reviews; the unique constraint allows any number of empty values.',
+          ro: 'Protecție împotriva trimiterilor duplicate: sha256 din id-ul sesiunii și emailul scris cu litere mici, setat doar de ruta publică de trimitere a recenziilor, astfel încât aceeași pereche (sesiune, email) să poată trimite cel mult o dată. Rămâne gol pentru recenziile adăugate manual; constrângerea de unicitate permite oricâte valori goale.',
+        },
       },
     },
   ],

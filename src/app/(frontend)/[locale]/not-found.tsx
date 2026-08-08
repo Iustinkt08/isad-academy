@@ -74,7 +74,7 @@ export default async function NotFound() {
           {t.backHome}
         </Link>
         <Link
-          href={localePath(locale, '/cursuri')}
+          href={localePath(locale, '/courses')}
           className="text-[13.5px] font-medium text-[#1c5d99] transition-colors hover:text-[#407ea2] lg:text-[15px]"
         >
           {t.browseCourses}

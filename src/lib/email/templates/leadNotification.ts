@@ -40,7 +40,7 @@ const firstNameOf = (name?: string | null): string => {
  */
 export const renderLeadNotificationEmail = (lead: LeadNotificationData): RenderedEmail => {
   const typeLabel = lead.type === 'corporate' ? 'Corporate' : 'Contact'
-  const subject = `New ${typeLabel} lead — ${firstNameOf(lead.name)}`
+  const subject = `New ${typeLabel} lead: ${firstNameOf(lead.name)}`
 
   const preferredPeriod =
     lead.preferredPeriod?.from || lead.preferredPeriod?.to

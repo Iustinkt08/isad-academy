@@ -18,7 +18,7 @@ export async function generateMetadata({
 }
 
 /**
- * /despre — v3 RESPONSIVE (owner, Figma 3977-571 pentru mobil; 3873-94 desktop).
+ * /about — v3 RESPONSIVE (owner, Figma 3977-571 pentru mobil; 3873-94 desktop).
  * Desktop (≥lg): Hero → Beliefs (traseu orizontal) → Our Values (carduri) → CTA.
  * Mobil (<lg): Hero (fără linia ISAD) → Beliefs (traseu VERTICAL cu valorile
  * integrate la puncte + reveal la scroll) → CTA. ValuesSection se ascunde singură
@@ -47,7 +47,7 @@ export default async function AboutPage({
         <ValuesSection locale={locale} />
       </Reveal>
       <Reveal>
-        <AboutCta locale={locale} ctaHref={localePath(locale, '/cursuri')} />
+        <AboutCta locale={locale} ctaHref={localePath(locale, '/courses')} />
       </Reveal>
     </div>
   )

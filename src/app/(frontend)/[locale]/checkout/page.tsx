@@ -59,7 +59,7 @@ function CheckoutUnavailable({
                 {t.viewCourse}
               </Button>
             )}
-            <Button href={localePath(locale, '/cursuri')}>{t.browseCourses}</Button>
+            <Button href={localePath(locale, '/courses')}>{t.browseCourses}</Button>
           </div>
         </div>
       </Container>
@@ -136,7 +136,7 @@ export default async function CheckoutPage({
   }
 
   const course = session.course && typeof session.course === 'object' ? session.course : null
-  const courseHref = course?.slug ? localePath(locale, `/cursuri/${course.slug}`) : undefined
+  const courseHref = course?.slug ? localePath(locale, `/courses/${course.slug}`) : undefined
 
   // Exhaustive status gate (T16): only an explicit 'upcoming' reaches the form. An
   // unknown/missing status (e.g. a future status value this page doesn't know about)
@@ -207,7 +207,7 @@ export default async function CheckoutPage({
   const scheduleRows = session.schedule ?? []
   const firstScheduleRow = scheduleRows[0]
   const scheduleLabel = firstScheduleRow
-    ? `${t.dayCount(scheduleRows.length)} · ${firstScheduleRow.startTime}–${firstScheduleRow.endTime}`
+    ? `${t.dayCount(scheduleRows.length)} · ${firstScheduleRow.startTime}-${firstScheduleRow.endTime}`
     : null
 
   const sessionView: CheckoutSessionView = {

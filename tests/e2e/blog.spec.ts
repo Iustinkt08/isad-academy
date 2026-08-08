@@ -95,7 +95,7 @@ test.describe('blog article', () => {
     await expect(related).toContainText('ISO/IEC 42001:2023')
     await expect(related.getByRole('link', { name: 'View course' })).toHaveAttribute(
       'href',
-      /\/cursuri\/iso-iec-42001-2023/,
+      /\/courses\/iso-iec-42001-2023/,
     )
 
     // Newsletter CTA always present

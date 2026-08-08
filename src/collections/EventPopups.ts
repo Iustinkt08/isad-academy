@@ -25,10 +25,12 @@ export const EventPopups: CollectionConfig = {
   slug: 'eventPopups',
   admin: {
     useAsTitle: 'internalName',
-    group: 'Sales',
+    group: { en: 'Sales', ro: 'Vânzări' },
     defaultColumns: ['internalName', 'eventDate', 'status', 'registrationsCount'],
-    description:
-      'One entry per live event. A pop-up shows on the site only while it is "Published" AND the clock is between "Start showing at" and the event date — after the event it disappears on its own. "Registrations" counts the people who signed up for THAT event; their details are in Event Registrations.',
+    description: {
+      en: 'One entry per live event. A pop-up shows on the site only while its status is "Published" AND the current time is between "Start showing at" and the event date; after the event it disappears on its own. "Registrations" counts the people who signed up for that event; their details are in Event Registrations.',
+      ro: 'Câte o intrare pentru fiecare eveniment live. Un pop-up apare pe site doar cât timp are statusul „Published" ȘI ora curentă este între „Start showing at" și data evenimentului; după eveniment dispare de la sine. „Registrations" numără persoanele înscrise la acel eveniment; detaliile lor sunt în Event Registrations.',
+    },
   },
   defaultSort: '-eventDate',
   access: {
@@ -68,7 +70,12 @@ export const EventPopups: CollectionConfig = {
       name: 'internalName',
       type: 'text',
       required: true,
-      admin: { description: 'Only visible here, to tell events apart. Not shown to visitors.' },
+      admin: {
+        description: {
+          en: 'Internal name used only in this admin list, to tell events apart. Never shown to visitors.',
+          ro: 'Nume intern folosit doar în această listă din admin, pentru a deosebi evenimentele. Nu este afișat niciodată vizitatorilor.',
+        },
+      },
     },
     slugField('internalName'),
     {
@@ -77,11 +84,17 @@ export const EventPopups: CollectionConfig = {
       required: true,
       defaultValue: 'draft',
       options: [
-        { label: 'Draft', value: 'draft' },
-        { label: 'Published', value: 'published' },
-        { label: 'Archived', value: 'archived' },
+        { label: { en: 'Draft', ro: 'Ciornă' }, value: 'draft' },
+        { label: { en: 'Published', ro: 'Publicat' }, value: 'published' },
+        { label: { en: 'Archived', ro: 'Arhivat' }, value: 'archived' },
       ],
-      admin: { position: 'sidebar', description: 'Only "Published" is ever shown on the site.' },
+      admin: {
+        position: 'sidebar',
+        description: {
+          en: 'Only "Published" pop-ups can ever appear on the site; drafts and archived entries are never shown to visitors.',
+          ro: 'Doar pop-up-urile „Published" pot apărea pe site; ciornele și intrările arhivate nu sunt afișate niciodată vizitatorilor.',
+        },
+      },
     },
     {
       name: 'displayVersion',
@@ -90,8 +103,10 @@ export const EventPopups: CollectionConfig = {
       admin: {
         position: 'sidebar',
         readOnly: true,
-        description:
-          'Bumped by "Force re-show". Visitors who dismissed an older version see it again.',
+        description: {
+          en: 'Increased automatically by "Force re-show". Visitors who dismissed an older version of the pop-up will see the new version again.',
+          ro: 'Crescut automat de „Force re-show". Vizitatorii care au închis o versiune mai veche a pop-up-ului îl vor vedea din nou în versiunea nouă.',
+        },
       },
     },
     {
@@ -99,15 +114,17 @@ export const EventPopups: CollectionConfig = {
       type: 'checkbox',
       virtual: true,
       defaultValue: false,
-      label: 'Force re-show',
+      label: { en: 'Force re-show', ro: 'Forțează reafișarea' },
       admin: {
         position: 'sidebar',
         // OBLIGATORIU lângă `virtual: true`: Payload face câmpurile virtuale readOnly în
         // admin din oficiu (fields/config/sanitize.js), iar bifa apărea gri, neapăsabilă.
         // Aici e singurul câmp virtual pe care omul TREBUIE să-l poată atinge.
         readOnly: false,
-        description:
-          'Tick and save to show this pop-up again to people who dismissed it. Those who already registered never see it again.',
+        description: {
+          en: 'Tick and save to show this pop-up again to visitors who dismissed it. People who already registered never see it again. The box un-ticks itself after saving.',
+          ro: 'Bifați și salvați pentru a afișa din nou pop-up-ul vizitatorilor care l-au închis. Cei deja înscriși nu îl mai văd niciodată. Căsuța se debifează singură după salvare.',
+        },
       },
     },
 
@@ -117,7 +134,10 @@ export const EventPopups: CollectionConfig = {
       type: 'text',
       localized: true,
       admin: {
-        description: 'Event title — the part rendered in plain ink, e.g. "AI Governance ".',
+        description: {
+          en: 'Event title, the part rendered in the plain ink color, for example "AI Governance ". Keep the trailing space if the gradient segment continues the sentence.',
+          ro: 'Titlul evenimentului, partea redată în culoarea de text obișnuită, de exemplu „AI Governance ". Păstrați spațiul de la final dacă segmentul cu gradient continuă propoziția.',
+        },
       },
     },
     {
@@ -125,7 +145,10 @@ export const EventPopups: CollectionConfig = {
       type: 'text',
       localized: true,
       admin: {
-        description: 'Event title — the segment rendered in the brand gradient, e.g. "in Practice.".',
+        description: {
+          en: 'Event title, the segment rendered in the brand gradient, for example "in Practice.". Displayed right after the plain part.',
+          ro: 'Titlul evenimentului, segmentul redat cu gradientul de brand, de exemplu „in Practice.". Se afișează imediat după partea simplă.',
+        },
       },
     },
     { name: 'description', type: 'textarea', localized: true },
@@ -133,13 +156,26 @@ export const EventPopups: CollectionConfig = {
       name: 'metaLine',
       type: 'text',
       localized: true,
-      admin: { description: 'E.g. "Thu 14 Aug 2026 · 18:00 (EEST) · Live on Zoom".' },
+      admin: {
+        description: {
+          en: 'Short info line shown under the title, for example "Thu 14 Aug 2026 · 18:00 (EEST) · Live on Zoom".',
+          ro: 'Linie scurtă de informații afișată sub titlu, de exemplu „Thu 14 Aug 2026 · 18:00 (EEST) · Live on Zoom".',
+        },
+      },
     },
     {
       name: 'speakers',
       type: 'array',
-      labels: { singular: 'Speaker', plural: 'Speakers' },
-      admin: { description: 'Shown with photo, or initials when no photo is uploaded.' },
+      labels: {
+        singular: { en: 'Speaker', ro: 'Speaker' },
+        plural: { en: 'Speakers', ro: 'Speakeri' },
+      },
+      admin: {
+        description: {
+          en: 'Speakers shown in the pop-up, each with their photo, or with initials when no photo is uploaded.',
+          ro: 'Speakerii afișați în pop-up, fiecare cu fotografia sa sau cu inițialele atunci când nu este încărcată nicio fotografie.',
+        },
+      },
       fields: [
         { name: 'name', type: 'text', required: true },
         { name: 'role', type: 'text', localized: true },
@@ -150,21 +186,37 @@ export const EventPopups: CollectionConfig = {
       name: 'ctaLabel',
       type: 'text',
       localized: true,
-      admin: { description: 'Main button label. Empty = "Secure your spot".' },
+      admin: {
+        description: {
+          en: 'Label of the main button in the pop-up. When empty, the site shows "Secure your spot".',
+          ro: 'Textul butonului principal din pop-up. Când este gol, site-ul afișează „Secure your spot".',
+        },
+      },
     },
     {
       name: 'joinLabel',
       type: 'text',
       localized: true,
-      admin: { description: 'Form submit label. Empty = "Join us".' },
+      admin: {
+        description: {
+          en: 'Label of the registration form submit button. When empty, the site shows "Join us".',
+          ro: 'Textul butonului de trimitere a formularului de înscriere. Când este gol, site-ul afișează „Join us".',
+        },
+      },
     },
     {
       name: 'occupations',
       type: 'array',
       localized: true,
-      labels: { singular: 'Occupation option', plural: 'Occupation options' },
+      labels: {
+        singular: { en: 'Occupation option', ro: 'Opțiune de ocupație' },
+        plural: { en: 'Occupation options', ro: 'Opțiuni de ocupație' },
+      },
       admin: {
-        description: 'Options offered in the registration form (visitors can also type their own).',
+        description: {
+          en: 'Options offered in the occupation list of the registration form. Visitors can also type their own answer.',
+          ro: 'Opțiunile oferite în lista de ocupații din formularul de înscriere. Vizitatorii pot scrie și propriul răspuns.',
+        },
       },
       fields: [{ name: 'label', type: 'text', required: true }],
     },
@@ -176,8 +228,10 @@ export const EventPopups: CollectionConfig = {
       required: true,
       admin: {
         date: { pickerAppearance: 'dayAndTime' },
-        description:
-          'Countdown target. The pop-up disappears on its own after this moment — no need to unpublish it.',
+        description: {
+          en: 'Date and time of the event, used as the countdown target. The pop-up disappears on its own after this moment; there is no need to unpublish it.',
+          ro: 'Data și ora evenimentului, folosite ca țintă pentru numărătoarea inversă. Pop-up-ul dispare singur după acest moment; nu este nevoie să îl retrageți manual.',
+        },
       },
     },
     {
@@ -186,7 +240,10 @@ export const EventPopups: CollectionConfig = {
       required: true,
       admin: {
         date: { pickerAppearance: 'dayAndTime' },
-        description: 'From when the pop-up may appear. Must be before the event date.',
+        description: {
+          en: 'The moment from which the pop-up may start appearing on the site. Must be before the event date.',
+          ro: 'Momentul din care pop-up-ul poate începe să apară pe site. Trebuie să fie înaintea datei evenimentului.',
+        },
       },
       validate: (value: unknown, options: unknown): string | true => {
         const siblingData = (options as { siblingData?: { eventDate?: unknown } } | undefined)
@@ -195,7 +252,7 @@ export const EventPopups: CollectionConfig = {
         if (typeof value !== 'string' || typeof eventDate !== 'string') return true
         return new Date(value) < new Date(eventDate)
           ? true
-          : 'Must be before the event date — otherwise the pop-up could never show.'
+          : 'Must be before the event date, otherwise the pop-up could never show.'
       },
     },
     {
@@ -204,7 +261,12 @@ export const EventPopups: CollectionConfig = {
       defaultValue: 5,
       min: 0,
       max: 120,
-      admin: { description: 'Seconds on the page before the pop-up appears.' },
+      admin: {
+        description: {
+          en: 'How many seconds a visitor stays on the page before the pop-up appears.',
+          ro: 'Câte secunde stă vizitatorul pe pagină înainte să apară pop-up-ul.',
+        },
+      },
     },
 
     // ——— Consimțământ newsletter ————————————————————————————————————————————————————————
@@ -212,7 +274,12 @@ export const EventPopups: CollectionConfig = {
       name: 'newsletterOptInEnabled',
       type: 'checkbox',
       defaultValue: true,
-      admin: { description: 'Show the (unticked) newsletter opt-in in the registration form.' },
+      admin: {
+        description: {
+          en: 'Shows the newsletter opt-in checkbox (unticked by default) in the registration form. Untick to hide the opt-in entirely for this event.',
+          ro: 'Afișează în formularul de înscriere căsuța de abonare la newsletter (debifată implicit). Debifați pentru a ascunde complet opțiunea la acest eveniment.',
+        },
+      },
     },
     {
       name: 'newsletterConsentText',
@@ -220,8 +287,10 @@ export const EventPopups: CollectionConfig = {
       localized: true,
       defaultValue: 'I want to receive news from isad.academy',
       admin: {
-        description:
-          'Wording shown next to the opt-in. Stored as a snapshot on every registration — GDPR proof of what exactly was agreed to.',
+        description: {
+          en: 'The wording shown next to the newsletter opt-in. Stored as a snapshot on every registration, as GDPR proof of exactly what was agreed to.',
+          ro: 'Formularea afișată lângă căsuța de abonare la newsletter. Se păstrează ca instantaneu la fiecare înscriere, ca dovadă GDPR a textului exact acceptat.',
+        },
       },
     },
 
@@ -232,7 +301,10 @@ export const EventPopups: CollectionConfig = {
       virtual: true,
       admin: {
         readOnly: true,
-        description: 'How many people signed up for this event.',
+        description: {
+          en: 'How many people signed up for this event. Counted live from Event Registrations; read-only.',
+          ro: 'Câte persoane s-au înscris la acest eveniment. Numărat în timp real din Event Registrations; doar pentru citire.',
+        },
       },
       hooks: {
         afterRead: [

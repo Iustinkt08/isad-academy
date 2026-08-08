@@ -47,7 +47,7 @@ export function RelatedCourseCard({ course, locale }: { course: Course; locale: 
         )}
       </div>
       <Link
-        href={localePath(locale, `/cursuri/${course.slug}`)}
+        href={localePath(locale, `/courses/${course.slug}`)}
         className="shrink-0 whitespace-nowrap rounded-[999px] bg-gradient-to-b from-[#407ea2] to-[#1c5d99] to-[80%] px-[18px] pb-[11px] pt-[10px] text-[14px] font-medium text-white shadow-[0_4px_4px_-2px_rgba(0,0,0,0.21)] transition-transform hover:scale-[1.03] motion-reduce:transition-none"
       >
         {t.viewCourse} <span aria-hidden="true">→</span>

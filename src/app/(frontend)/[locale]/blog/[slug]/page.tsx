@@ -120,7 +120,8 @@ function buildBlogPostingJsonLd(post: BlogPost, locale: Locale): Record<string, 
     dateModified: post.updatedAt,
     ...(description ? { description } : {}),
     ...(post.author ? { author: { '@type': 'Person', name: post.author } } : {}),
-    ...(image ? { image: [`${siteUrl}${image}`] } : {}),
+    // `media.url` is absolute when serverURL is set — only prefix genuinely relative paths.
+    ...(image ? { image: [image.startsWith('http') ? image : `${siteUrl}${image}`] } : {}),
     publisher: {
       '@type': 'Organization',
       name: SITE_NAME,

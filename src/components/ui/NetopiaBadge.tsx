@@ -54,7 +54,7 @@ export function NetopiaBadge({
       src={tone === 'light' ? '/netopia/netopia-cards-light.png' : '/netopia/netopia-cards-dark.png'}
       // Informativ, nu decorativ: spune ce mijloace de plată sunt acceptate. Numele mărcilor
       // rămân ca atare — sunt denumiri comerciale, nu text de UI de tradus.
-      alt="NETOPIA Payments — Visa, Mastercard"
+      alt="NETOPIA Payments: Visa, Mastercard"
       width={CANVAS.width}
       height={CANVAS.height}
       unoptimized

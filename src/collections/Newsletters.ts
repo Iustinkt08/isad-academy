@@ -16,10 +16,12 @@ export const Newsletters: CollectionConfig = {
   slug: 'newsletters',
   admin: {
     useAsTitle: 'subject',
-    group: 'Marketing',
+    group: { en: 'Marketing', ro: 'Marketing' },
     defaultColumns: ['subject', 'sentAt', 'lastResult'],
-    description:
-      'Write a newsletter and send it to everyone subscribed. Tick “Send now” and save — the message goes out once and cannot be re-sent.',
+    description: {
+      en: 'Write a newsletter in the dashboard and broadcast it to every subscriber on the Brevo list. Tick "Send now" and save: the message goes out once and cannot be re-sent.',
+      ro: 'Scrie un newsletter din dashboard și trimite-l tuturor abonaților din lista Brevo. Bifează "Trimite acum" și salvează: mesajul pleacă o singură dată și nu poate fi retrimis.',
+    },
   },
   access: {
     read: isAdmin,
@@ -35,13 +37,21 @@ export const Newsletters: CollectionConfig = {
       name: 'subject',
       type: 'text',
       required: true,
-      admin: { description: 'Subject line recipients see in their inbox.' },
+      admin: {
+        description: {
+          en: 'The subject line recipients see in their inbox.',
+          ro: 'Subiectul pe care destinatarii îl văd în inbox.',
+        },
+      },
     },
     {
       name: 'preheader',
       type: 'text',
       admin: {
-        description: 'Optional one-line intro shown under the title. Leave empty to skip it.',
+        description: {
+          en: 'Optional one-line intro shown under the title in the email. Leave empty to skip it.',
+          ro: 'Introducere opțională de un rând, afișată sub titlu în email. Lasă gol ca să fie omisă.',
+        },
       },
     },
     {
@@ -49,18 +59,23 @@ export const Newsletters: CollectionConfig = {
       type: 'richText',
       required: true,
       admin: {
-        description:
-          'The message. Headings, bold, italic, links and lists are carried into the e-mail; images and embeds are not.',
+        description: {
+          en: 'The body of the message. Headings, bold, italic, links and lists are carried into the email; images and embeds are not.',
+          ro: 'Conținutul mesajului. Titlurile, bold, italic, linkurile și listele ajung în email; imaginile și elementele încorporate nu.',
+        },
       },
     },
     {
       name: 'sendNow',
       type: 'checkbox',
       defaultValue: false,
-      label: 'Send now',
+      label: { en: 'Send now', ro: 'Trimite acum' },
       admin: {
         position: 'sidebar',
-        description: 'Tick and save to send. Sending happens once — this cannot be undone.',
+        description: {
+          en: 'Tick and save to send the newsletter to all subscribers. Sending happens exactly once and cannot be undone.',
+          ro: 'Bifează și salvează pentru a trimite newsletterul tuturor abonaților. Trimiterea are loc o singură dată și nu poate fi anulată.',
+        },
       },
     },
     {
@@ -69,7 +84,10 @@ export const Newsletters: CollectionConfig = {
       admin: {
         position: 'sidebar',
         readOnly: true,
-        description: 'Stamped when the newsletter was sent. Once set, it can never be re-sent.',
+        description: {
+          en: 'Set automatically at the moment the newsletter went out. Once this date exists, the newsletter can never be sent again.',
+          ro: 'Completată automat în momentul în care newsletterul a plecat. Odată setată această dată, newsletterul nu mai poate fi trimis din nou.',
+        },
       },
     },
     {
@@ -78,7 +96,10 @@ export const Newsletters: CollectionConfig = {
       admin: {
         position: 'sidebar',
         readOnly: true,
-        description: 'Outcome of the send — check here if the newsletter did not arrive.',
+        description: {
+          en: 'Outcome of the last send attempt. Check here first if the newsletter did not arrive.',
+          ro: 'Rezultatul ultimei încercări de trimitere. Verifică aici mai întâi dacă newsletterul nu a ajuns.',
+        },
       },
     },
   ],

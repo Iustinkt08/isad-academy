@@ -60,7 +60,7 @@ export const renderBaseLayout = ({ title, bodyHtml, footerText, preheader }: Bas
             <tr>
               <td style="padding:16px 32px;border-top:1px solid #eeeeee;">
                 <span style="font-size:12px;color:${INK}99;">${escapeHtml(
-                  footerText ?? 'isad.academy — live, expert-led professional courses.',
+                  footerText ?? 'isad.academy: live, expert-led professional courses.',
                 )}</span>
               </td>
             </tr>

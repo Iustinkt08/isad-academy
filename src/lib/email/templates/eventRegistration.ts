@@ -21,26 +21,26 @@ export const renderEventRegistrationConfirmation = (
   registration: EventRegistrationData,
   event: EventEmailContext,
 ): RenderedEmail => {
-  const subject = `You're in — ${event.eventTitle}`
+  const subject = `You're in: ${event.eventTitle}`
   const firstName = registration.firstName?.trim() || 'there'
 
   const bodyHtml = `
-    <h1 style="font-size:20px;margin:0 0 16px;">You're in — see you there.</h1>
+    <h1 style="font-size:20px;margin:0 0 16px;">You're in. See you there.</h1>
     <p style="margin:0 0 12px;font-size:14px;">Hi ${escapeHtml(firstName)},</p>
     <p style="margin:0 0 12px;font-size:14px;">
       Your spot for <strong>${escapeHtml(event.eventTitle)}</strong> is reserved.
       ${event.metaLine ? `<br />${escapeHtml(event.metaLine)}` : ''}
     </p>
-    <p style="margin:0;font-size:14px;">The invite link is on its way — we'll send it to this address before the event starts.</p>
+    <p style="margin:0;font-size:14px;">The invite link is on its way. We'll send it to this address before the event starts.</p>
   `
 
   const text = [
-    `You're in — see you there.`,
+    `You're in. See you there.`,
     ``,
     `Hi ${firstName},`,
     `Your spot for ${event.eventTitle} is reserved.`,
     ...(event.metaLine ? [event.metaLine] : []),
-    `The invite link is on its way — we'll send it to this address before the event starts.`,
+    `The invite link is on its way. We'll send it to this address before the event starts.`,
   ].join('\n')
 
   return { subject, html: renderBaseLayout({ title: subject, bodyHtml }), text }
@@ -51,7 +51,7 @@ export const renderEventRegistrationNotification = (
   registration: EventRegistrationData,
   event: EventEmailContext,
 ): RenderedEmail => {
-  const subject = `New event registration — ${registration.firstName?.trim() || 'Visitor'}`
+  const subject = `New event registration: ${registration.firstName?.trim() || 'Visitor'}`
 
   const allRows: Array<[string, string | null | undefined]> = [
     ['Event', event.eventTitle],

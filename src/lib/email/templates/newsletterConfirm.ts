@@ -21,30 +21,30 @@ import type { RenderedEmail } from './paymentConfirmation'
 const COPY = {
   en: {
     subject: 'Confirm your subscription to isad.academy',
-    preheader: 'One click and you’re in — confirm your e-mail address.',
+    preheader: 'One click and you’re in: confirm your e-mail address.',
     heading: 'Confirm your subscription',
-    intro: 'Someone — hopefully you — asked to receive updates from isad.academy at this address.',
+    intro: 'Someone (hopefully you) asked to receive updates from isad.academy at this address.',
     action: 'Please confirm so we know it’s really you:',
     button: 'Confirm subscription',
     fallback: 'If the button doesn’t work, copy this link into your browser:',
     expiry: 'This link works for 48 hours.',
     ignore:
-      'If you didn’t request this, simply ignore this e-mail — nothing will be sent to you and your address is not stored.',
+      'If you didn’t request this, simply ignore this e-mail. Nothing will be sent to you and your address is not stored.',
     signoff: 'The isad.academy Team',
     footer:
       'You received this e-mail because your address was entered in the newsletter form on isad.academy. No subscription is active until you confirm.',
   },
   ro: {
     subject: 'Confirmă abonarea la isad.academy',
-    preheader: 'Un singur click — confirmă adresa ta de e-mail.',
+    preheader: 'Un singur click: confirmă adresa ta de e-mail.',
     heading: 'Confirmă abonarea',
-    intro: 'Cineva — sperăm că tu — a cerut să primească noutăți de la isad.academy pe această adresă.',
+    intro: 'Cineva (sperăm că tu) a cerut să primească noutăți de la isad.academy pe această adresă.',
     action: 'Te rugăm să confirmi, ca să știm că ești chiar tu:',
     button: 'Confirmă abonarea',
     fallback: 'Dacă butonul nu funcționează, copiază linkul acesta în browser:',
     expiry: 'Linkul este valabil 48 de ore.',
     ignore:
-      'Dacă nu tu ai cerut asta, ignoră pur și simplu acest e-mail — nu îți vom trimite nimic, iar adresa ta nu este păstrată.',
+      'Dacă nu tu ai cerut asta, ignoră pur și simplu acest e-mail. Nu îți vom trimite nimic, iar adresa ta nu este păstrată.',
     signoff: 'Echipa isad.academy',
     footer:
       'Ai primit acest e-mail pentru că adresa ta a fost introdusă în formularul de newsletter de pe isad.academy. Abonarea nu este activă până nu confirmi.',

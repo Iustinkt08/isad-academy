@@ -5,7 +5,7 @@ import { uploadsDir } from '../lib/media/uploadsDir'
 export const Media: CollectionConfig = {
   slug: 'media',
   admin: {
-    group: 'Content',
+    group: { en: 'Content', ro: 'Conținut' },
   },
   access: {
     read: () => true,

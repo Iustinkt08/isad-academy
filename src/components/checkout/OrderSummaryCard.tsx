@@ -206,7 +206,7 @@ export default function OrderSummaryCard({
           {t.total}
         </span>
         <span className="shrink-0 text-[20px] font-semibold leading-[28px] tracking-[-0.5px] text-ink lg:text-[22px] lg:leading-normal">
-          {pricing ? formatPrice(pricing.total, currency) : '—'}
+          {pricing ? formatPrice(pricing.total, currency) : '-'}
         </span>
       </div>
       <p className="text-[12px] leading-[18px] text-[#959595] lg:leading-normal lg:text-grey-600">

@@ -13,16 +13,16 @@ import {
   isPastSession,
   lexicalToPlainText,
 } from '@/components/courses/helpers'
-import CourseCallout from '@/components/cursuri/CourseCallout'
+import CourseCallout from '@/components/courses/CourseCallout'
 import {
   CourseAbout,
   CourseAudience,
   CourseCertification,
   CourseProgramme,
   type ProgrammeDay,
-} from '@/components/cursuri/CourseContent'
-import CourseHeader from '@/components/cursuri/CourseHeader'
-import EnrolmentCard, { ExpertMiniCard, type Edition } from '@/components/cursuri/EnrolmentCard'
+} from '@/components/courses/CourseContent'
+import CourseHeader from '@/components/courses/CourseHeader'
+import EnrolmentCard, { ExpertMiniCard, type Edition } from '@/components/courses/EnrolmentCard'
 import { NewsletterForm } from '@/components/layout/NewsletterForm'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { Container } from '@/components/ui/Container'
@@ -89,7 +89,7 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
   if (!data) return { title: dict.courseDetail.metaNotFound }
 
   const { course } = data
-  const coursePath = localePath(locale, `/cursuri/${course.slug}`)
+  const coursePath = localePath(locale, `/courses/${course.slug}`)
 
   // plugin-seo `meta.*` first (T14 — docs/PLAN.md locked decision), content fallbacks after.
   // An editor-set meta.title is used verbatim (absolute), otherwise the root layout's
@@ -131,7 +131,7 @@ function buildCourseJsonLd(
   locale: Locale,
 ): Record<string, unknown> {
   const siteUrl = getSiteUrl()
-  const courseUrl = `${siteUrl}${localePath(locale, `/cursuri/${course.slug}`)}`
+  const courseUrl = `${siteUrl}${localePath(locale, `/courses/${course.slug}`)}`
   const description = excerpt(lexicalToPlainText(course.description))
   const image = asMedia(course.meta?.image)?.url || asMedia(course.image)?.url
 
@@ -141,7 +141,8 @@ function buildCourseJsonLd(
     name: course.title,
     url: courseUrl,
     ...(description ? { description } : {}),
-    ...(image ? { image: `${siteUrl}${image}` } : {}),
+    // `media.url` is absolute when serverURL is set — only prefix genuinely relative paths.
+    ...(image ? { image: image.startsWith('http') ? image : `${siteUrl}${image}` } : {}),
     ...(course.durationHours ? { timeRequired: `PT${course.durationHours}H` } : {}),
     provider: {
       '@type': 'Organization',
@@ -217,7 +218,7 @@ const editionDateRange = (session: CourseSession): string => {
     .sort()
   const first = days[0]
   const last = days[days.length - 1]
-  if (first && last && first !== last) return `${formatDotDayMonth(first)} – ${formatDotDate(last)}`
+  if (first && last && first !== last) return `${formatDotDayMonth(first)} - ${formatDotDate(last)}`
   return formatDotDate(first ?? session.startDate)
 }
 
@@ -284,7 +285,7 @@ const courseTeaser = (course: Course): string => {
 }
 
 /**
- * /cursuri/[slug] — owner Figma redesign (node 3790:4223):
+ * /courses/[slug] — owner Figma redesign (node 3790:4223):
  * CourseHeader (simplified — no meta chips, no Share) → two columns (content flex-1
  * basis-600 + aside 456 sticky) → CourseCallout, on surface-subtle. Programme shows the
  * EARLIEST upcoming edition's schedule (server-rendered — the client edition selection
@@ -333,7 +334,7 @@ export default async function CourseDetailPage({ params }: Args) {
     topic: t.liveSession(row.startTime, row.endTime),
   }))
   const programmeHoursLabel = programmeRows[0]
-    ? `${programmeRows[0].startTime}–${programmeRows[0].endTime}${programmeRows.length > 1 ? ` · ${t.daily}` : ''}`
+    ? `${programmeRows[0].startTime}-${programmeRows[0].endTime}${programmeRows.length > 1 ? ` · ${t.daily}` : ''}`
     : ''
 
   return (
@@ -345,7 +346,7 @@ export default async function CourseDetailPage({ params }: Args) {
           data={{
             // Back la catalog (owner 2026-07-26) — a înlocuit breadcrumb-ul
             backLabel: t.backToCourses,
-            backHref: localePath(locale, '/cursuri'),
+            backHref: localePath(locale, '/courses'),
             pillLabel: isPecbTrack ? t.pillPecb : t.pillOwn,
             titlePlain,
             titleGradient,

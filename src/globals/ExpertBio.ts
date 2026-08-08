@@ -11,8 +11,11 @@ import { revalidateSiteHook } from '../lib/revalidateSite'
 export const ExpertBio: GlobalConfig = {
   slug: 'expertBio',
   admin: {
-    group: 'Site',
-    description: 'The expert bio, shown on Home (short) and About (full).',
+    group: { en: 'Site', ro: 'Site' },
+    description: {
+      en: 'The trainer biography, reused across the site: the short bio appears in the expert band on the homepage, the full bio on the About page. Saving republishes both pages.',
+      ro: 'Biografia trainerului, refolosită pe site: biografia scurtă apare în banda expertului de pe pagina principală, iar cea completă pe pagina Despre. Salvarea republică ambele pagini.',
+    },
   },
   access: {
     read: () => true,
@@ -24,15 +27,48 @@ export const ExpertBio: GlobalConfig = {
   },
   fields: [
     { name: 'name', type: 'text' },
-    { name: 'title', type: 'text', localized: true, admin: { description: 'Professional title / headline.' } },
+    {
+      name: 'title',
+      type: 'text',
+      localized: true,
+      admin: {
+        description: {
+          en: 'Professional title or headline shown next to the name, e.g. the role and main credential.',
+          ro: 'Titlul profesional sau headline-ul afișat lângă nume, de exemplu rolul și acreditarea principală.',
+        },
+      },
+    },
     { name: 'photo', type: 'upload', relationTo: 'media' },
-    { name: 'shortBio', type: 'textarea', localized: true, admin: { description: 'Used in the Home expert band.' } },
-    { name: 'fullBio', type: 'richText', localized: true, admin: { description: 'Used on the About page.' } },
+    {
+      name: 'shortBio',
+      type: 'textarea',
+      localized: true,
+      admin: {
+        description: {
+          en: 'Short biography shown in the expert band on the homepage.',
+          ro: 'Biografie scurtă, afișată în banda expertului de pe pagina principală.',
+        },
+      },
+    },
+    {
+      name: 'fullBio',
+      type: 'richText',
+      localized: true,
+      admin: {
+        description: {
+          en: 'Full biography shown on the About page.',
+          ro: 'Biografia completă, afișată pe pagina Despre.',
+        },
+      },
+    },
     {
       name: 'credentials',
       type: 'array',
       localized: true,
-      labels: { singular: 'Credential', plural: 'Credentials' },
+      labels: {
+        singular: { en: 'Credential', ro: 'Acreditare' },
+        plural: { en: 'Credentials', ro: 'Acreditări' },
+      },
       fields: [
         { name: 'label', type: 'text' },
         { name: 'value', type: 'text' },

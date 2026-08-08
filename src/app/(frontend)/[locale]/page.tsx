@@ -168,7 +168,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const title = hero?.title || dict.hero.titleFallback
   const subtitle = hero?.subtitle || dict.hero.subtitleFallback
   const ctaText = hero?.ctaText || dict.hero.ctaFallback
-  const ctaLink = hero?.ctaLink || localePath(locale, '/cursuri')
+  const ctaLink = hero?.ctaLink || localePath(locale, '/courses')
 
   return (
     <>

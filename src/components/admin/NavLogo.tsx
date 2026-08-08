@@ -8,7 +8,7 @@ import Link from 'next/link'
  */
 export function NavLogo() {
   return (
-    <Link aria-label="isad.academy — dashboard" className="isad-nav-logo" href="/admin">
+    <Link aria-label="isad.academy dashboard" className="isad-nav-logo" href="/admin">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img alt="" className="isad-admin-logo--light" src="/brand/icon-black.svg" />
       {/* eslint-disable-next-line @next/next/no-img-element */}

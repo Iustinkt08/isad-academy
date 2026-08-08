@@ -231,7 +231,7 @@ async function seed() {
   const log = (message: string) => payload.logger.info(`[seed] ${message}`)
 
   // --- Published course: ISO/IEC 42001:2023 preparation training -----------------------
-  const courseTitle = 'ISO/IEC 42001:2023 — AI Management Systems (preparation training)'
+  const courseTitle = 'ISO/IEC 42001:2023 AI Management Systems (preparation training)'
   const { doc: course, created: courseCreated } = await findOrCreate(
     payload,
     'courses',
@@ -242,11 +242,11 @@ async function seed() {
       durationHours: 16,
       category: 'iso',
       description: richText([
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit — sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. [Placeholder copy, pending Silviu review — CLAUDE.md §15.]',
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. [Placeholder copy, pending Silviu review.]',
         'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore.',
       ]),
       audience: [
-        { text: 'Lorem ipsum: Compliance officers overseeing AI systems. [Placeholder — pending Silviu confirmation]' },
+        { text: 'Lorem ipsum: Compliance officers overseeing AI systems. [Placeholder, pending Silviu confirmation]' },
         { text: 'Lorem ipsum: Risk and audit professionals entering AI governance. [Placeholder]' },
         { text: 'Lorem ipsum: Technical leads preparing for ISO/IEC 42001 readiness. [Placeholder]' },
       ],
@@ -256,13 +256,13 @@ async function seed() {
 
   // RO translation (bilingual site RO/EN) — localized fields only
   await withRo(payload, 'courses', course.id as number, {
-    title: 'ISO/IEC 42001:2023 — Sisteme de management al inteligenței artificiale (curs de pregătire)',
+    title: 'ISO/IEC 42001:2023 Sisteme de management al inteligenței artificiale (curs de pregătire)',
     description: richText([
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit — sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. [Text substituent, în așteptarea verificării lui Silviu — CLAUDE.md §15.]',
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. [Text substituent, în așteptarea verificării lui Silviu.]',
       'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore.',
     ]),
     audience: [
-      { text: 'Lorem ipsum: Ofițeri de conformitate care supraveghează sisteme AI. [Substituent — în așteptarea confirmării lui Silviu]' },
+      { text: 'Lorem ipsum: Ofițeri de conformitate care supraveghează sisteme AI. [Substituent, în așteptarea confirmării lui Silviu]' },
       { text: 'Lorem ipsum: Profesioniști în risc și audit care intră în guvernanța AI. [Substituent]' },
       { text: 'Lorem ipsum: Lideri tehnici care pregătesc organizația pentru ISO/IEC 42001. [Substituent]' },
     ],
@@ -280,7 +280,7 @@ async function seed() {
       durationHours: 12,
       category: 'antiFraud',
       description: richText([
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. [Placeholder copy, pending Silviu review — CLAUDE.md §15.]',
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. [Placeholder copy, pending Silviu review.]',
       ]),
       audience: [{ text: 'Lorem ipsum: Fraud investigation teams. [Placeholder]' }],
     },
@@ -295,7 +295,7 @@ async function seed() {
     {
       title: 'Fundamente antifraudă pentru instituții financiare',
       description: richText([
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. [Text substituent, în așteptarea verificării lui Silviu — CLAUDE.md §15.]',
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. [Text substituent, în așteptarea verificării lui Silviu.]',
       ]),
       audience: [{ text: 'Lorem ipsum: Echipe de investigare a fraudelor. [Substituent]' }],
     },
@@ -314,7 +314,7 @@ async function seed() {
       durationHours: 8,
       category: 'iso',
       description: richText([
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit — sed do eiusmod tempor incididunt ut labore. [Placeholder copy, pending Silviu review — CLAUDE.md §15.]',
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore. [Placeholder copy, pending Silviu review.]',
       ]),
       audience: [
         { text: 'Lorem ipsum: Managers building an AI risk register. [Placeholder]' },
@@ -328,7 +328,7 @@ async function seed() {
   await withRo(payload, 'courses', course2.id as number, {
     title: 'Fundamentele managementului riscurilor AI',
     description: richText([
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit — sed do eiusmod tempor incididunt ut labore. [Text substituent, în așteptarea verificării lui Silviu — CLAUDE.md §15.]',
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore. [Text substituent, în așteptarea verificării lui Silviu.]',
     ]),
     audience: [
       { text: 'Lorem ipsum: Manageri care construiesc un registru de riscuri AI. [Substituent]' },
@@ -435,8 +435,8 @@ async function seed() {
       course: course.id,
     },
     {
-      text: 'Good overview of the AI management framework — would recommend to technical teams.',
-      textRo: 'O bună trecere în revistă a cadrului de management al AI — l-aș recomanda echipelor tehnice.',
+      text: 'Good overview of the AI management framework. Would recommend to technical teams.',
+      textRo: 'O bună trecere în revistă a cadrului de management al AI. L-aș recomanda echipelor tehnice.',
       authorName: 'Elena Radu',
       roleCompany: 'IT Lead, TechCorp',
       source: 'manual',
@@ -454,23 +454,23 @@ async function seed() {
     {
       question: 'Is the ISO/IEC 42001 certificate accredited?',
       answer: richText([
-        'isad.academy courses are training that prepares you for ISO/IEC 42001:2023. You receive a certificate of completion issued by APCF, together with CPD credits — not an accredited ISO certification.',
+        'isad.academy courses are training that prepares you for ISO/IEC 42001:2023. You receive a certificate of completion issued by APCF, together with CPD credits, not an accredited ISO certification.',
       ]),
       order: 1,
       ro: {
         question: 'Este certificatul ISO/IEC 42001 acreditat?',
         answer: richText([
-          'Cursurile isad.academy sunt programe de pregătire pentru ISO/IEC 42001:2023. Primești un certificat de absolvire emis de APCF, împreună cu credite CPD — nu o certificare ISO acreditată.',
+          'Cursurile isad.academy sunt programe de pregătire pentru ISO/IEC 42001:2023. Primești un certificat de absolvire emis de APCF, împreună cu credite CPD, nu o certificare ISO acreditată.',
         ]),
       },
     },
     {
       question: 'How are the courses delivered?',
-      answer: richText(['All courses are delivered live, 1:1, on Zoom — never pre-recorded.']),
+      answer: richText(['All courses are delivered live, 1:1, on Zoom, never pre-recorded.']),
       order: 2,
       ro: {
         question: 'Cum sunt livrate cursurile?',
-        answer: richText(['Toate cursurile sunt livrate live, 1:1, pe Zoom — niciodată preînregistrate.']),
+        answer: richText(['Toate cursurile sunt livrate live, 1:1, pe Zoom, niciodată preînregistrate.']),
       },
     },
     {
@@ -482,7 +482,7 @@ async function seed() {
       ro: {
         question: 'Ce sunt creditele CPD?',
         answer: richText([
-          'Creditele CPD (Continuing Professional Development — dezvoltare profesională continuă) recunosc orele investite în formarea profesională.',
+          'Creditele CPD (Continuing Professional Development, dezvoltare profesională continuă) recunosc orele investite în formarea profesională.',
         ]),
       },
     },
@@ -535,7 +535,7 @@ async function seed() {
       body: lexicalRoot([
         paragraph([
           textNode(
-            'Before an auditor walks through your AI inventory, walk through it yourself. These five questions surface the gaps that show up most often in first-time AI audits. [Placeholder demo article — pending Silviu review.]',
+            'Before an auditor walks through your AI inventory, walk through it yourself. These five questions surface the gaps that show up most often in first-time AI audits. [Placeholder demo article, pending Silviu review.]',
           ),
         ]),
         paragraph([
@@ -557,7 +557,7 @@ async function seed() {
     body: lexicalRoot([
       paragraph([
         textNode(
-          'Înainte ca un auditor să îți parcurgă inventarul AI, parcurge-l tu. Aceste cinci întrebări scot la iveală lacunele care apar cel mai des la primele audituri AI. [Articol demonstrativ substituent — în așteptarea verificării lui Silviu.]',
+          'Înainte ca un auditor să îți parcurgă inventarul AI, parcurge-l tu. Aceste cinci întrebări scot la iveală lacunele care apar cel mai des la primele audituri AI. [Articol demonstrativ substituent, în așteptarea verificării lui Silviu.]',
         ),
       ]),
       paragraph([
@@ -577,7 +577,7 @@ async function seed() {
       title: post1Title,
       _status: 'published',
       excerpt:
-        'ISO/IEC 42001:2023 is the first management-system standard for AI. Here is what it covers — and how to prepare.',
+        'ISO/IEC 42001:2023 is the first management-system standard for AI. Here is what it covers, and how to prepare.',
       coverImage: coverMedia.id,
       relatedCourse: course.id,
       // readingTime deliberately omitted — the beforeChange hook auto-estimates it.
@@ -585,10 +585,10 @@ async function seed() {
         paragraph([
           textNode('ISO/IEC 42001:2023 is the first '),
           textNode('management-system standard for AI', { color: 'blue' }),
-          textNode(' — it does for AI governance what ISO 27001 did for information security. Preparing for it early gives your organisation a '),
+          textNode(': it does for AI governance what ISO 27001 did for information security. Preparing for it early gives your organisation a '),
           textNode('structured, auditable way', { color: 'aqua' }),
           textNode(
-            ' to run AI responsibly. [Placeholder demo article — pending Silviu review.]',
+            ' to run AI responsibly. [Placeholder demo article, pending Silviu review.]',
           ),
         ]),
         heading('h2', 'Why it matters now'),
@@ -598,7 +598,7 @@ async function seed() {
           ),
         ]),
         blockquote(
-          'Governance is not about slowing AI down — it is about being able to prove, at any moment, that you know what your AI is doing.',
+          'Governance is not about slowing AI down; it is about being able to prove, at any moment, that you know what your AI is doing.',
         ),
         uploadNode(imageMedia.id),
         heading('h2', 'Where to start'),
@@ -632,15 +632,15 @@ async function seed() {
   await withRo(payload, 'blogPosts', post1.id as number, {
     title: 'Ce înseamnă ISO/IEC 42001 pentru guvernanța AI din organizația ta',
     excerpt:
-      'ISO/IEC 42001:2023 este primul standard de sistem de management pentru AI. Iată ce acoperă — și cum te poți pregăti.',
+      'ISO/IEC 42001:2023 este primul standard de sistem de management pentru AI. Iată ce acoperă și cum te poți pregăti.',
     body: lexicalRoot([
       paragraph([
         textNode('ISO/IEC 42001:2023 este primul '),
         textNode('standard de sistem de management pentru AI', { color: 'blue' }),
-        textNode(' — face pentru guvernanța AI ceea ce ISO 27001 a făcut pentru securitatea informației. Pregătirea din timp oferă organizației tale o '),
+        textNode(': face pentru guvernanța AI ceea ce ISO 27001 a făcut pentru securitatea informației. Pregătirea din timp oferă organizației tale o '),
         textNode('modalitate structurată și auditabilă', { color: 'aqua' }),
         textNode(
-          ' de a utiliza AI în mod responsabil. [Articol demonstrativ substituent — în așteptarea verificării lui Silviu.]',
+          ' de a utiliza AI în mod responsabil. [Articol demonstrativ substituent, în așteptarea verificării lui Silviu.]',
         ),
       ]),
       heading('h2', 'De ce contează acum'),
@@ -650,7 +650,7 @@ async function seed() {
         ),
       ]),
       blockquote(
-        'Guvernanța nu înseamnă să încetinești AI-ul — înseamnă să poți dovedi, în orice moment, că știi ce face AI-ul tău.',
+        'Guvernanța nu înseamnă să încetinești AI-ul; înseamnă să poți dovedi, în orice moment, că știi ce face AI-ul tău.',
       ),
       uploadNode(imageMedia.id),
       heading('h2', 'De unde să începi'),
@@ -686,9 +686,9 @@ async function seed() {
     {
       title: draftPostTitle,
       _status: 'draft',
-      excerpt: 'Not published yet — must 404 publicly.',
+      excerpt: 'Not published yet; must 404 publicly.',
       body: lexicalRoot([
-        paragraph([textNode('Work in progress. [Placeholder draft — pending Silviu review.]')]),
+        paragraph([textNode('Work in progress. [Placeholder draft, pending Silviu review.]')]),
       ]),
     },
   )
@@ -701,9 +701,9 @@ async function seed() {
     draftPost.id as number,
     {
       title: 'Ciornă: tendințe viitoare',
-      excerpt: 'Nepublicat încă — trebuie să returneze 404 public.',
+      excerpt: 'Nepublicat încă; trebuie să returneze 404 public.',
       body: lexicalRoot([
-        paragraph([textNode('Lucrare în curs. [Ciornă substituent — în așteptarea verificării lui Silviu.]')]),
+        paragraph([textNode('Lucrare în curs. [Ciornă substituent, în așteptarea verificării lui Silviu.]')]),
       ]),
     },
     { draft: true },
@@ -718,12 +718,12 @@ async function seed() {
       shortBio:
         'International consultant, trainer, and speaker with over 20 years of experience helping organizations leverage Artificial Intelligence, Governance, Risk Management, and Financial Crime solutions to solve real-world challenges.',
       fullBio: richText([
-        'Dr. Silviu Gresoi has spent over 21 years working in anti-fraud, risk management and data analytics across the banking and energy sectors, including roles at BancPost, Banca Românească, Garanti Bank and First Bank. [TO CONFIRM — EN copy pending Silviu review, CLAUDE.md §4/§15]',
+        'Dr. Silviu Gresoi has spent over 21 years working in anti-fraud, risk management and data analytics across the banking and energy sectors, including roles at BancPost, Banca Românească, Garanti Bank and First Bank. [TO CONFIRM: EN copy pending Silviu review]',
         'He is a Certified Fraud Examiner (CFE, 2014) and holds a PhD in AI & Machine Learning from Politehnica Bucharest. He has spoken at AI Expo Europe and AI Summit Europe. [TO CONFIRM]',
       ]),
       credentials: [
         { label: 'Certification', value: 'CFE (Certified Fraud Examiner), 2014' },
-        { label: 'Education', value: 'PhD, AI & Machine Learning — Politehnica Bucharest' },
+        { label: 'Education', value: 'PhD, AI & Machine Learning, Politehnica Bucharest' },
         { label: 'Experience', value: '21+ years in Anti-Fraud, Risk Management & Data Analytics' },
         { label: 'Speaking', value: 'AI Expo Europe, AI Summit Europe' },
       ],
@@ -740,19 +740,19 @@ async function seed() {
       shortBio:
         'Consultant internațional, trainer și speaker cu peste 20 de ani de experiență, care ajută organizațiile să valorifice soluții de inteligență artificială, guvernanță, management al riscului și combatere a criminalității financiare pentru a rezolva provocări reale.',
       fullBio: richText([
-        'Dr. Silviu Gresoi a lucrat peste 21 de ani în antifraudă, managementul riscului și analiza datelor, în sectorul bancar și în cel energetic, inclusiv în roluri la BancPost, Banca Românească, Garanti Bank și First Bank. [DE CONFIRMAT — copy în așteptarea verificării lui Silviu, CLAUDE.md §4/§15]',
+        'Dr. Silviu Gresoi a lucrat peste 21 de ani în antifraudă, managementul riscului și analiza datelor, în sectorul bancar și în cel energetic, inclusiv în roluri la BancPost, Banca Românească, Garanti Bank și First Bank. [DE CONFIRMAT: copy în așteptarea verificării lui Silviu]',
         'Este Certified Fraud Examiner (CFE, 2014) și deține un doctorat în AI & Machine Learning la Politehnica București. A susținut prezentări la AI Expo Europe și AI Summit Europe. [DE CONFIRMAT]',
       ]),
       credentials: [
         { label: 'Certificare', value: 'CFE (Certified Fraud Examiner), 2014' },
-        { label: 'Educație', value: 'Doctorat, AI & Machine Learning — Politehnica București' },
+        { label: 'Educație', value: 'Doctorat, AI & Machine Learning, Politehnica București' },
         { label: 'Experiență', value: '21+ ani în antifraudă, managementul riscului și analiza datelor' },
         { label: 'Conferințe', value: 'AI Expo Europe, AI Summit Europe' },
       ],
     },
     overrideAccess: true,
   })
-  log('expertBio global: upserted [TO CONFIRM placeholders — CLAUDE.md §4/§15]')
+  log('expertBio global: upserted [TO CONFIRM placeholders, CLAUDE.md §4/§15]')
 
   // --- homepage global ---------------------------------------------------------------------
   await payload.updateGlobal({
@@ -763,7 +763,7 @@ async function seed() {
         title: 'Learn AI, Data Analysis & Fraud Prevention',
         subtitle: 'Develop practical skills to face the world challenges.',
         ctaText: 'Get your certificate today',
-        ctaLink: '/cursuri',
+        ctaLink: '/courses',
       },
       featuredCourses: [course.id as number, course2.id as number],
       whyIsad: {
@@ -777,7 +777,7 @@ async function seed() {
         differentiators: [
           {
             title: 'Live, not recorded',
-            text: 'Every session is taught live, 1:1, on Zoom — no pre-recorded videos.',
+            text: 'Every session is taught live, 1:1, on Zoom. No pre-recorded videos.',
           },
           {
             title: 'Real-world expertise',
@@ -813,7 +813,7 @@ async function seed() {
         differentiators: [
           {
             title: 'Live, nu înregistrat',
-            text: 'Fiecare sesiune este predată live, 1:1, pe Zoom — fără videoclipuri preînregistrate.',
+            text: 'Fiecare sesiune este predată live, 1:1, pe Zoom. Fără videoclipuri preînregistrate.',
           },
           {
             title: 'Expertiză din practică',

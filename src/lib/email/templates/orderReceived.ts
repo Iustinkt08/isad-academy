@@ -38,7 +38,7 @@ const formatDate = (value: string | Date | null | undefined): string => {
 export const renderOrderReceivedEmail = (data: OrderReceivedData): RenderedEmail => {
   const courseTitle = data.courseTitle || 'your course'
   const startDate = formatDate(data.startDate)
-  const participantsList = data.participants.map((p) => p.name).filter(Boolean).join(', ') || '—'
+  const participantsList = data.participants.map((p) => p.name).filter(Boolean).join(', ') || '-'
   // Documentul clientului scrie `support@isad.academy`, dar adresa aia nu e sender verificat
   // în Brevo — mapată pe `contact@`, inboxul monitorizat (decizie owner 2026-08-05).
   // ATENȚIE: textele legale (Termeni §retragere/reclamații, Privacy, Cookies) promit în

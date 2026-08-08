@@ -8,11 +8,11 @@ import {
   isPastSession,
   lexicalToPlainText,
 } from '@/components/courses/helpers'
-import CatalogGrid from '@/components/cursuri/CatalogGrid'
-import CatalogHeader from '@/components/cursuri/CatalogHeader'
+import CatalogGrid from '@/components/courses/CatalogGrid'
+import CatalogHeader from '@/components/courses/CatalogHeader'
 import { Reveal } from '@/components/ui/Reveal'
-import type { CatalogCourse } from '@/components/cursuri/CourseCard'
-import PastEditions, { type PastEdition } from '@/components/cursuri/PastEditions'
+import type { CatalogCourse } from '@/components/courses/CourseCard'
+import PastEditions, { type PastEdition } from '@/components/courses/PastEditions'
 import { getDictionary, localePath, resolveLocale, type Locale } from '@/lib/i18n'
 import type { Course, CourseSession } from '@/payload-types'
 
@@ -110,7 +110,7 @@ async function getCatalogData(locale: Locale): Promise<CatalogData> {
           title: course.title,
           subtitle: courseSubtitle(course),
           description: courseSummary(course),
-          href: localePath(locale, `/cursuri/${course.slug}`),
+          href: localePath(locale, `/courses/${course.slug}`),
           // No upcoming edition → sort last (the date is never rendered).
           nextStartDate: hasUpcoming ? new Date(upcomingStart).toISOString() : '9999-12-31',
         })
@@ -126,7 +126,7 @@ async function getCatalogData(locale: Locale): Promise<CatalogData> {
 }
 
 /**
- * /cursuri (§6, owner Figma redesign v2 RESPONSIVE — desktop 3732-7, mobil 3908-107):
+ * /courses (§6, owner Figma redesign v2 RESPONSIVE — desktop 3732-7, mobil 3908-107):
  * CatalogHeader (quiz CTA = the primary action) → CatalogGrid (sort toggle only — no
  * filters, no search; teaser cards without date/price/seats; mobile snap strip + dots) →
  * PastEditions (mobile snap strip). Fully CMS-driven: courses + courseSessions from Payload.

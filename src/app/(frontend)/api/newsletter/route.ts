@@ -57,7 +57,7 @@ export async function POST(request: Request): Promise<Response> {
 
   if (!outcome.ok && outcome.reason === 'unsigned') {
     console.error(
-      '[newsletter] PAYLOAD_SECRET / NEWSLETTER_TOKEN_SECRET missing — cannot sign the confirmation link.',
+      '[newsletter] PAYLOAD_SECRET / NEWSLETTER_TOKEN_SECRET missing; cannot sign the confirmation link.',
     )
     return Response.json(
       { ok: false, error: 'Could not process your subscription. Please try again later.' },

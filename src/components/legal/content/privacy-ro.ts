@@ -1003,13 +1003,13 @@ export const privacyRo: LegalDocContent = {
         },
         {
           "kind": "p",
-          "text": "În astfel de cazuri, transferurile se vor realiza numai dacă sunt respectate condițiile prevăzute de articolele 44–49 din GDPR, inclusiv prin:"
+          "text": "În astfel de cazuri, transferurile se vor realiza numai dacă sunt respectate condițiile prevăzute de articolele 44-49 din GDPR, inclusiv prin:"
         },
         {
           "kind": "list",
           "items": [
             "decizii de adecvare emise de Comisia Europeană;",
-            "Clauze Contractuale Standard (Standard Contractual Clauses – SCC);",
+            "Clauze Contractuale Standard (Standard Contractual Clauses, SCC);",
             "alte garanții adecvate prevăzute de legislația aplicabilă."
           ]
         },

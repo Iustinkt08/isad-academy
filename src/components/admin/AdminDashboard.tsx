@@ -25,9 +25,9 @@ import { computeSeatsRemaining } from '../../collections/CourseSessions'
 const dateFormatter = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
 
 const formatDate = (value: null | string | undefined): string => {
-  if (!value) return '—'
+  if (!value) return '-'
   const date = new Date(value)
-  return Number.isNaN(date.getTime()) ? '—' : dateFormatter.format(date)
+  return Number.isNaN(date.getTime()) ? '-' : dateFormatter.format(date)
 }
 
 type ChipTone = 'error' | 'neutral' | 'success' | 'warning'
@@ -141,7 +141,7 @@ export async function AdminDashboard(props: ServerProps) {
         total:
           typeof order.pricing?.total === 'number'
             ? `${order.pricing.total} ${order.pricing?.currency ?? ''}`.trim()
-            : '—',
+            : '-',
       })),
     }
   } catch (err) {

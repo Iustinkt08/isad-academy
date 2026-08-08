@@ -41,7 +41,7 @@ describe('checkoutSubmitError — maps every T6 status/body to a UI surface', ()
   it('402 payment failed → declined message', () => {
     expect(checkoutSubmitError(402, { error: 'Payment failed.' })).toEqual({
       kind: 'general',
-      message: 'Payment was declined — please try again.',
+      message: 'Payment was declined. Please try again.',
     })
   })
 

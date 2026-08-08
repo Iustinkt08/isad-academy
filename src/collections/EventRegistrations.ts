@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload'
 
-import { isAdmin } from '../access/isAdmin'
+import { hiddenFromEditors, isAdminRole } from '../access/isAdminRole'
 import { sendEventRegistrationEmails } from '../lib/email/hooks'
 
 /**
@@ -13,7 +13,7 @@ export const EventRegistrations: CollectionConfig = {
   slug: 'eventRegistrations',
   admin: {
     useAsTitle: 'email',
-    group: 'Sales',
+    group: { en: 'Sales', ro: 'Vânzări' },
     defaultColumns: [
       'popup',
       'firstName',
@@ -23,18 +23,22 @@ export const EventRegistrations: CollectionConfig = {
       'newsletterOptIn',
       'createdAt',
     ],
-    description:
-      'Everyone who signed up through an event pop-up. Each row belongs to ONE event — see the "Popup" column. Use Filters → Popup to see a single event’s list. Signing up for one event never signs anyone up for another, and it does not subscribe them to the newsletter unless they ticked that box.',
+    description: {
+      en: 'Everyone who signed up through an event pop-up. Each row belongs to ONE event, shown in the "Popup" column; use Filters, then Popup, to see a single event\'s list. Signing up for one event never signs anyone up for another, and it does not subscribe them to the newsletter unless they ticked that box.',
+      ro: 'Toți cei care s-au înscris printr-un pop-up de eveniment. Fiecare rând aparține UNUI singur eveniment, afișat în coloana „Popup"; folosiți Filters, apoi Popup, pentru lista unui singur eveniment. Înscrierea la un eveniment nu înscrie pe nimeni la alt eveniment și nu abonează persoana la newsletter decât dacă a bifat acea căsuță.',
+    },
+    // Registrant PII is admin-only — editors manage the popups, not the sign-up list.
+    hidden: hiddenFromEditors,
   },
   defaultSort: '-createdAt',
   access: {
-    read: isAdmin,
+    read: isAdminRole,
     // Ca la `leads`: înscrierile publice trec prin serviciul întărit
     // `registerForEventPopup` (honeypot + validare + dedupe, scris cu `overrideAccess`).
     // Endpoint-ul brut de create din Payload nu are voie să fie un ocol public al lor.
     create: ({ req }) => Boolean(req.user),
-    update: isAdmin,
-    delete: isAdmin,
+    update: isAdminRole,
+    delete: isAdminRole,
   },
   // Un om nu se poate înscrie de două ori la același eveniment. Dedupe-ul din
   // `registerForEventPopup` e la nivel de aplicație și pierde cursa la două cereri
@@ -51,7 +55,10 @@ export const EventRegistrations: CollectionConfig = {
       required: true,
       index: true,
       admin: {
-        description: 'Which event pop-up this sign-up came from.',
+        description: {
+          en: 'The event pop-up this sign-up came from. Determines which event the person registered for.',
+          ro: 'Pop-up-ul de eveniment din care provine această înscriere. Determină la ce eveniment s-a înscris persoana.',
+        },
       },
     },
     { name: 'firstName', type: 'text', required: true },
@@ -60,7 +67,12 @@ export const EventRegistrations: CollectionConfig = {
     {
       name: 'occupation',
       type: 'text',
-      admin: { description: 'Picked from the configured list or typed freely.' },
+      admin: {
+        description: {
+          en: 'The occupation the person chose from the configured list or typed in freely on the registration form.',
+          ro: 'Ocupația pe care persoana a ales-o din lista configurată sau a scris-o liber în formularul de înscriere.',
+        },
+      },
     },
     {
       name: 'newsletterOptIn',
@@ -68,8 +80,10 @@ export const EventRegistrations: CollectionConfig = {
       defaultValue: false,
       admin: {
         readOnly: true,
-        description:
-          'Ticked the newsletter box when registering. This alone does NOT make them a subscriber — they still have to confirm the double opt-in e-mail.',
+        description: {
+          en: 'Whether the person ticked the newsletter box when registering. This alone does NOT make them a subscriber; they still have to confirm the double opt-in e-mail.',
+          ro: 'Dacă persoana a bifat căsuța de newsletter la înscriere. Doar bifa NU o face abonată; trebuie să confirme și e-mailul de dublu opt-in.',
+        },
       },
     },
     {
@@ -77,8 +91,10 @@ export const EventRegistrations: CollectionConfig = {
       type: 'group',
       admin: {
         readOnly: true,
-        description:
-          'GDPR proof: the exact wording agreed to, and when. Kept as a snapshot because the pop-up’s consent text can be edited later — the proof must not change with it.',
+        description: {
+          en: 'GDPR proof: the exact consent wording agreed to, and when. Kept as a snapshot because the pop-up\'s consent text can be edited later; the proof must not change with it.',
+          ro: 'Dovadă GDPR: formularea exactă a consimțământului acceptat și momentul acceptării. Păstrată ca instantaneu pentru că textul de consimțământ al pop-up-ului poate fi editat ulterior; dovada nu trebuie să se schimbe odată cu el.',
+        },
       },
       fields: [
         { name: 'consentText', type: 'textarea' },

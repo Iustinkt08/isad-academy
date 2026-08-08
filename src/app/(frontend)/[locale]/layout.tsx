@@ -77,7 +77,7 @@ export async function generateMetadata({
   return {
     metadataBase: new URL(getSiteUrl()),
     title: {
-      default: `${SITE_NAME} — ${meta.titleTagline}`,
+      default: `${SITE_NAME} · ${meta.titleTagline}`,
       template: `%s | ${SITE_NAME}`,
     },
     description: meta.siteDescription,
@@ -91,7 +91,7 @@ export async function generateMetadata({
           url: DEFAULT_OG_IMAGE,
           width: 1200,
           height: 630,
-          alt: `${SITE_NAME} — ${SITE_TAGLINE}`,
+          alt: `${SITE_NAME} · ${SITE_TAGLINE}`,
         },
       ],
     },

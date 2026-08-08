@@ -58,7 +58,7 @@ export default function CheckoutHeader({
               </span>
               {num < 3 && (
                 <span aria-hidden className="text-[11px] text-[#cccccc] lg:text-[14px]">
-                  —
+                  −
                 </span>
               )}
             </li>

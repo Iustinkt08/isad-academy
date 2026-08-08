@@ -1003,7 +1003,7 @@ export const privacyEn: LegalDocContent = {
         },
         {
           "kind": "p",
-          "text": "In such cases, transfers will only take place if the conditions set forth in Articles 44–49 of the GDPR are met, including through:"
+          "text": "In such cases, transfers will only take place if the conditions set forth in Articles 44-49 of the GDPR are met, including through:"
         },
         {
           "kind": "list",

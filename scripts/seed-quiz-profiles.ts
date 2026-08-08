@@ -43,18 +43,18 @@ const PROFILES: Record<string, Profile> = {
     outcomes: ['overview', 'certification', 'foundationForMore'],
     domains: ['ai', 'isoManagement'],
     quizPitchEn:
-      'The Foundation course: the big picture of ISO/IEC 42001 and the base for the certifications that follow — the recommended starting point.',
+      'The Foundation course: the big picture of ISO/IEC 42001 and the base for the certifications that follow. The recommended starting point.',
     quizPitchRo:
-      'Cursul Foundation: imaginea de ansamblu asupra ISO/IEC 42001 și baza pentru certificările următoare — punctul de start recomandat.',
+      'Cursul Foundation: imaginea de ansamblu asupra ISO/IEC 42001 și baza pentru certificările următoare. Punctul de start recomandat.',
   },
   'lead-implementer': {
     level: 'advanced',
     outcomes: ['implementationPlan', 'practicalSkills', 'certification'],
     domains: ['ai', 'isoManagement'],
     quizPitchEn:
-      'You learn to plan, implement and manage an AI management system compliant with ISO/IEC 42001, end to end — with the PECB exam included in the track.',
+      'You learn to plan, implement and manage an AI management system compliant with ISO/IEC 42001, end to end, with the PECB exam included in the track.',
     quizPitchRo:
-      'Înveți să planifici, să implementezi și să gestionezi un sistem de management AI conform ISO/IEC 42001, cap-coadă — cu examenul PECB inclus în traseu.',
+      'Înveți să planifici, să implementezi și să gestionezi un sistem de management AI conform ISO/IEC 42001, cap-coadă, cu examenul PECB inclus în traseu.',
   },
   'lead-auditor': {
     level: 'specialization',
@@ -70,9 +70,9 @@ const PROFILES: Record<string, Profile> = {
     outcomes: ['practicalSkills', 'overview'],
     domains: ['ai', 'riskCompliance'],
     quizPitchEn:
-      'A practical course on responsible AI governance: ethics, risk, transparency and accountability — immediately applicable in your organization.',
+      'A practical course on responsible AI governance: ethics, risk, transparency and accountability, immediately applicable in your organization.',
     quizPitchRo:
-      'Curs practic de guvernanță AI responsabilă: etică, risc, transparență și responsabilitate — aplicabile imediat în organizația ta.',
+      'Curs practic de guvernanță AI responsabilă: etică, risc, transparență și responsabilitate, aplicabile imediat în organizația ta.',
   },
 }
 
@@ -88,7 +88,7 @@ async function main() {
     })
     const course = found.docs[0]
     if (!course) {
-      console.warn(`SKIP — no course with slug "${slug}"`)
+      console.warn(`SKIP: no course with slug "${slug}"`)
       continue
     }
     // EN pe locale-ul default; RO printr-un update separat — mock-urile nu au titlu RO,

@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload'
 
-import { isAdmin } from '../access/isAdmin'
+import { hiddenFromEditors, isAdminRole } from '../access/isAdminRole'
 import { sendOrderConfirmationEmail, sendOrderReceivedEmail } from '../lib/email/hooks'
 import { issueInvoiceOnConfirm } from '../lib/invoicing/hooks/issueInvoiceOnConfirm'
 import { consumeSeatsOnConfirm, releaseSeatsOnDelete } from '../lib/seats'
@@ -15,17 +15,22 @@ export const Orders: CollectionConfig = {
   slug: 'orders',
   admin: {
     useAsTitle: 'id',
-    group: 'Sales',
+    group: { en: 'Sales', ro: 'Vânzări' },
     defaultColumns: ['paymentStatus', 'session', 'quantity', 'createdAt'],
     listSearchableFields: ['buyer.email', 'buyer.name'],
-    description: 'Checkout orders. Server-side only — never exposed to the public API.',
+    description: {
+      en: 'Orders placed through the site checkout, one course edition per order. Created and updated by the payment flow; use this list to review buyers, participants and payment status. Never exposed to the public API.',
+      ro: 'Comenzile plasate prin checkout-ul site-ului, o singură ediție de curs per comandă. Create și actualizate de fluxul de plată; folosește lista pentru a consulta cumpărătorii, participanții și statusul plății. Nu sunt expuse niciodată prin API-ul public.',
+    },
+    // Sales data is admin-only — editors manage content, not orders (owner 2026-08-08).
+    hidden: hiddenFromEditors,
   },
   defaultSort: '-createdAt',
   access: {
-    read: isAdmin,
-    create: isAdmin,
-    update: isAdmin,
-    delete: isAdmin,
+    read: isAdminRole,
+    create: isAdminRole,
+    update: isAdminRole,
+    delete: isAdminRole,
   },
   fields: [
     {
@@ -48,7 +53,12 @@ export const Orders: CollectionConfig = {
         { name: 'name', type: 'text', required: true },
         { name: 'email', type: 'email', required: true },
         { name: 'phone', type: 'text' },
-        { name: 'isCompany', type: 'checkbox', defaultValue: false, label: 'Buying as a company (B2B)' },
+        {
+          name: 'isCompany',
+          type: 'checkbox',
+          defaultValue: false,
+          label: { en: 'Buying as a company (B2B)', ro: 'Cumpărare pe firmă (B2B)' },
+        },
         {
           name: 'companyName',
           type: 'text',
@@ -57,7 +67,7 @@ export const Orders: CollectionConfig = {
         {
           name: 'cui',
           type: 'text',
-          label: 'CUI / VAT ID',
+          label: { en: 'CUI / VAT ID', ro: 'CUI / Cod TVA' },
           admin: { condition: (_, siblingData) => Boolean(siblingData?.isCompany) },
         },
         {
@@ -72,12 +82,14 @@ export const Orders: CollectionConfig = {
       type: 'array',
       minRows: 1,
       labels: {
-        singular: 'Participant',
-        plural: 'Participants',
+        singular: { en: 'Participant', ro: 'Participant' },
+        plural: { en: 'Participants', ro: 'Participanți' },
       },
       admin: {
-        description:
-          'One row per seat — length must equal "quantity". When quantity is 1, the checkout API fills this from the buyer.',
+        description: {
+          en: 'One row per seat; the number of rows must equal "quantity". For single-seat orders, checkout fills this in automatically from the buyer details.',
+          ro: 'Un rând pentru fiecare loc; numărul de rânduri trebuie să fie egal cu "quantity". Pentru comenzile cu un singur loc, checkout-ul completează automat datele cumpărătorului aici.',
+        },
       },
       fields: [
         { name: 'name', type: 'text', required: true },
@@ -102,23 +114,33 @@ export const Orders: CollectionConfig = {
         // UI-only lock (admin.readOnly never affects the Local API the checkout writes
         // through with overrideAccess) — the fiscal snapshot must not be hand-edited.
         readOnly: true,
-        description:
-          'Snapshot of the pricing engine output at the moment of purchase (CLAUDE.md §8) — never recomputed after the fact. Read-only: not hand-editable.',
+        description: {
+          en: 'Snapshot of the full price breakdown at the moment of purchase: base price, applied window, discounts and total. Never recomputed afterwards and not hand-editable; it documents exactly what the buyer paid.',
+          ro: 'Instantaneu al detalierii complete de preț din momentul cumpărării: preț de bază, fereastra aplicată, reducerile și totalul. Nu se recalculează ulterior și nu se editează manual; documentează exact cât a plătit cumpărătorul.',
+        },
       },
       fields: [
         { name: 'basePrice', type: 'number' },
         {
           name: 'currency',
           type: 'select',
-          options: ['EUR', 'RON'],
-          admin: { description: 'Visitor currency resolved by geo at purchase time (B1).' },
+          options: [
+            { label: { en: 'EUR', ro: 'EUR' }, value: 'EUR' },
+            { label: { en: 'RON', ro: 'RON' }, value: 'RON' },
+          ],
+          admin: {
+            description: {
+              en: "Currency the buyer paid in, resolved from the visitor's location at purchase time: RON for Romania, EUR otherwise.",
+              ro: 'Moneda în care a plătit cumpărătorul, stabilită după locația vizitatorului la momentul cumpărării: RON pentru România, EUR în rest.',
+            },
+          },
         },
         {
           name: 'appliedWindow',
           type: 'select',
           options: [
-            { label: 'Early Bird', value: 'earlyBird' },
-            { label: 'Standard', value: 'standard' },
+            { label: { en: 'Early Bird', ro: 'Early Bird' }, value: 'earlyBird' },
+            { label: { en: 'Standard', ro: 'Standard' }, value: 'standard' },
           ],
         },
         { name: 'groupDiscount', type: 'number', defaultValue: 0 },
@@ -137,10 +159,10 @@ export const Orders: CollectionConfig = {
       required: true,
       defaultValue: 'pending',
       options: [
-        { label: 'Pending', value: 'pending' },
-        { label: 'Confirmed', value: 'confirmed' },
-        { label: 'Failed', value: 'failed' },
-        { label: 'Refunded', value: 'refunded' },
+        { label: { en: 'Pending', ro: 'În așteptare' }, value: 'pending' },
+        { label: { en: 'Confirmed', ro: 'Confirmată' }, value: 'confirmed' },
+        { label: { en: 'Failed', ro: 'Eșuată' }, value: 'failed' },
+        { label: { en: 'Refunded', ro: 'Rambursată' }, value: 'refunded' },
       ],
     },
     {
@@ -148,7 +170,10 @@ export const Orders: CollectionConfig = {
       type: 'text',
       admin: {
         readOnly: true,
-        description: 'Payment provider that handled this order, e.g. "mock", "stripe". Set by checkout — read-only.',
+        description: {
+          en: 'Payment provider that handled this order, e.g. "mock" or "netopia". Set automatically by checkout; read-only.',
+          ro: 'Procesatorul de plăți care a gestionat comanda, de exemplu "mock" sau "netopia". Setat automat de checkout; doar pentru citire.',
+        },
       },
     },
     {
@@ -156,7 +181,10 @@ export const Orders: CollectionConfig = {
       type: 'text',
       admin: {
         readOnly: true,
-        description: "Provider's transaction/session reference. Set by checkout — read-only.",
+        description: {
+          en: "The provider's transaction or payment-session reference. Set automatically by checkout; read-only. Use it to find the payment in the provider's own dashboard.",
+          ro: 'Referința tranzacției sau a sesiunii de plată la procesator. Setată automat de checkout; doar pentru citire. Folosește-o pentru a găsi plata în panoul procesatorului.',
+        },
       },
     },
   ],

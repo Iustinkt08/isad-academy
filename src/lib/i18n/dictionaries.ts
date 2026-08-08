@@ -22,7 +22,7 @@ const en = {
     quiz: 'Quiz',
     openMenu: 'Open menu',
     closeMenu: 'Close menu',
-    brandHome: 'isad.academy — home',
+    brandHome: 'isad.academy home',
   },
   hero: {
     eyebrow: 'Live online training · ISO/IEC 42001:2023',
@@ -43,7 +43,7 @@ const en = {
       certifies: 'This certifies that',
       sampleName: 'Alex Popescu',
       completed: 'has completed the live training',
-      course: 'ISO/IEC 42001:2023 — AI Management Systems',
+      course: 'ISO/IEC 42001:2023 (AI Management Systems)',
       trainer: 'Dr. Silviu Gresoi',
       trainerRole: 'Lead trainer',
       trainerLabel: 'Trainer',
@@ -55,14 +55,14 @@ const en = {
   },
   home: {
     featuredTitle: 'Featured courses',
-    featuredSub: 'Live, one-to-one editions — hand-picked for where AI governance is heading.',
+    featuredSub: 'Live, one-to-one editions, hand-picked for where AI governance is heading.',
     expertEyebrow: 'Meet your expert',
     expertCta: 'About the expert',
     whyTitle: 'Why isad.academy',
     certEyebrow: 'Certification',
     certTitle: 'What you walk away with',
     certLine: (issuer: string) =>
-      `Training that prepares you for ISO/IEC 42001:2023 — with certification obtained directly through ${issuer} and CPD credits for every training hour.`,
+      `Training that prepares you for ISO/IEC 42001:2023, with certification obtained directly through ${issuer} and CPD credits for every training hour.`,
     testimonialsTitle: 'What participants say',
     partnersTitle: 'Partners',
     newsletterTitleFallback: 'Stay ahead of AI governance & compliance',
@@ -90,7 +90,7 @@ const en = {
       },
       ai: {
         title: 'AI-First, Future-Proof',
-        body: 'Specialized in AI Management Systems and Responsible AI — the standards organizations need now, not generic IT training.',
+        body: 'Specialized in AI Management Systems and Responsible AI: the standards organizations need now, not generic IT training.',
       },
     },
     statsFallback: {
@@ -140,50 +140,50 @@ const en = {
     sub: 'Everything our learners ask before getting started.',
     allQuestions: 'All questions',
     stillQuestions: 'Still have questions?',
-    contactSub: 'Book a discovery call or use the contact form — we reply by e-mail.',
+    contactSub: 'Book a discovery call or use the contact form. We reply by e-mail.',
     contactCta: 'Contact us',
     items: [
       // Discover — the company, the site, the courses
       {
         category: 'discover',
         q: 'What is isad.academy?',
-        a: 'isad.academy is the course platform of International Security and Defence (ISAD), an official PECB partner. We deliver live, practitioner-led training on AI governance and ISO/IEC 42001 — built to help you renew your knowledge and stay in step with global policies and evolving ISO standards.',
+        a: 'isad.academy is the course platform of International Security and Defence (ISAD), an official PECB partner. We deliver live, practitioner-led training on AI governance and ISO/IEC 42001, built to help you renew your knowledge and stay in step with global policies and evolving ISO standards.',
       },
       {
         category: 'discover',
         q: 'Who teaches the courses?',
-        a: 'All courses are taught live by Dr. Silviu Gresoi — PhD in AI & Machine Learning, Certified Fraud Examiner, with 20+ years of experience in anti-fraud, risk management and data analytics, and a speaker at AI Expo Europe and AI Summit Europe.',
+        a: 'All courses are taught live by Dr. Silviu Gresoi: PhD in AI & Machine Learning, Certified Fraud Examiner, with 20+ years of experience in anti-fraud, risk management and data analytics, and a speaker at AI Expo Europe and AI Summit Europe.',
       },
       {
         category: 'discover',
         q: 'What courses can I take?',
-        a: 'At launch we run four courses: the official PECB ISO/IEC 42001 tracks — Foundation, Lead Implementer and Lead Auditor — plus AI Governance & Responsible AI, ISAD Academy’s own practical course. The catalog lists every upcoming edition; not sure which fits you, take the short quiz on the courses page.',
+        a: 'At launch we run four courses: the official PECB ISO/IEC 42001 tracks (Foundation, Lead Implementer and Lead Auditor), plus AI Governance & Responsible AI, ISAD Academy’s own practical course. The catalog lists every upcoming edition; not sure which fits you, take the short quiz on the courses page.',
       },
       {
         category: 'discover',
         q: 'Are the courses live or self-paced?',
-        a: 'All courses are delivered live on Zoom, in small groups, directly by Dr. Silviu Gresoi. There are no pre-recorded lessons — every session leaves room for your questions and your organization’s real cases.',
+        a: 'All courses are delivered live on Zoom, in small groups, directly by Dr. Silviu Gresoi. There are no pre-recorded lessons. Every session leaves room for your questions and your organization’s real cases.',
       },
       // Learn — time framing, evaluations
       {
         category: 'learn',
         q: 'How long does a course take and how is it scheduled?',
-        a: 'Duration differs per course and is listed in hours on each course page. Every edition has its own concrete programme — the exact days and hours are published on the course page, so you know the full schedule before you enrol.',
+        a: 'Duration differs per course and is listed in hours on each course page. Every edition has its own concrete programme: the exact days and hours are published on the course page, so you know the full schedule before you enrol.',
       },
       {
         category: 'learn',
         q: 'When do the next editions start?',
-        a: 'Each course page lists its upcoming editions with start dates and available seats. If an edition is sold out or no dates are open yet, leave your e-mail under “Notify me” or subscribe to the newsletter — you’ll hear the moment new dates are announced.',
+        a: 'Each course page lists its upcoming editions with start dates and available seats. If an edition is sold out or no dates are open yet, leave your e-mail under “Notify me” or subscribe to the newsletter, and you’ll hear the moment new dates are announced.',
       },
       {
         category: 'learn',
         q: 'Do I need prior experience with ISO standards?',
-        a: 'Not for the Foundation course or AI Governance & Responsible AI — they start from the ground up. For Lead Implementer and Lead Auditor, basic familiarity with management systems helps but is not mandatory. Not sure which level fits you? Take the short quiz and we will recommend a course.',
+        a: 'Not for the Foundation course or AI Governance & Responsible AI: they start from the ground up. For Lead Implementer and Lead Auditor, basic familiarity with management systems helps but is not mandatory. Not sure which level fits you? Take the short quiz and we will recommend a course.',
       },
       {
         category: 'learn',
-        q: 'How am I evaluated — is there an exam?',
-        a: 'For the PECB tracks, the evaluation is the official PECB exam, taken online through the PECB platform after the training — and the preparation is built into the final day of the course. For ISAD Academy’s own courses there is no external exam: you complete the live sessions and receive your certificate of completion.',
+        q: 'How am I evaluated? Is there an exam?',
+        a: 'For the PECB tracks, the evaluation is the official PECB exam, taken online through the PECB platform after the training, and the preparation is built into the final day of the course. For ISAD Academy’s own courses there is no external exam: you complete the live sessions and receive your certificate of completion.',
       },
       // Validate — certifications
       {
@@ -199,12 +199,12 @@ const en = {
       {
         category: 'validate',
         q: 'How do CPD credits work?',
-        a: 'Simple: one hour of learning equals one CPD credit. A 35-hour course earns you 35 CPD credits, stated on your certificate — recognized for your continuing professional development.',
+        a: 'Simple: one hour of learning equals one CPD credit. A 35-hour course earns you 35 CPD credits, stated on your certificate and recognized for your continuing professional development.',
       },
       {
         category: 'validate',
         q: 'Is the certification recognized internationally?',
-        a: 'Yes. PECB is a global certification body and its certificates are recognized internationally. ISO/IEC 42001:2023 itself is the international standard for AI management systems — so the credential travels with you across employers and borders.',
+        a: 'Yes. PECB is a global certification body and its certificates are recognized internationally. ISO/IEC 42001:2023 itself is the international standard for AI management systems, so the credential travels with you across employers and borders.',
       },
       // Access — enrolment for individuals and organizations
       {
@@ -215,17 +215,17 @@ const en = {
       {
         category: 'access',
         q: 'Can I enrol my team or my company?',
-        a: 'Yes. At checkout you can buy several seats on the same edition — each with a named participant — and pay as a company, with your billing details on the invoice. From 3 seats, the 10% group discount applies automatically. And for a private session delivered just for your team, online or on-site, head to the Corporate page and tell us what you need.',
+        a: 'Yes. At checkout you can buy several seats on the same edition (each with a named participant) and pay as a company, with your billing details on the invoice. From 3 seats, the 10% group discount applies automatically. And for a private session delivered just for your team, online or on-site, head to the Corporate page and tell us what you need.',
       },
       {
         category: 'access',
         q: 'Can I pay in RON or EUR?',
-        a: 'Both: prices are in RON for participants from Romania and in EUR for international participants. All prices are final — isad.academy is not VAT registered, so no VAT is added at checkout.',
+        a: 'Both: prices are in RON for participants from Romania and in EUR for international participants. All prices are final: isad.academy is not VAT registered, so no VAT is added at checkout.',
       },
       {
         category: 'access',
-        q: 'Do discounts stack — group, member, promo codes?',
-        a: 'Yes, discounts stack. The 10% group discount applies automatically from 3 seats on the same edition, APCF members get their member discount with their code, and promo codes apply on top — all combined in your order summary before payment.',
+        q: 'Do discounts stack (group, member, promo codes)?',
+        a: 'Yes, discounts stack. The 10% group discount applies automatically from 3 seats on the same edition, APCF members get their member discount with their code, and promo codes apply on top, all combined in your order summary before payment.',
       },
       {
         category: 'access',
@@ -240,7 +240,7 @@ const en = {
       'Live ISO/IEC 42001 and AI governance training, certified through PECB. Explore upcoming editions and enrol online.',
     titlePlain: 'Explore our ',
     titleGradient: 'courses',
-    subtitle: 'Live, practitioner-led training — certified through PECB, delivered on Zoom.',
+    subtitle: 'Live, practitioner-led training, certified through PECB, delivered on Zoom.',
     notSure: 'Not sure where to start?',
     quizCta: 'Course quiz',
     gridAria: 'Course catalog',
@@ -252,7 +252,7 @@ const en = {
     emptyBody:
       "Subscribe to the newsletter below and we'll let you know the moment new dates are announced.",
     pastTitle: 'Past editions',
-    pastSubtitle: 'Already delivered — new dates are announced in the catalog above.',
+    pastSubtitle: 'Already delivered. New dates are announced in the catalog above.',
     completed: 'Completed',
     editionMeta: (date: string, participants: number) =>
       `Edition ${date} · ${participants} ${participants === 1 ? 'participant' : 'participants'}`,
@@ -273,9 +273,9 @@ const en = {
     chipNextEdition: (date: string) => `Next edition ${date}`,
     aboutTitle: 'About this course',
     audienceTitle: "Who it's for",
-    programmeTitle: (edition: string) => `Programme — edition ${edition}`,
+    programmeTitle: (edition: string) => `Programme: edition ${edition}`,
     dayN: (n: number) => `Day ${n}`,
-    liveSession: (start: string, end: string) => `Live session · ${start}–${end}`,
+    liveSession: (start: string, end: string) => `Live session · ${start}-${end}`,
     daily: 'daily',
     dayCount: (n: number) => (n === 1 ? '1 day' : `${n} days`),
     certificationTitle: 'Certification',
@@ -288,7 +288,7 @@ const en = {
     certPecbSteps: [
       'Attend the live training',
       'Sit the PECB exam',
-      'Get certified — enrolled on the PECB platform',
+      'Get certified: enrolled on the PECB platform',
     ],
     certOwnSteps: [
       'Attend the live training',
@@ -306,7 +306,7 @@ const en = {
     opensLater: 'Enrolment opens later',
     standardLabel: 'Standard',
     discountsNote:
-      '3+ seats get a −10% group discount. Member & promo codes apply at checkout — discounts stack.',
+      '3+ seats get a −10% group discount. Member & promo codes apply at checkout. Discounts stack.',
     notifyTitle: 'Notify me next edition',
     notifyBody:
       "All upcoming editions are sold out. Subscribe and we'll let you know the moment a new edition opens.",
@@ -316,25 +316,25 @@ const en = {
     comingSoonTitle: 'Enrolment coming soon',
     comingSoonBody:
       "New editions are being scheduled. Subscribe and we'll let you know the moment enrolment opens.",
-    vatNote: 'Final price — isad.academy is not VAT registered.',
+    vatNote: 'Final price: isad.academy is not VAT registered.',
     refundNote: 'Full refund or free transfer if the edition is cancelled.',
     expertRole: 'Your trainer · 20+ years in AI, risk & financial crime',
     calloutTeamTitle: 'Need this for your whole team?',
-    calloutTeamBody: 'We deliver this course in-house — online or on-site.',
+    calloutTeamBody: 'We deliver this course in-house, online or on-site.',
     calloutQuestionsTitle: 'Questions before enrolling?',
-    calloutQuestionsBody: 'Write to us — we reply within one business day.',
+    calloutQuestionsBody: 'Write to us. We reply within one business day.',
   },
   corporate: {
     metaTitle: 'Corporate training',
     metaDescription:
-      'In-house AI, governance and ISO/IEC 42001 training for organizations — from executive sessions to technical programs, delivered live by isad.academy.',
+      'In-house AI, governance and ISO/IEC 42001 training for organizations, from executive sessions to technical programs, delivered live by isad.academy.',
     hero: {
       pill: 'Corporate Training · In-house & Online',
       titleTop: 'Help your organization',
       titleBottomPrefix: 'adopt',
       titleBottomHighlight: 'AI responsibly',
       subtitle:
-        'From executive sessions for management to technical programs for delivery teams — isad.academy builds the skills your organization needs for AI, governance, compliance and international standards.',
+        'From executive sessions for management to technical programs for delivery teams, isad.academy builds the skills your organization needs for AI, governance, compliance and international standards.',
       ctaPrimary: 'Request a proposal',
       ctaSecondary: 'See training topics',
     },
@@ -344,7 +344,7 @@ const en = {
       items: [
         {
           title: 'Executive Sessions',
-          text: 'For leadership and management — AI strategy, risk and governance explained in business language, not jargon.',
+          text: 'For leadership and management: AI strategy, risk and governance explained in business language, not jargon.',
         },
         {
           title: 'Technical Programs',
@@ -361,24 +361,24 @@ const en = {
     form: {
       ariaLabel: 'Request a corporate proposal',
       title: 'Request a corporate proposal',
-      subtitle: 'Tell us about your team — we’ll get back to you.',
+      subtitle: 'Tell us about your team. We’ll get back to you.',
       companyName: 'Company name',
       contactPerson: 'Contact person',
       workEmail: 'E-mail',
       phoneLabel: 'Phone (optional)',
       phonePlaceholder: 'Phone',
       participantsLabel: 'How many participants?',
-      participantsPlaceholder: 'Participants (e.g. 10–25)',
+      participantsPlaceholder: 'Participants (e.g. 10-25)',
       participantsOption: (range: string) => `${range} participants`,
       topicLabel: 'Topic',
       topicPlaceholder: 'Topic / course',
-      topicOtherOption: 'Other — tell us what you need',
+      topicOtherOption: 'Other: tell us what you need',
       topicOtherLabel: 'What topic do you have in mind?',
       periodLegend: 'Preferred period (optional)',
       periodFromLabel: 'From',
       periodToLabel: 'To',
-      periodFromPlaceholder: 'Preferred period — from',
-      periodToPlaceholder: 'Preferred period — to',
+      periodFromPlaceholder: 'Preferred period: from',
+      periodToPlaceholder: 'Preferred period: to',
       messageLabel: 'Tell us about your goals (optional)',
       errors: {
         companyName: 'Please enter your company name.',
@@ -393,7 +393,7 @@ const en = {
       },
       submit: 'Request proposal',
       submitting: 'Sending…',
-      successTitle: 'Thank you — we’ll get back to you.',
+      successTitle: 'Thank you. We’ll get back to you.',
       successMessage: 'Your request has been sent. We’ll reply by e-mail with a proposal for your team.',
     },
     aside: {
@@ -401,16 +401,16 @@ const en = {
       steps: [
         'We review your needs and reply by e-mail.',
         'We propose the format, dates and pricing.',
-        'We deliver — live on Zoom or on-site.',
+        'We deliver: live on Zoom or on-site.',
       ],
       talkTitle: 'Prefer to talk directly?',
-      talkNote: 'Mon–Fri · we reply by e-mail',
+      talkNote: 'Mon-Fri · we reply by e-mail',
     },
   },
   about: {
     metaTitle: 'About us',
     metaDescription:
-      'isad.academy is your curated navigation instrument for a changing world — a course platform built by International Security and Defence (ISAD), an official PECB partner.',
+      'isad.academy is your curated navigation instrument for a changing world: a course platform built by International Security and Defence (ISAD), an official PECB partner.',
     // v3 redesign (owner Figma 3873-94 desktop / 3977-571 mobile) — copy delivered 1:1.
     heroPill: 'About us',
     heroTitlePlain: 'Your navigation instrument for a ',
@@ -418,8 +418,8 @@ const en = {
     heroIntro1:
       'The world is spinning faster than ever. New technologies emerge, new skills take shape, and fresh, flexible perspectives become essential.',
     heroIntro2:
-      'isad.academy is, before anything else, your curated navigation instrument for this changing world — a course platform designed to help you renew your knowledge, strengthen your competencies, and move in step with global policies and evolving ISO standards.',
-    heroBuiltBy: 'Built by International Security and Defence (ISAD) — an official PECB partner.',
+      'isad.academy is, before anything else, your curated navigation instrument for this changing world: a course platform designed to help you renew your knowledge, strengthen your competencies, and move in step with global policies and evolving ISO standards.',
+    heroBuiltBy: 'Built by International Security and Defence (ISAD), an official PECB partner.',
     beliefsHeading: 'What guides us',
     beliefs: [
       {
@@ -464,13 +464,13 @@ const en = {
     ctaLabel: 'Explore our courses',
     heroTitle: 'Serious training for the people who make AI trustworthy',
     heroSubtitle:
-      'isad.academy is an independent online academy for AI governance, risk and compliance — every course taught live, one-to-one, by a practitioner.',
+      'isad.academy is an independent online academy for AI governance, risk and compliance: every course taught live, one-to-one, by a practitioner.',
     expertEyebrow: 'Your expert',
     approachTitle: 'How we teach',
     approachCards: [
       {
         title: 'Live, never recorded',
-        text: 'Every session happens live on Zoom — you can ask, challenge and dig deeper in the moment.',
+        text: 'Every session happens live on Zoom, so you can ask, challenge and dig deeper in the moment.',
       },
       {
         title: 'One-to-one by default',
@@ -478,23 +478,23 @@ const en = {
       },
       {
         title: 'Practitioner-led',
-        text: 'You learn from someone who has done the work — decades in anti-fraud, risk and data, now applied to AI governance.',
+        text: 'You learn from someone who has done the work: decades in anti-fraud, risk and data, now applied to AI governance.',
       },
     ],
     credibilityTitle: 'Credibility you can check',
     certLinePrefix:
-      'isad.academy is independent. Certificates of completion for our courses are issued by APCF — ',
+      'isad.academy is independent. Certificates of completion for our courses are issued by APCF; ',
     certLinkLabel: 'see how certification works',
     certLineSuffix: '.',
     ctaTitle: 'Ready when you are',
-    ctaText: 'Browse the catalog, or talk to us first — either way, you’ll be learning live.',
+    ctaText: 'Browse the catalog, or talk to us first; either way, you’ll be learning live.',
     ctaCourses: 'See courses',
     ctaContact: 'Contact us',
   },
   contact: {
     metaTitle: 'Contact',
     metaDescription:
-      'Ask about a course, corporate training or certification — send us a message and we will get back to you by e-mail.',
+      'Ask about a course, corporate training or certification: send us a message and we will get back to you by e-mail.',
     title: 'Contact',
     intro: 'Questions about a course, corporate training or certification? Send us a message.',
     headerTitlePlain: 'Questions?',
@@ -522,7 +522,7 @@ const en = {
       },
       submit: 'Send message',
       submitting: 'Sending…',
-      successTitle: 'Thanks — we’ll get back to you.',
+      successTitle: 'Thanks. We’ll get back to you.',
       successMessage: 'Your message has been sent. We usually reply by e-mail, so keep an eye on your inbox.',
       privacyPrefix: 'By sending, you agree to our ',
       privacyLinkLabel: 'Privacy Policy',
@@ -537,16 +537,16 @@ const en = {
       responseTimeValue: 'Within one business day',
       linkedin: 'LinkedIn',
       linkedinCta: 'Connect on LinkedIn',
-      fallback: 'The form is the fastest way to reach us — we reply by e-mail.',
+      fallback: 'The form is the fastest way to reach us; we reply by e-mail.',
     },
   },
   quiz: {
     metaTitle: 'Find your course',
     metaDescription:
-      'Not sure which course fits you? The isad.academy course quiz is coming soon — subscribe to be notified when it launches.',
+      'Not sure which course fits you? The isad.academy course quiz is coming soon. Subscribe to be notified when it launches.',
     badge: 'Coming soon',
     title: 'Find your course',
-    text: 'The course quiz is coming soon. Answer a few quick questions and we’ll point you to the course that best fits your goals — no guesswork needed.',
+    text: 'The course quiz is coming soon. Answer a few quick questions and we’ll point you to the course that best fits your goals, no guesswork needed.',
     browseCta: 'Browse all courses',
     notifyTitle: 'Get notified when it launches',
     notifyText: 'Subscribe and we’ll let you know the moment the quiz goes live.',
@@ -555,7 +555,7 @@ const en = {
     headerTitlePlain: 'Articles &',
     headerTitleGradient: 'insights',
     headerSub:
-      'Practical notes on AI governance, ISO/IEC 42001 and responsible AI — from the trainer’s desk.',
+      'Practical notes on AI governance, ISO/IEC 42001 and responsible AI, from the trainer’s desk.',
     brandLabel: 'isad.academy · blog',
     newBadge: 'New',
     readArticle: 'Read article',
@@ -563,9 +563,9 @@ const en = {
     // Mobile list layout (Figma 3977-612)
     backToBlog: 'Back to blog',
     latestLabel: 'Latest article',
-    swipeLabel: 'More articles — swipe',
+    swipeLabel: 'More articles: swipe',
     mobileNewsTitle: 'Get new articles in your inbox.',
-    mobileNewsSub: 'One e-mail when we publish — no spam, unsubscribe anytime.',
+    mobileNewsSub: 'One e-mail when we publish. No spam, unsubscribe anytime.',
     listTitle: 'Blog',
     metaDescription:
       'Articles on AI governance, ISO/IEC 42001, anti-fraud and risk management from Dr. Silviu Gresoi.',
@@ -580,7 +580,7 @@ const en = {
       other: 'Other',
     },
     articleNotFound: 'Article not found',
-    draftBanner: 'You’re previewing a draft — it is not publicly visible.',
+    draftBanner: 'You’re previewing a draft. It is not publicly visible.',
     draftExit: 'Exit preview',
     breadcrumbAria: 'Breadcrumb',
     shareLinkedIn: 'Share on LinkedIn',
@@ -589,7 +589,7 @@ const en = {
     hoursLive: (n: number) => `${n} hours · Live on Zoom`,
     viewCourse: 'View course',
     inboxTitle: 'Get new articles in your inbox',
-    inboxSub: 'One e-mail when we publish — no spam, unsubscribe anytime.',
+    inboxSub: 'One e-mail when we publish. No spam, unsubscribe anytime.',
     leadMagnet: {
       title: 'Get the resource',
       intro: 'We’ll e-mail you the download link.',
@@ -599,7 +599,7 @@ const en = {
       submit: 'Send me the link',
       // Article redesign (Figma 3977-687 / 3977-718) — black pill button label
       submitFile: 'Send me the file',
-      success: 'Check your inbox — the download link is on its way.',
+      success: 'Check your inbox: the download link is on its way.',
       genericError: 'Something went wrong. Please try again later.',
     },
   },
@@ -614,7 +614,7 @@ const en = {
       'The cookies and similar technologies isad.academy uses, and how to manage your preferences.',
     deliveryTitle: 'Delivery Policy',
     deliveryMetaDescription:
-      'How isad.academy courses are delivered — live online sessions on Zoom — followed by the full Terms & Conditions.',
+      'How isad.academy courses are delivered (live online sessions on Zoom), followed by the full Terms & Conditions.',
     termsTitle: 'Terms & Conditions',
     termsMetaDescription:
       'The terms governing the use of isad.academy and the purchase of live course editions.',
@@ -624,13 +624,13 @@ const en = {
     metaDescription: 'Tell us about your experience with your isad.academy course.',
     badge: 'Share your review',
     howWas: (course: string) => `How was ${course}?`,
-    subtitle: 'Your feedback helps future participants decide — and Silviu reads every single one.',
+    subtitle: 'Your feedback helps future participants decide, and Silviu reads every single one.',
     invalidBadge: 'Review link',
     invalidTitle: 'This link is no longer valid',
     invalidBody:
       'This review link is invalid or has expired. If you would still like to share your experience, please get in touch with us and we will send you a fresh link.',
     textLabel: 'Your review',
-    textPlaceholder: 'Tell us about your experience — what stood out, what you learned…',
+    textPlaceholder: 'Tell us about your experience: what stood out, what you learned…',
     nameLabel: 'Your name (optional)',
     namePlaceholder: 'Jane Doe',
     roleLabel: 'Role / Company (optional)',
@@ -653,7 +653,7 @@ const en = {
     confirmedTitle: 'Subscription confirmed',
     confirmedMetaDescription: 'Your isad.academy newsletter subscription is confirmed.',
     confirmedBody:
-      'Thanks for confirming your e-mail address — you are now subscribed to the isad.academy newsletter. We will let you know about new courses, articles and certification updates.',
+      'Thanks for confirming your e-mail address. You are now subscribed to the isad.academy newsletter. We will let you know about new courses, articles and certification updates.',
     /* Link invalid sau expirat. Formulat NEUTRU intenționat: pagina nu confirmă și nu infirmă
        că vreo adresă anume aștepta confirmarea — altfel ar deveni un oracol de adrese. */
     invalidTitle: 'This link is no longer valid',
@@ -733,7 +733,7 @@ const en = {
     codeAppliedPrefix: 'Code',
     codeAppliedSuffix: 'applied.',
     removeCode: 'Remove code',
-    stackNote: 'Discounts stack — group, member and code apply together.',
+    stackNote: 'Discounts stack: group, member and code apply together.',
     enterCodeFirst: 'Enter a discount code first.',
     codeCheckFailed: "We couldn't check this code right now. Please try again.",
     errorEnterName: 'Please enter your name.',
@@ -752,10 +752,10 @@ const en = {
     discountCode: 'Discount code',
     pricingUnavailable: 'Pricing is currently unavailable for this edition.',
     fallbackEstimate:
-      'Live pricing is temporarily unavailable — this is an estimate without discount codes. Your final price is confirmed before payment.',
+      'Live pricing is temporarily unavailable. This is an estimate without discount codes. Your final price is confirmed before payment.',
     updatingPrice: 'Updating price…',
     total: 'Total',
-    vatNotRegistered: 'Final price — isad.academy is not VAT registered.',
+    vatNotRegistered: 'Final price: isad.academy is not VAT registered.',
     vatIncluded: 'All prices include VAT.',
     soldOutNotifyPrefix: 'You can ask to be notified about the next edition on',
     coursePageLinkLabel: 'the course page',
@@ -779,7 +779,7 @@ const en = {
     codeUsageLimitReached: 'This code has reached its usage limit.',
     codeDuplicate: 'This code is already applied.',
     errorCheckDetails: 'Please check your details and try again.',
-    errorPaymentDeclined: 'Payment was declined — please try again.',
+    errorPaymentDeclined: 'Payment was declined. Please try again.',
     errorEditionNotFound: 'This edition could not be found. It may have been removed.',
     errorJustSoldOut: 'This edition just sold out.',
     errorEnrolmentNotOpen: 'Enrolment is not open for this edition.',
@@ -796,27 +796,27 @@ const en = {
       "We couldn't find a recent enrolment in this browser session. If you just paid, check your e-mail for the confirmation.",
     orderConfirmedBadge: 'Order confirmed',
     enrolledTitle: "You're enrolled!",
-    editionStarting: (course: string, date: string) => `${course} — edition starting ${date}.`,
+    editionStarting: (course: string, date: string) => `${course}, edition starting ${date}.`,
     orderReference: 'Order reference:',
     participantHeading: (n: number): string => (n === 1 ? 'Participant' : 'Participants'),
     pricingHeading: 'Pricing',
     meetInviteNote:
       'Your Zoom invite will follow a few days before the course starts. Each participant receives it at the e-mail address above.',
     stayInLoop: 'Stay in the loop',
-    stayInLoopSub: 'Get new edition dates and articles in your inbox — no spam, unsubscribe anytime.',
+    stayInLoopSub: 'Get new edition dates and articles in your inbox. No spam, unsubscribe anytime.',
     backToCourses: 'Back to courses',
     paymentPendingBadge: 'Payment processing',
     paymentPendingTitle: 'Almost there…',
     paymentPendingNote:
-      "We're waiting for the payment processor to confirm your payment. You'll receive the confirmation e-mail as soon as it goes through — it's safe to close this page.",
+      "We're waiting for the payment processor to confirm your payment. You'll receive the confirmation e-mail as soon as it goes through. It's safe to close this page.",
     paymentFailedTitle: 'Payment unsuccessful',
     paymentFailedMessage:
-      'Your payment was cancelled or declined — nothing was charged and no seats were reserved. You can try enrolling again anytime.',
+      'Your payment was cancelled or declined. Nothing was charged and no seats were reserved. You can try enrolling again anytime.',
     // Confirmation page redesign (Figma 4031-156 / 4031-218)
     confirmedTitle: 'Enrolment',
     confirmedTitleAccent: 'confirmed.',
     confirmedSubtitle: (email: string) =>
-      `Payment received — your seats are booked. A confirmation e-mail is on its way to ${email}.`,
+      `Payment received. Your seats are booked, and a confirmation e-mail is on its way to ${email}.`,
     inboxFallback: 'your inbox',
     successMarkAria: 'Payment confirmed',
     orderRefLabel: (id: number) => `Order #${id}`,
@@ -828,7 +828,7 @@ const en = {
     paymentPaidValue: 'Paid · card',
     paymentProcessingValue: 'Processing',
     totalPaid: 'Total paid',
-    nextConfirmEmail: 'Confirmation e-mail with your order details — already sent',
+    nextConfirmEmail: 'Confirmation e-mail with your order details (already sent)',
     nextPendingEmail: 'Confirmation e-mail arrives as soon as the payment is confirmed',
     nextConfirmInvoice: 'Invoice issued automatically to your billing e-mail',
     nextConfirmMeet: 'Zoom invite arrives before the start date',
@@ -859,12 +859,12 @@ const en = {
     firstName: 'First name',
     lastName: 'Last name',
     emailPlaceholder: 'E-mail',
-    occupationPlaceholder: 'Occupation — choose or type',
+    occupationPlaceholder: 'Occupation (choose or type)',
     joinDefault: 'Join us',
     sending: 'Sending…',
     privacyNote: 'By joining, you agree to our Privacy Policy.',
     back: 'Back',
-    successTitle: 'You’re in — see you there.',
+    successTitle: 'You’re in. See you there.',
     successBody: 'The invite link is on its way to your inbox.',
     done: 'Done',
     errorGeneric: 'Something went wrong. Please try again.',
@@ -882,7 +882,7 @@ const en = {
     subscribe: 'Subscribe',
     sending: 'Sending…',
     subscribing: 'Subscribing…',
-    success: 'Almost there — check your inbox to confirm your subscription.',
+    success: 'Almost there: check your inbox to confirm your subscription.',
     genericError: 'Something went wrong. Please try again later.',
   },
   footer: {
@@ -928,7 +928,7 @@ const ro: Dictionary = {
     quiz: 'Quiz',
     openMenu: 'Deschide meniul',
     closeMenu: 'Închide meniul',
-    brandHome: 'isad.academy — acasă',
+    brandHome: 'isad.academy, acasă',
   },
   hero: {
     eyebrow: 'Training live online · ISO/IEC 42001:2023',
@@ -949,7 +949,7 @@ const ro: Dictionary = {
       certifies: 'Se certifică prin prezenta că',
       sampleName: 'Alex Popescu',
       completed: 'a absolvit trainingul live',
-      course: 'ISO/IEC 42001:2023 — AI Management Systems',
+      course: 'ISO/IEC 42001:2023 (AI Management Systems)',
       trainer: 'Dr. Silviu Gresoi',
       trainerRole: 'Trainer principal',
       trainerLabel: 'Trainer',
@@ -961,14 +961,14 @@ const ro: Dictionary = {
   },
   home: {
     featuredTitle: 'Cursuri recomandate',
-    featuredSub: 'Ediții live, unu-la-unu — alese pentru direcția în care merge guvernanța AI.',
+    featuredSub: 'Ediții live, unu-la-unu, alese pentru direcția în care merge guvernanța AI.',
     expertEyebrow: 'Expertul tău',
     expertCta: 'Despre expert',
     whyTitle: 'De ce isad.academy',
     certEyebrow: 'Certificare',
     certTitle: 'Cu ce pleci acasă',
     certLine: (issuer: string) =>
-      `Training care te pregătește pentru ISO/IEC 42001:2023 — cu certificare obținută direct prin ${issuer} și credite CPD pentru fiecare oră de training.`,
+      `Training care te pregătește pentru ISO/IEC 42001:2023, cu certificare obținută direct prin ${issuer} și credite CPD pentru fiecare oră de training.`,
     testimonialsTitle: 'Ce spun participanții',
     partnersTitle: 'Parteneri',
     newsletterTitleFallback: 'Rămâi cu un pas înaintea guvernanței AI',
@@ -996,7 +996,7 @@ const ro: Dictionary = {
       },
       ai: {
         title: 'AI-First, pregătit pentru viitor',
-        body: 'Specializați în AI Management Systems și Responsible AI — standardele de care organizațiile au nevoie acum, nu training IT generic.',
+        body: 'Specializați în AI Management Systems și Responsible AI: standardele de care organizațiile au nevoie acum, nu training IT generic.',
       },
     },
     statsFallback: {
@@ -1027,8 +1027,8 @@ const ro: Dictionary = {
   },
   testimonials: {
     headingPre: 'Ce spun',
-    headingLearners: 'cursanții',
-    headingMid: '— de la',
+    headingLearners: 'cursanții,',
+    headingMid: 'de la',
     headingProfessionals: 'profesioniștii',
     headingPost: 'pe care i-am format',
     participantFallback: 'Participant la curs',
@@ -1046,50 +1046,50 @@ const ro: Dictionary = {
     sub: 'Tot ce ne întreabă cursanții înainte de a începe.',
     allQuestions: 'Toate întrebările',
     stillQuestions: 'Mai ai întrebări?',
-    contactSub: 'Programează un call de descoperire sau folosește formularul de contact — îți răspundem pe e-mail.',
+    contactSub: 'Programează un call de descoperire sau folosește formularul de contact. Îți răspundem pe e-mail.',
     contactCta: 'Contactează-ne',
     items: [
       // Descoperă — compania, site-ul, cursurile
       {
         category: 'discover',
         q: 'Ce este isad.academy?',
-        a: 'isad.academy este platforma de cursuri a International Security and Defence (ISAD), partener oficial PECB. Livrăm training live, condus de practicieni, pe guvernanța AI și ISO/IEC 42001 — construit să te ajute să îți înnoiești cunoștințele și să ții pasul cu politicile globale și standardele ISO în continuă evoluție.',
+        a: 'isad.academy este platforma de cursuri a International Security and Defence (ISAD), partener oficial PECB. Livrăm training live, condus de practicieni, pe guvernanța AI și ISO/IEC 42001, construit să te ajute să îți înnoiești cunoștințele și să ții pasul cu politicile globale și standardele ISO în continuă evoluție.',
       },
       {
         category: 'discover',
         q: 'Cine predă cursurile?',
-        a: 'Toate cursurile sunt predate live de Dr. Silviu Gresoi — doctor în AI & Machine Learning, Certified Fraud Examiner, cu peste 20 de ani de experiență în anti-fraudă, managementul riscului și data analytics, speaker la AI Expo Europe și AI Summit Europe.',
+        a: 'Toate cursurile sunt predate live de Dr. Silviu Gresoi: doctor în AI & Machine Learning, Certified Fraud Examiner, cu peste 20 de ani de experiență în anti-fraudă, managementul riscului și data analytics, speaker la AI Expo Europe și AI Summit Europe.',
       },
       {
         category: 'discover',
         q: 'Ce cursuri pot urma?',
-        a: 'La lansare avem patru cursuri: traseele oficiale PECB ISO/IEC 42001 — Foundation, Lead Implementer și Lead Auditor — plus AI Governance & Responsible AI, cursul practic propriu ISAD Academy. Catalogul listează fiecare ediție viitoare; dacă nu ești sigur care ți se potrivește, completează quiz-ul scurt din pagina de cursuri.',
+        a: 'La lansare avem patru cursuri: traseele oficiale PECB ISO/IEC 42001 (Foundation, Lead Implementer și Lead Auditor), plus AI Governance & Responsible AI, cursul practic propriu ISAD Academy. Catalogul listează fiecare ediție viitoare; dacă nu ești sigur care ți se potrivește, completează quiz-ul scurt din pagina de cursuri.',
       },
       {
         category: 'discover',
         q: 'Cursurile sunt live sau în ritm propriu?',
-        a: 'Toate cursurile sunt livrate live pe Zoom, în grupuri mici, direct de Dr. Silviu Gresoi. Nu există lecții preînregistrate — fiecare sesiune lasă loc pentru întrebările tale și pentru cazurile reale din organizația ta.',
+        a: 'Toate cursurile sunt livrate live pe Zoom, în grupuri mici, direct de Dr. Silviu Gresoi. Nu există lecții preînregistrate. Fiecare sesiune lasă loc pentru întrebările tale și pentru cazurile reale din organizația ta.',
       },
       // Învață — programul în timp, evaluările
       {
         category: 'learn',
         q: 'Cât durează un curs și cum e programat?',
-        a: 'Durata diferă de la curs la curs și e afișată în ore pe fiecare pagină de curs. Fiecare ediție are propriul program concret — zilele și orele exacte sunt publicate pe pagina cursului, așa că știi întregul calendar înainte să te înscrii.',
+        a: 'Durata diferă de la curs la curs și e afișată în ore pe fiecare pagină de curs. Fiecare ediție are propriul program concret: zilele și orele exacte sunt publicate pe pagina cursului, așa că știi întregul calendar înainte să te înscrii.',
       },
       {
         category: 'learn',
         q: 'Când încep următoarele ediții?',
-        a: 'Fiecare pagină de curs listează edițiile viitoare, cu date de început și locuri disponibile. Dacă o ediție e sold out sau nu sunt încă date anunțate, lasă-ți e-mailul la „Anunță-mă" sau abonează-te la newsletter — afli imediat ce apar date noi.',
+        a: 'Fiecare pagină de curs listează edițiile viitoare, cu date de început și locuri disponibile. Dacă o ediție e sold out sau nu sunt încă date anunțate, lasă-ți e-mailul la „Anunță-mă" sau abonează-te la newsletter. Afli imediat ce apar date noi.',
       },
       {
         category: 'learn',
         q: 'Am nevoie de experiență anterioară cu standardele ISO?',
-        a: 'Nu pentru cursul Foundation sau AI Governance & Responsible AI — acestea pornesc de la zero. Pentru Lead Implementer și Lead Auditor, o familiaritate de bază cu sistemele de management ajută, dar nu e obligatorie. Nu ești sigur ce nivel ți se potrivește? Completează quiz-ul scurt și îți recomandăm noi un curs.',
+        a: 'Nu pentru cursul Foundation sau AI Governance & Responsible AI: acestea pornesc de la zero. Pentru Lead Implementer și Lead Auditor, o familiaritate de bază cu sistemele de management ajută, dar nu e obligatorie. Nu ești sigur ce nivel ți se potrivește? Completează quiz-ul scurt și îți recomandăm noi un curs.',
       },
       {
         category: 'learn',
-        q: 'Cum sunt evaluat — există examen?',
-        a: 'Pentru traseele PECB, evaluarea este examenul oficial PECB, susținut online prin platforma PECB după training — iar pregătirea e inclusă în ultima zi de curs. Pentru cursurile proprii ISAD Academy nu există examen extern: finalizezi sesiunile live și primești certificatul de absolvire.',
+        q: 'Cum sunt evaluat? Există examen?',
+        a: 'Pentru traseele PECB, evaluarea este examenul oficial PECB, susținut online prin platforma PECB după training, iar pregătirea e inclusă în ultima zi de curs. Pentru cursurile proprii ISAD Academy nu există examen extern: finalizezi sesiunile live și primești certificatul de absolvire.',
       },
       // Validează — certificările
       {
@@ -1105,12 +1105,12 @@ const ro: Dictionary = {
       {
         category: 'validate',
         q: 'Cum funcționează creditele CPD?',
-        a: 'Simplu: o oră de învățare înseamnă un credit CPD. Un curs de 35 de ore îți aduce 35 de credite CPD, menționate pe certificat — recunoscute pentru dezvoltarea ta profesională continuă.',
+        a: 'Simplu: o oră de învățare înseamnă un credit CPD. Un curs de 35 de ore îți aduce 35 de credite CPD, menționate pe certificat și recunoscute pentru dezvoltarea ta profesională continuă.',
       },
       {
         category: 'validate',
         q: 'Certificarea e recunoscută internațional?',
-        a: 'Da. PECB este un organism global de certificare, iar certificatele sale sunt recunoscute internațional. ISO/IEC 42001:2023 este chiar standardul internațional pentru sistemele de management al AI — așa că acreditarea te însoțește oriunde, indiferent de angajator sau țară.',
+        a: 'Da. PECB este un organism global de certificare, iar certificatele sale sunt recunoscute internațional. ISO/IEC 42001:2023 este chiar standardul internațional pentru sistemele de management al AI, așa că acreditarea te însoțește oriunde, indiferent de angajator sau țară.',
       },
       // Acces — înscrierea pentru persoane fizice și organizații
       {
@@ -1121,17 +1121,17 @@ const ro: Dictionary = {
       {
         category: 'access',
         q: 'Pot înscrie echipa sau compania mea?',
-        a: 'Da. La checkout poți cumpăra mai multe locuri pe aceeași ediție — fiecare cu participantul lui nominal — și poți plăti ca firmă, cu datele de facturare pe factură. De la 3 locuri, reducerea de grup de 10% se aplică automat. Iar pentru o sesiune privată livrată doar pentru echipa ta, online sau la sediu, intră pe pagina Corporate și spune-ne ce ai nevoie.',
+        a: 'Da. La checkout poți cumpăra mai multe locuri pe aceeași ediție (fiecare cu participantul lui nominal) și poți plăti ca firmă, cu datele de facturare pe factură. De la 3 locuri, reducerea de grup de 10% se aplică automat. Iar pentru o sesiune privată livrată doar pentru echipa ta, online sau la sediu, intră pe pagina Corporate și spune-ne ce ai nevoie.',
       },
       {
         category: 'access',
         q: 'Pot plăti în RON sau EUR?',
-        a: 'Ambele: prețurile sunt în RON pentru participanții din România și în EUR pentru participanții internaționali. Toate prețurile sunt finale — isad.academy nu este plătitoare de TVA, deci nu se adaugă TVA la checkout.',
+        a: 'Ambele: prețurile sunt în RON pentru participanții din România și în EUR pentru participanții internaționali. Toate prețurile sunt finale: isad.academy nu este plătitoare de TVA, deci nu se adaugă TVA la checkout.',
       },
       {
         category: 'access',
-        q: 'Se cumulează reducerile — de grup, de membru, codurile promoționale?',
-        a: 'Da, reducerile se cumulează. Reducerea de grup de 10% se aplică automat de la 3 locuri pe aceeași ediție, membrii APCF primesc reducerea de membru cu codul lor, iar codurile promoționale se aplică peste — toate combinate în sumarul comenzii, înainte de plată.',
+        q: 'Se cumulează reducerile (de grup, de membru, codurile promoționale)?',
+        a: 'Da, reducerile se cumulează. Reducerea de grup de 10% se aplică automat de la 3 locuri pe aceeași ediție, membrii APCF primesc reducerea de membru cu codul lor, iar codurile promoționale se aplică peste, toate combinate în sumarul comenzii, înainte de plată.',
       },
       {
         category: 'access',
@@ -1146,7 +1146,7 @@ const ro: Dictionary = {
       'Training live ISO/IEC 42001 și guvernanța AI, cu certificare prin PECB. Explorează edițiile viitoare și înscrie-te online.',
     titlePlain: 'Explorează ',
     titleGradient: 'cursurile noastre',
-    subtitle: 'Training live, susținut de un practician — certificat prin PECB, livrat pe Zoom.',
+    subtitle: 'Training live, susținut de un practician, certificat prin PECB, livrat pe Zoom.',
     notSure: 'Nu știi de unde să începi?',
     quizCta: 'Quiz de cursuri',
     gridAria: 'Catalogul de cursuri',
@@ -1159,7 +1159,7 @@ const ro: Dictionary = {
     emptyBody:
       'Abonează-te la newsletterul de mai jos și te anunțăm imediat ce sunt anunțate date noi.',
     pastTitle: 'Ediții trecute',
-    pastSubtitle: 'Deja livrate — datele noi sunt anunțate în catalogul de mai sus.',
+    pastSubtitle: 'Deja livrate. Datele noi sunt anunțate în catalogul de mai sus.',
     completed: 'Finalizată',
     editionMeta: (date: string, participants: number) =>
       `Ediția ${date} · ${
@@ -1188,9 +1188,9 @@ const ro: Dictionary = {
     chipNextEdition: (date: string) => `Următoarea ediție ${date}`,
     aboutTitle: 'Despre acest curs',
     audienceTitle: 'Cui i se adresează',
-    programmeTitle: (edition: string) => `Program — ediția ${edition}`,
+    programmeTitle: (edition: string) => `Program: ediția ${edition}`,
     dayN: (n: number) => `Ziua ${n}`,
-    liveSession: (start: string, end: string) => `Sesiune live · ${start}–${end}`,
+    liveSession: (start: string, end: string) => `Sesiune live · ${start}-${end}`,
     daily: 'zilnic',
     dayCount: (n: number) => (n === 1 ? '1 zi' : n < 20 ? `${n} zile` : `${n} de zile`),
     certificationTitle: 'Certificare',
@@ -1203,7 +1203,7 @@ const ro: Dictionary = {
     certPecbSteps: [
       'Participă la trainingul live',
       'Susține examenul PECB',
-      'Obține certificarea — înrolat pe platforma PECB',
+      'Obține certificarea: înrolat pe platforma PECB',
     ],
     certOwnSteps: [
       'Participă la trainingul live',
@@ -1221,7 +1221,7 @@ const ro: Dictionary = {
     opensLater: 'Înscrierile se deschid mai târziu',
     standardLabel: 'Standard',
     discountsNote:
-      'La 3+ locuri primești −10% reducere de grup. Codurile de membru și cele promoționale se aplică la checkout — reducerile se cumulează.',
+      'La 3+ locuri primești −10% reducere de grup. Codurile de membru și cele promoționale se aplică la checkout. Reducerile se cumulează.',
     notifyTitle: 'Anunță-mă la următoarea ediție',
     notifyBody:
       'Toate edițiile viitoare au locurile epuizate. Abonează-te și te anunțăm imediat ce se deschide o ediție nouă.',
@@ -1231,25 +1231,25 @@ const ro: Dictionary = {
     comingSoonTitle: 'Înscrierile se deschid în curând',
     comingSoonBody:
       'Ediții noi sunt în curs de programare. Abonează-te și te anunțăm imediat ce se deschid înscrierile.',
-    vatNote: 'Preț final — isad.academy nu este plătitoare de TVA.',
+    vatNote: 'Preț final: isad.academy nu este plătitoare de TVA.',
     refundNote: 'Rambursare integrală sau transfer gratuit dacă ediția este anulată.',
     expertRole: 'Trainerul tău · 20+ ani în AI, risc și criminalitate financiară',
     calloutTeamTitle: 'Ai nevoie de acest curs pentru toată echipa?',
-    calloutTeamBody: 'Livrăm acest curs in-house — online sau la sediul vostru.',
+    calloutTeamBody: 'Livrăm acest curs in-house, online sau la sediul vostru.',
     calloutQuestionsTitle: 'Ai întrebări înainte de înscriere?',
-    calloutQuestionsBody: 'Scrie-ne — răspundem în cel mult o zi lucrătoare.',
+    calloutQuestionsBody: 'Scrie-ne. Răspundem în cel mult o zi lucrătoare.',
   },
   corporate: {
     metaTitle: 'Training corporate',
     metaDescription:
-      'Training in-house de AI, guvernanță și ISO/IEC 42001 pentru organizații — de la sesiuni pentru management la programe tehnice, livrat live de isad.academy.',
+      'Training in-house de AI, guvernanță și ISO/IEC 42001 pentru organizații, de la sesiuni pentru management la programe tehnice, livrat live de isad.academy.',
     hero: {
       pill: 'Training corporate · In-house & online',
       titleTop: 'Ajută-ți organizația',
       titleBottomPrefix: 'să adopte',
       titleBottomHighlight: 'AI-ul responsabil',
       subtitle:
-        'De la sesiuni executive pentru management la programe tehnice pentru echipele de livrare — isad.academy construiește competențele de care organizația ta are nevoie în AI, guvernanță, conformitate și standarde internaționale.',
+        'De la sesiuni executive pentru management la programe tehnice pentru echipele de livrare, isad.academy construiește competențele de care organizația ta are nevoie în AI, guvernanță, conformitate și standarde internaționale.',
       ctaPrimary: 'Solicită o ofertă',
       ctaSecondary: 'Vezi temele de training',
     },
@@ -1259,7 +1259,7 @@ const ro: Dictionary = {
       items: [
         {
           title: 'Sesiuni executive',
-          text: 'Pentru leadership și management — strategie AI, risc și guvernanță explicate în limbaj de business, nu în jargon.',
+          text: 'Pentru leadership și management: strategie AI, risc și guvernanță explicate în limbaj de business, nu în jargon.',
         },
         {
           title: 'Programe tehnice',
@@ -1267,7 +1267,7 @@ const ro: Dictionary = {
         },
         {
           title: 'Trasee de certificare',
-          text: 'Trasee PECB ISO/IEC 42001 livrate in-house — de înscrierea la examen pe platforma PECB ne ocupăm noi.',
+          text: 'Trasee PECB ISO/IEC 42001 livrate in-house. De înscrierea la examen pe platforma PECB ne ocupăm noi.',
         },
       ],
       idealFor: 'Ideal pentru',
@@ -1276,24 +1276,24 @@ const ro: Dictionary = {
     form: {
       ariaLabel: 'Solicită o ofertă corporate',
       title: 'Solicită o ofertă corporate',
-      subtitle: 'Spune-ne despre echipa ta — revenim noi către tine.',
+      subtitle: 'Spune-ne despre echipa ta. Revenim noi către tine.',
       companyName: 'Numele companiei',
       contactPerson: 'Persoană de contact',
       workEmail: 'E-mail',
       phoneLabel: 'Telefon (opțional)',
       phonePlaceholder: 'Telefon',
       participantsLabel: 'Câți participanți?',
-      participantsPlaceholder: 'Participanți (ex. 10–25)',
+      participantsPlaceholder: 'Participanți (ex. 10-25)',
       participantsOption: (range: string) => `${range} participanți`,
       topicLabel: 'Temă',
       topicPlaceholder: 'Temă / curs',
-      topicOtherOption: 'Altceva — spune-ne ce ai nevoie',
+      topicOtherOption: 'Altceva: spune-ne ce ai nevoie',
       topicOtherLabel: 'Ce temă ai în minte?',
       periodLegend: 'Perioada preferată (opțional)',
       periodFromLabel: 'De la',
       periodToLabel: 'Până la',
-      periodFromPlaceholder: 'Perioada preferată — de la',
-      periodToPlaceholder: 'Perioada preferată — până la',
+      periodFromPlaceholder: 'Perioada preferată: de la',
+      periodToPlaceholder: 'Perioada preferată: până la',
       messageLabel: 'Spune-ne despre obiectivele voastre (opțional)',
       errors: {
         companyName: 'Te rugăm să introduci numele companiei.',
@@ -1308,7 +1308,7 @@ const ro: Dictionary = {
       },
       submit: 'Solicită o ofertă',
       submitting: 'Se trimite…',
-      successTitle: 'Mulțumim — revenim noi către tine.',
+      successTitle: 'Mulțumim. Revenim noi către tine.',
       successMessage: 'Cererea ta a fost trimisă. Îți răspundem pe e-mail cu o ofertă pentru echipa ta.',
     },
     aside: {
@@ -1316,16 +1316,16 @@ const ro: Dictionary = {
       steps: [
         'Analizăm nevoile voastre și răspundem pe e-mail.',
         'Propunem formatul, datele și prețul.',
-        'Livrăm — live pe Zoom sau la sediul vostru.',
+        'Livrăm: live pe Zoom sau la sediul vostru.',
       ],
       talkTitle: 'Preferi să vorbim direct?',
-      talkNote: 'Luni–vineri · răspundem pe e-mail',
+      talkNote: 'Luni-vineri · răspundem pe e-mail',
     },
   },
   about: {
     metaTitle: 'Despre noi',
     metaDescription:
-      'isad.academy este instrumentul tău de navigație pentru o lume în schimbare — o platformă de cursuri construită de International Security and Defence (ISAD), partener oficial PECB.',
+      'isad.academy este instrumentul tău de navigație pentru o lume în schimbare: o platformă de cursuri construită de International Security and Defence (ISAD), partener oficial PECB.',
     // v3 redesign (owner Figma 3873-94 desktop / 3977-571 mobil) — traducerea RO a copy-ului 1:1.
     heroPill: 'Despre noi',
     heroTitlePlain: 'Instrumentul tău de navigație pentru o ',
@@ -1333,8 +1333,8 @@ const ro: Dictionary = {
     heroIntro1:
       'Lumea se învârte mai repede ca oricând. Apar tehnologii noi, prind contur competențe noi, iar perspectivele proaspete și flexibile devin esențiale.',
     heroIntro2:
-      'isad.academy este, înainte de toate, instrumentul tău curatoriat de navigație pentru această lume în schimbare — o platformă de cursuri concepută să te ajute să îți înnoiești cunoștințele, să îți consolidezi competențele și să ții pasul cu politicile globale și standardele ISO în continuă evoluție.',
-    heroBuiltBy: 'Construită de International Security and Defence (ISAD) — partener oficial PECB.',
+      'isad.academy este, înainte de toate, instrumentul tău curatoriat de navigație pentru această lume în schimbare: o platformă de cursuri concepută să te ajute să îți înnoiești cunoștințele, să îți consolidezi competențele și să ții pasul cu politicile globale și standardele ISO în continuă evoluție.',
+    heroBuiltBy: 'Construită de International Security and Defence (ISAD), partener oficial PECB.',
     beliefsHeading: 'Ce ne ghidează',
     beliefs: [
       {
@@ -1379,13 +1379,13 @@ const ro: Dictionary = {
     ctaLabel: 'Explorează cursurile noastre',
     heroTitle: 'Training serios pentru oamenii care fac AI-ul demn de încredere',
     heroSubtitle:
-      'isad.academy este o academie online independentă pentru guvernanța, riscul și conformitatea AI — fiecare curs predat live, unu-la-unu, de un practician.',
+      'isad.academy este o academie online independentă pentru guvernanța, riscul și conformitatea AI: fiecare curs predat live, unu-la-unu, de un practician.',
     expertEyebrow: 'Expertul tău',
     approachTitle: 'Cum predăm',
     approachCards: [
       {
         title: 'Live, niciodată înregistrat',
-        text: 'Fiecare sesiune are loc live pe Zoom — poți întreba, contrazice și aprofunda pe loc.',
+        text: 'Fiecare sesiune are loc live pe Zoom, așa că poți întreba, contrazice și aprofunda pe loc.',
       },
       {
         title: 'Unu-la-unu, implicit',
@@ -1393,23 +1393,23 @@ const ro: Dictionary = {
       },
       {
         title: 'Condus de un practician',
-        text: 'Înveți de la cineva care a făcut munca asta — decenii în antifraudă, risc și date, aplicate acum guvernanței AI.',
+        text: 'Înveți de la cineva care a făcut munca asta: decenii în antifraudă, risc și date, aplicate acum guvernanței AI.',
       },
     ],
     credibilityTitle: 'Credibilitate pe care o poți verifica',
     certLinePrefix:
-      'isad.academy este independentă. Certificatele de absolvire pentru cursurile noastre sunt emise de APCF — ',
+      'isad.academy este independentă. Certificatele de absolvire pentru cursurile noastre sunt emise de APCF; ',
     certLinkLabel: 'vezi cum funcționează certificarea',
     certLineSuffix: '.',
     ctaTitle: 'Suntem gata când ești și tu',
-    ctaText: 'Răsfoiește catalogul sau vorbește mai întâi cu noi — oricum ar fi, vei învăța live.',
+    ctaText: 'Răsfoiește catalogul sau vorbește mai întâi cu noi; oricum ar fi, vei învăța live.',
     ctaCourses: 'Vezi cursurile',
     ctaContact: 'Contactează-ne',
   },
   contact: {
     metaTitle: 'Contact',
     metaDescription:
-      'Întreabă-ne despre un curs, training corporate sau certificare — trimite-ne un mesaj și îți răspundem pe e-mail.',
+      'Întreabă-ne despre un curs, training corporate sau certificare: trimite-ne un mesaj și îți răspundem pe e-mail.',
     title: 'Contact',
     intro: 'Ai întrebări despre un curs, training corporate sau certificare? Trimite-ne un mesaj.',
     headerTitlePlain: 'Întrebări?',
@@ -1437,7 +1437,7 @@ const ro: Dictionary = {
       },
       submit: 'Trimite mesajul',
       submitting: 'Se trimite…',
-      successTitle: 'Mulțumim — revenim noi către tine.',
+      successTitle: 'Mulțumim. Revenim noi către tine.',
       successMessage: 'Mesajul tău a fost trimis. De obicei răspundem pe e-mail, așa că fii cu ochii pe inbox.',
       privacyPrefix: 'Prin trimitere, ești de acord cu ',
       privacyLinkLabel: 'Politica de confidențialitate',
@@ -1452,16 +1452,16 @@ const ro: Dictionary = {
       responseTimeValue: 'În cel mult o zi lucrătoare',
       linkedin: 'LinkedIn',
       linkedinCta: 'Conectează-te pe LinkedIn',
-      fallback: 'Formularul e cel mai rapid mod de a ajunge la noi — răspundem pe e-mail.',
+      fallback: 'Formularul e cel mai rapid mod de a ajunge la noi; răspundem pe e-mail.',
     },
   },
   quiz: {
     metaTitle: 'Găsește-ți cursul',
     metaDescription:
-      'Nu ești sigur ce curs ți se potrivește? Quiz-ul de cursuri isad.academy vine în curând — abonează-te ca să fii anunțat la lansare.',
+      'Nu ești sigur ce curs ți se potrivește? Quiz-ul de cursuri isad.academy vine în curând. Abonează-te ca să fii anunțat la lansare.',
     badge: 'În curând',
     title: 'Găsește-ți cursul',
-    text: 'Quiz-ul de cursuri vine în curând. Răspunzi la câteva întrebări rapide și te îndrumăm către cursul care se potrivește cel mai bine obiectivelor tale — fără ghicit.',
+    text: 'Quiz-ul de cursuri vine în curând. Răspunzi la câteva întrebări rapide și te îndrumăm către cursul care se potrivește cel mai bine obiectivelor tale, fără ghicit.',
     browseCta: 'Vezi toate cursurile',
     notifyTitle: 'Fii anunțat la lansare',
     notifyText: 'Abonează-te și îți dăm de veste imediat ce quiz-ul devine activ.',
@@ -1470,7 +1470,7 @@ const ro: Dictionary = {
     headerTitlePlain: 'Articole și',
     headerTitleGradient: 'perspective',
     headerSub:
-      'Notițe practice despre guvernanța AI, ISO/IEC 42001 și AI responsabil — direct de la biroul trainerului.',
+      'Notițe practice despre guvernanța AI, ISO/IEC 42001 și AI responsabil, direct de la biroul trainerului.',
     brandLabel: 'isad.academy · blog',
     newBadge: 'Nou',
     readArticle: 'Citește articolul',
@@ -1478,9 +1478,9 @@ const ro: Dictionary = {
     // Mobile list layout (Figma 3977-612)
     backToBlog: 'Înapoi la blog',
     latestLabel: 'Cel mai recent articol',
-    swipeLabel: 'Mai multe articole — glisează',
+    swipeLabel: 'Mai multe articole: glisează',
     mobileNewsTitle: 'Primești articolele noi pe e-mail.',
-    mobileNewsSub: 'Un e-mail când publicăm — fără spam, te dezabonezi oricând.',
+    mobileNewsSub: 'Un e-mail când publicăm. Fără spam, te dezabonezi oricând.',
     listTitle: 'Blog',
     metaDescription:
       'Articole despre guvernanța AI, ISO/IEC 42001, anti-fraudă și managementul riscului, de la Dr. Silviu Gresoi.',
@@ -1495,7 +1495,7 @@ const ro: Dictionary = {
       other: 'Altele',
     },
     articleNotFound: 'Articolul nu a fost găsit',
-    draftBanner: 'Previzualizezi o ciornă — nu este vizibilă public.',
+    draftBanner: 'Previzualizezi o ciornă. Nu este vizibilă public.',
     draftExit: 'Ieși din previzualizare',
     breadcrumbAria: 'Fir de navigare',
     shareLinkedIn: 'Distribuie pe LinkedIn',
@@ -1504,7 +1504,7 @@ const ro: Dictionary = {
     hoursLive: (n: number) => `${n} ore · Live pe Zoom`,
     viewCourse: 'Vezi cursul',
     inboxTitle: 'Primește articolele noi pe e-mail',
-    inboxSub: 'Un singur e-mail când publicăm — fără spam, te poți dezabona oricând.',
+    inboxSub: 'Un singur e-mail când publicăm. Fără spam, te poți dezabona oricând.',
     leadMagnet: {
       title: 'Obține resursa',
       intro: 'Îți trimitem linkul de descărcare pe e-mail.',
@@ -1514,7 +1514,7 @@ const ro: Dictionary = {
       submit: 'Trimite-mi linkul',
       // Article redesign (Figma 3977-687 / 3977-718) — black pill button label
       submitFile: 'Trimite-mi fișierul',
-      success: 'Verifică-ți inboxul — linkul de descărcare e pe drum.',
+      success: 'Verifică-ți inboxul: linkul de descărcare e pe drum.',
       genericError: 'Ceva nu a mers. Te rugăm să încerci din nou mai târziu.',
     },
   },
@@ -1529,7 +1529,7 @@ const ro: Dictionary = {
       'Cookie-urile și tehnologiile similare folosite de isad.academy și cum îți gestionezi preferințele.',
     deliveryTitle: 'Politica de livrare',
     deliveryMetaDescription:
-      'Cum sunt livrate cursurile isad.academy — sesiuni live online pe Zoom — urmate de Termenii și condițiile complete.',
+      'Cum sunt livrate cursurile isad.academy (sesiuni live online pe Zoom), urmate de Termenii și condițiile complete.',
     termsTitle: 'Termeni și condiții',
     termsMetaDescription:
       'Termenii care guvernează utilizarea isad.academy și achiziția edițiilor de curs live.',
@@ -1540,13 +1540,13 @@ const ro: Dictionary = {
     badge: 'Lasă-ne o recenzie',
     howWas: (course: string) => `Cum a fost ${course}?`,
     subtitle:
-      'Feedbackul tău îi ajută pe viitorii participanți să decidă — iar Silviu citește fiecare recenzie.',
+      'Feedbackul tău îi ajută pe viitorii participanți să decidă, iar Silviu citește fiecare recenzie.',
     invalidBadge: 'Link de recenzie',
     invalidTitle: 'Acest link nu mai este valid',
     invalidBody:
       'Acest link de recenzie este invalid sau a expirat. Dacă vrei totuși să ne împărtășești experiența ta, scrie-ne și îți trimitem un link nou.',
     textLabel: 'Recenzia ta',
-    textPlaceholder: 'Povestește-ne experiența ta — ce te-a impresionat, ce ai învățat…',
+    textPlaceholder: 'Povestește-ne experiența ta: ce te-a impresionat, ce ai învățat…',
     nameLabel: 'Numele tău (opțional)',
     namePlaceholder: 'Ioana Popescu',
     roleLabel: 'Rol / Companie (opțional)',
@@ -1575,7 +1575,7 @@ const ro: Dictionary = {
     failedBody:
       'Ceva n-a mers la noi în timp ce îți confirmam adresa. Te rugăm să încerci din nou peste câteva minute sau scrie-ne dacă se repetă.',
     confirmedBody:
-      'Îți mulțumim că ți-ai confirmat adresa de e-mail — ești acum abonat(ă) la newsletterul isad.academy. Te anunțăm despre cursuri noi, articole și noutăți legate de certificare.',
+      'Îți mulțumim că ți-ai confirmat adresa de e-mail. Ești acum abonat(ă) la newsletterul isad.academy. Te anunțăm despre cursuri noi, articole și noutăți legate de certificare.',
     backHome: 'Înapoi acasă',
   },
   checkout: {
@@ -1646,7 +1646,7 @@ const ro: Dictionary = {
     codeAppliedPrefix: 'Codul',
     codeAppliedSuffix: 'a fost aplicat.',
     removeCode: 'Elimină codul',
-    stackNote: 'Reducerile se cumulează — grup, membru și cod se aplică împreună.',
+    stackNote: 'Reducerile se cumulează: grup, membru și cod se aplică împreună.',
     enterCodeFirst: 'Introdu mai întâi un cod de reducere.',
     codeCheckFailed: 'Nu am putut verifica acest cod acum. Te rugăm să încerci din nou.',
     errorEnterName: 'Te rugăm să îți introduci numele.',
@@ -1665,10 +1665,10 @@ const ro: Dictionary = {
     discountCode: 'Cod de reducere',
     pricingUnavailable: 'Prețul nu este disponibil momentan pentru această ediție.',
     fallbackEstimate:
-      'Prețul live este temporar indisponibil — aceasta este o estimare fără coduri de reducere. Prețul final este confirmat înainte de plată.',
+      'Prețul live este temporar indisponibil. Aceasta este o estimare fără coduri de reducere. Prețul final este confirmat înainte de plată.',
     updatingPrice: 'Se actualizează prețul…',
     total: 'Total',
-    vatNotRegistered: 'Preț final — isad.academy nu este plătitoare de TVA.',
+    vatNotRegistered: 'Preț final: isad.academy nu este plătitoare de TVA.',
     vatIncluded: 'Toate prețurile includ TVA.',
     soldOutNotifyPrefix: 'Poți cere să fii anunțat despre următoarea ediție pe',
     coursePageLinkLabel: 'pagina cursului',
@@ -1689,7 +1689,7 @@ const ro: Dictionary = {
     codeUsageLimitReached: 'Acest cod a atins limita de utilizări.',
     codeDuplicate: 'Acest cod este deja aplicat.',
     errorCheckDetails: 'Te rugăm să verifici datele și să încerci din nou.',
-    errorPaymentDeclined: 'Plata a fost refuzată — te rugăm să încerci din nou.',
+    errorPaymentDeclined: 'Plata a fost refuzată. Te rugăm să încerci din nou.',
     errorEditionNotFound: 'Această ediție nu a putut fi găsită. Este posibil să fi fost ștearsă.',
     errorJustSoldOut: 'Locurile pentru această ediție tocmai s-au epuizat.',
     errorEnrolmentNotOpen: 'Înscrierile nu sunt deschise pentru această ediție.',
@@ -1706,27 +1706,27 @@ const ro: Dictionary = {
       'Nu am găsit o înscriere recentă în această sesiune de browser. Dacă tocmai ai plătit, verifică e-mailul pentru confirmare.',
     orderConfirmedBadge: 'Comandă confirmată',
     enrolledTitle: 'Te-ai înscris!',
-    editionStarting: (course: string, date: string) => `${course} — ediția începe pe ${date}.`,
+    editionStarting: (course: string, date: string) => `${course}: ediția începe pe ${date}.`,
     orderReference: 'Referința comenzii:',
     participantHeading: (n: number) => (n === 1 ? 'Participant' : 'Participanți'),
     pricingHeading: 'Preț',
     meetInviteNote:
       'Invitația ta Zoom va sosi cu câteva zile înainte de începerea cursului. Fiecare participant o primește la adresa de e-mail de mai sus.',
     stayInLoop: 'Rămâi la curent',
-    stayInLoopSub: 'Primești datele noilor ediții și articolele direct în inbox — fără spam, te poți dezabona oricând.',
+    stayInLoopSub: 'Primești datele noilor ediții și articolele direct în inbox. Fără spam, te poți dezabona oricând.',
     backToCourses: 'Înapoi la cursuri',
     paymentPendingBadge: 'Plata se procesează',
     paymentPendingTitle: 'Aproape gata…',
     paymentPendingNote:
-      'Așteptăm confirmarea plății de la procesator. Primești e-mailul de confirmare imediat ce plata este validată — poți închide pagina fără grijă.',
+      'Așteptăm confirmarea plății de la procesator. Primești e-mailul de confirmare imediat ce plata este validată. Poți închide pagina fără grijă.',
     paymentFailedTitle: 'Plata nu a reușit',
     paymentFailedMessage:
-      'Plata a fost anulată sau refuzată — nu s-a retras nimic și niciun loc nu a fost rezervat. Poți încerca înscrierea din nou oricând.',
+      'Plata a fost anulată sau refuzată. Nu s-a retras nimic și niciun loc nu a fost rezervat. Poți încerca înscrierea din nou oricând.',
     // Confirmation page redesign (Figma 4031-156 / 4031-218)
     confirmedTitle: 'Înscriere',
     confirmedTitleAccent: 'confirmată.',
     confirmedSubtitle: (email: string) =>
-      `Plata a fost primită — locurile tale sunt rezervate. E-mailul de confirmare e pe drum către ${email}.`,
+      `Plata a fost primită. Locurile tale sunt rezervate, iar e-mailul de confirmare e pe drum către ${email}.`,
     inboxFallback: 'inboxul tău',
     successMarkAria: 'Plată confirmată',
     orderRefLabel: (id: number) => `Comanda #${id}`,
@@ -1738,7 +1738,7 @@ const ro: Dictionary = {
     paymentPaidValue: 'Plătit · card',
     paymentProcessingValue: 'În procesare',
     totalPaid: 'Total plătit',
-    nextConfirmEmail: 'E-mailul de confirmare cu detaliile comenzii — deja trimis',
+    nextConfirmEmail: 'E-mailul de confirmare cu detaliile comenzii (deja trimis)',
     nextPendingEmail: 'E-mailul de confirmare sosește imediat ce plata este validată',
     nextConfirmInvoice: 'Factura se emite automat către e-mailul de facturare',
     nextConfirmMeet: 'Invitația Zoom sosește înainte de data de start',
@@ -1769,12 +1769,12 @@ const ro: Dictionary = {
     firstName: 'Prenume',
     lastName: 'Nume',
     emailPlaceholder: 'E-mail',
-    occupationPlaceholder: 'Ocupație — alege sau scrie',
+    occupationPlaceholder: 'Ocupație (alege sau scrie)',
     joinDefault: 'Ne vedem acolo',
     sending: 'Se trimite…',
     privacyNote: 'Prin înscriere, ești de acord cu Politica de confidențialitate.',
     back: 'Înapoi',
-    successTitle: 'Ești pe listă — ne vedem acolo.',
+    successTitle: 'Ești pe listă. Ne vedem acolo.',
     successBody: 'Linkul de participare e pe drum către inboxul tău.',
     done: 'Gata',
     errorGeneric: 'Ceva nu a mers bine. Te rugăm să încerci din nou.',
@@ -1785,14 +1785,14 @@ const ro: Dictionary = {
   meta: {
     titleTagline: 'Training live ISO/IEC 42001',
     siteDescription:
-      'Cursuri live susținute de experți, care te pregătesc pentru ISO/IEC 42001:2023 — predate unu-la-unu pe Zoom.',
+      'Cursuri live susținute de experți, care te pregătesc pentru ISO/IEC 42001:2023, predate unu-la-unu pe Zoom.',
   },
   newsletterForm: {
     emailLabel: 'E-mail',
     subscribe: 'Abonează-te',
     sending: 'Se trimite…',
     subscribing: 'Se trimite…',
-    success: 'Aproape gata — verifică-ți inboxul pentru a confirma abonarea.',
+    success: 'Aproape gata: verifică-ți inboxul pentru a confirma abonarea.',
     genericError: 'Ceva n-a mers. Te rugăm să încerci din nou mai târziu.',
   },
   footer: {

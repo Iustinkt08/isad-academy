@@ -37,12 +37,12 @@ export async function generateMetadata({
     ? {
         title: 'Quiz de cursuri',
         description:
-          '12 întrebări scurte — îți recomandăm cursul sau parcursul potrivit, în mai puțin de două minute.',
+          '12 întrebări scurte. Îți recomandăm cursul sau parcursul potrivit, în mai puțin de două minute.',
       }
     : {
         title: 'Course quiz',
         description:
-          '12 short questions — we recommend the right course or learning path in under two minutes.',
+          '12 short questions. We recommend the right course or learning path in under two minutes.',
       }
 }
 

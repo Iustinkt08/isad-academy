@@ -166,7 +166,7 @@ export interface UserAuthOperations {
   };
 }
 /**
- * Payload admin users only. Clients never log in.
+ * Dashboard user accounts only: administrators and editors. Site clients never get accounts and never log in; course participants are recorded on their orders instead.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users".
@@ -214,7 +214,7 @@ export interface Media {
   focalY?: number | null;
 }
 /**
- * Course teasers shown in the catalog. Editions (dates/prices/seats) live on Course Sessions.
+ * Course presentation pages shown in the catalog. Each course holds only the shared content (title, description, audience); dates, prices and seats live on Course Sessions, one entry per edition.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "courses".
@@ -227,23 +227,23 @@ export interface Course {
    */
   slug?: string | null;
   /**
-   * Short blurb shown on the course preview cards (Home "Explore our upcoming courses"). Keep it to 1–2 sentences.
+   * Short blurb shown on the course preview cards, for example in the "Explore our upcoming courses" section on the homepage. Keep it to one or two sentences; it does not appear on the course page itself.
    */
   shortDescription?: string | null;
   /**
-   * Banner image shown on the catalog card and course detail header.
+   * Banner image shown on the catalog card and in the course page header. Uploading a new image updates both places.
    */
   image?: (number | null) | Media;
   /**
-   * Total course length in hours.
+   * Total course length in hours, shown on the catalog card and on the course page. Also used to calculate CPD credits, at 1 credit per hour.
    */
   durationHours?: number | null;
   /**
-   * Reserved for future catalog filtering — no filter UI at launch (CLAUDE.md §6).
+   * Reserved for future catalog filtering. The category is stored now, but the catalog shows no filter at launch.
    */
   category?: ('iso' | 'antiFraud' | 'security' | 'other') | null;
   /**
-   * Full course description. Placeholder copy until Silviu confirms real content (CLAUDE.md §15).
+   * Full course description shown on the course page, below the header. Placeholder copy stays here until the final text is confirmed.
    */
   description?: {
     root: {
@@ -261,7 +261,7 @@ export interface Course {
     [k: string]: unknown;
   } | null;
   /**
-   * "Who this course is for" — one row per bullet point.
+   * The "Who this course is for" list on the course page. Add one row per bullet point; rows appear on the site in the order set here.
    */
   audience?:
     | {
@@ -270,11 +270,11 @@ export interface Course {
       }[]
     | null;
   /**
-   * CPD credits are 1 per course hour (house rule C3, CLAUDE.md §9 R2) and derive automatically from Duration (hours). This field is only used as a fallback for courses whose Duration is left empty.
+   * CPD credits shown on the course page. Calculated automatically as 1 credit per course hour from Duration (hours); this field is used only when Duration is empty.
    */
   certificationCredits?: number | null;
   /**
-   * Editions of this course. Add/edit them from the Course Sessions collection.
+   * The editions of this course, with their dates, prices and seats. Add or edit them in the Course Sessions collection; they appear here automatically.
    */
   sessions?: {
     docs?: (number | CourseSession)[];
@@ -282,21 +282,21 @@ export interface Course {
     totalDocs?: number;
   };
   /**
-   * Quiz matching tags. Fill these in so the course quiz can recommend this course. Leave Level empty to keep the course OUT of the quiz.
+   * Matching tags for the course quiz on the site. Fill these in so the quiz can recommend this course; leave Level empty to keep the course out of the quiz results entirely.
    */
   quizProfile?: {
     /**
-     * Depth of the course. Required for the course to appear in quiz results.
+     * Depth of the course. Required for the course to appear in quiz results; while empty, the quiz never recommends this course.
      */
     level?: ('introductory' | 'intermediate' | 'advanced' | 'specialization') | null;
     /**
-     * What a participant walks away with (pick all that apply).
+     * What a participant walks away with at the end of the course. Pick all that apply; the quiz matches these against the visitor's answers.
      */
     outcomes?:
       | ('overview' | 'practicalSkills' | 'implementationPlan' | 'auditPrep' | 'certification' | 'foundationForMore')[]
       | null;
     /**
-     * Mirrors quiz question 2 ("Ce domeniu te interesează cel mai mult?") — pick all that apply.
+     * The domains this course covers, mirroring the quiz question about the visitor's field of interest. Pick all that apply.
      */
     domains?:
       | (
@@ -304,7 +304,7 @@ export interface Course {
         )[]
       | null;
     /**
-     * One–two sentences shown on the quiz result screen ("why we recommend it"). The quiz is in Romanian — write the RO version at least.
+     * One or two sentences shown on the quiz result screen as the reason this course is recommended. The quiz runs in Romanian, so write at least the Romanian version.
      */
     quizPitch?: string | null;
   };
@@ -321,7 +321,7 @@ export interface Course {
   _status?: ('draft' | 'published') | null;
 }
 /**
- * Editions of a course — dates, schedule, capacity and price windows.
+ * Editions of a course: dates, schedule, capacity and price windows. Each edition sells separately; the seat counts and the Early Bird or Standard prices shown on the site come from here.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "courseSessions".
@@ -331,77 +331,77 @@ export interface CourseSession {
   course: number | Course;
   startDate: string;
   /**
-   * Concrete days and hours this edition meets.
+   * The concrete days and hours this edition meets, shown in the program section of the course page. The latest day here also decides when the edition counts as past.
    */
   schedule?:
     | {
         date: string;
         /**
-         * e.g. "09:00"
+         * Start time of that day, 24-hour format, for example "09:00".
          */
         startTime: string;
         /**
-         * e.g. "17:00"
+         * End time of that day, 24-hour format, for example "17:00".
          */
         endTime: string;
         id?: string | null;
       }[]
     | null;
   /**
-   * Total seats for this edition.
+   * Total seats for this edition. The site shows "X seats left" only when few remain, and sales stop automatically once every seat is sold.
    */
   capacity: number;
   /**
-   * Consumed only on a CONFIRMED order, atomically (T5). Do not edit by hand.
+   * Seats consumed by confirmed orders. Updated automatically and atomically when a payment is confirmed; a refund releases the seats again. Do not edit by hand.
    */
   seatsSold?: number | null;
   /**
-   * Idempotency stamp for the daily review-request job (T13, CLAUDE.md §10) — set once the post-session review-request emails have been sent for this edition (best-effort: stamped even if some individual sends failed, so the job never re-mails everyone on a retry). Never set by hand.
+   * Timestamp set once the review-request emails have gone out to participants after this edition ended. The daily job checks it so nobody is emailed twice, even when a retry follows partial failures. Never set by hand.
    */
   reviewRequestSentAt?: string | null;
   /**
-   * Early Bird price window. Leave empty if this edition has none.
+   * Early Bird price window. While the current date is inside this window, the site sells at this price. Leave everything empty if this edition has no Early Bird offer.
    */
   earlyBird?: {
     price?: number | null;
     /**
-     * Charged to visitors from Romania (B1 — geo-based currency). Leave empty to sell this window in EUR only.
+     * Price charged to visitors browsing from Romania (the currency is chosen by the visitor's location). Leave empty to sell this window in EUR only.
      */
     priceRON?: number | null;
     startDate?: string | null;
     /**
-     * Leave both dates empty if there is no early bird window.
+     * Last day of the Early Bird window. Leave both dates empty if this edition has no Early Bird window.
      */
     endDate?: string | null;
   };
   /**
-   * Standard price window.
+   * Standard price window, used when the Early Bird window is not active. If neither window is active, the edition cannot be purchased and the site shows "Enrolment coming soon".
    */
   standard?: {
     price?: number | null;
     /**
-     * Charged to visitors from Romania (B1 — geo-based currency). Leave empty to sell this window in EUR only.
+     * Price charged to visitors browsing from Romania (the currency is chosen by the visitor's location). Leave empty to sell this window in EUR only.
      */
     priceRON?: number | null;
     startDate?: string | null;
     /**
-     * Leave both dates empty if there is no standard window.
+     * Last day of the Standard window. Leave both dates empty if this edition has no Standard window.
      */
     endDate?: string | null;
   };
   /**
-   * Computed: capacity − seatsSold. Not stored.
+   * Calculated automatically as capacity minus seats sold. Read-only and never stored; a negative number means the edition was oversold and needs attention.
    */
   seatsRemaining?: number | null;
   /**
-   * Computed from dates, seats and price windows. Not stored.
+   * Derived automatically from the dates, the remaining seats and the price windows. Read-only and never stored; it changes on its own as time passes or seats sell.
    */
   status?: ('upcoming' | 'past' | 'soldOut' | 'noActiveWindow') | null;
   updatedAt: string;
   createdAt: string;
 }
 /**
- * Checkout orders. Server-side only — never exposed to the public API.
+ * Orders placed through the site checkout, one course edition per order. Created and updated by the payment flow; use this list to review buyers, participants and payment status. Never exposed to the public API.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "orders".
@@ -420,7 +420,7 @@ export interface Order {
     address?: string | null;
   };
   /**
-   * One row per seat — length must equal "quantity". When quantity is 1, the checkout API fills this from the buyer.
+   * One row per seat; the number of rows must equal "quantity". For single-seat orders, checkout fills this in automatically from the buyer details.
    */
   participants?:
     | {
@@ -430,12 +430,12 @@ export interface Order {
       }[]
     | null;
   /**
-   * Snapshot of the pricing engine output at the moment of purchase (CLAUDE.md §8) — never recomputed after the fact. Read-only: not hand-editable.
+   * Snapshot of the full price breakdown at the moment of purchase: base price, applied window, discounts and total. Never recomputed afterwards and not hand-editable; it documents exactly what the buyer paid.
    */
   pricing?: {
     basePrice?: number | null;
     /**
-     * Visitor currency resolved by geo at purchase time (B1).
+     * Currency the buyer paid in, resolved from the visitor's location at purchase time: RON for Romania, EUR otherwise.
      */
     currency?: ('EUR' | 'RON') | null;
     appliedWindow?: ('earlyBird' | 'standard') | null;
@@ -448,18 +448,18 @@ export interface Order {
   };
   paymentStatus: 'pending' | 'confirmed' | 'failed' | 'refunded';
   /**
-   * Payment provider that handled this order, e.g. "mock", "stripe". Set by checkout — read-only.
+   * Payment provider that handled this order, e.g. "mock" or "netopia". Set automatically by checkout; read-only.
    */
   provider?: string | null;
   /**
-   * Provider's transaction/session reference. Set by checkout — read-only.
+   * The provider's transaction or payment-session reference. Set automatically by checkout; read-only. Use it to find the payment in the provider's own dashboard.
    */
   providerRef?: string | null;
   updatedAt: string;
   createdAt: string;
 }
 /**
- * Discount codes. Never publicly readable — checkout validates codes server-side.
+ * Discount codes entered at checkout. Never publicly readable: the checkout validates a customer's code on the server, so visitors cannot list the valid codes.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "discountCodes".
@@ -470,15 +470,15 @@ export interface DiscountCode {
   percentage: number;
   expiresAt?: string | null;
   /**
-   * Leave empty for unlimited uses.
+   * Maximum number of orders that may use this code. Leave empty for unlimited uses; once the limit is reached, checkout rejects the code.
    */
   usageLimit?: number | null;
   /**
-   * Incremented by checkout when the code is applied. Do not edit by hand.
+   * How many times checkout has applied this code so far. Increased automatically on each confirmed use. Do not edit by hand.
    */
   usageCount?: number | null;
   /**
-   * "member" codes also grant the member discount (CLAUDE.md §8, §13 — % TBD).
+   * General codes apply only their own percentage. Member codes additionally grant the member discount to the order, as if the buyer were an APCF member.
    */
   type: 'general' | 'member';
   isActive?: boolean | null;
@@ -486,7 +486,7 @@ export interface DiscountCode {
   createdAt: string;
 }
 /**
- * Testimonials. No rating — curate homepage placement with "Show on home" (max 5 shown).
+ * Participant testimonials, collected by email after a course edition ends or added manually. There is no star rating. Curate homepage placement with "Show on home"; at most 5 appear there.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "reviews".
@@ -498,23 +498,23 @@ export interface Review {
   roleCompany?: string | null;
   photo?: (number | null) | Media;
   /**
-   * Which course this review refers to, if any.
+   * The course this testimonial refers to, if any. Optional; used for context in the dashboard.
    */
   course?: (number | null) | Course;
   source: 'emailForm' | 'manual';
   /**
-   * Silviu curates which testimonials appear on Home — max 5 are shown, enforced in the query.
+   * Tick to feature this testimonial on the homepage. At most 5 ticked testimonials are displayed there; the rest stay hidden from visitors.
    */
   showOnHome?: boolean | null;
   /**
-   * T13 duplicate-submission guard — sha256(sessionId + ":" + lowercased email), set only by the public /api/reviews/submit route so the same (session, email) pair can submit at most once. Left empty for manually-added reviews (a nullable unique column allows any number of empty values in Postgres — effectively "sparse").
+   * Duplicate-submission guard: sha256 of the session id and the lowercased email, set only by the public review submission route so the same (session, email) pair can submit at most once. Left empty for manually added reviews; the unique constraint allows any number of empty values.
    */
   submissionKey?: string | null;
   updatedAt: string;
   createdAt: string;
 }
 /**
- * Blog articles — rich text supports named colors, link chips and downloadable resources.
+ * Blog articles shown on the Blog page. The rich text editor supports named brand colors, link chips (pill-style external links) and downloadable resources. The first publish of an article can also email newsletter subscribers.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "blogPosts".
@@ -527,12 +527,12 @@ export interface BlogPost {
    */
   slug?: string | null;
   /**
-   * Optional — articles may be published without a cover image.
+   * Cover image shown on the blog list card and at the top of the article. Optional: articles can be published without one and the layout adapts.
    */
   coverImage?: (number | null) | Media;
   excerpt?: string | null;
   /**
-   * Supports colored text, blockquotes, in-text images, link chips (external pill links) and downloadable resources.
+   * Article body shown on the article page. Supports colored text, blockquotes, images inside the text, link chips (pill-style external links) and downloadable resources.
    */
   body?: {
     root: {
@@ -550,19 +550,19 @@ export interface BlogPost {
     [k: string]: unknown;
   } | null;
   /**
-   * Defaults to Dr. Silviu Gresoi — editable per article.
+   * Author name shown under the article title. Pre-filled with Dr. Silviu Gresoi and editable per article.
    */
   author?: string | null;
   /**
-   * Reserved for future filtering — no filter UI at launch (CLAUDE.md §6).
+   * Reserved for future filtering of the blog list. The category is stored now, but the site shows no filter at launch.
    */
   category?: ('aiGovernance' | 'antiFraud' | 'riskManagement' | 'other') | null;
   /**
-   * Minutes. Leave empty to auto-estimate from the body (~200 words/min); a manual value always wins.
+   * Reading time in minutes, shown on the blog card and on the article page. Leave empty to estimate it automatically from the body at about 200 words per minute; a value entered by hand always takes priority.
    */
   readingTime?: number | null;
   /**
-   * If enabled, the article shows a gated email form that delivers the attached file.
+   * When enabled, the article shows an email form that delivers the attached file to the reader after they submit their address.
    */
   leadMagnet?: {
     /**
@@ -575,15 +575,15 @@ export interface BlogPost {
     file?: (number | null) | Media;
   };
   /**
-   * Toggle "related to a course" — shows a course callout at the end of the article.
+   * Links this article to a course. When set, a callout for that course appears at the end of the article; when empty, no callout is shown.
    */
   relatedCourse?: (number | null) | Course;
   /**
-   * Uncheck to publish WITHOUT emailing subscribers. First publish only — the broadcast is ever sent once. Publishing unchecked keeps that one send available: unpublish, tick the box and publish again to send it later.
+   * Uncheck to publish WITHOUT emailing subscribers. Only the first publish can trigger the newsletter broadcast, and it is sent at most once. Publishing while unchecked keeps that one send available: unpublish, tick the box and publish again to send it later.
    */
   sendNewsletterOnPublish?: boolean | null;
   /**
-   * Set automatically once the first-publish newsletter broadcast has been attempted (T7) — prevents re-sending on subsequent re-saves/re-publishes. Do not edit by hand.
+   * Set automatically once the first-publish newsletter broadcast has been attempted. Prevents the broadcast from being sent again on later saves or re-publishes. Do not edit by hand.
    */
   broadcastSentAt?: string | null;
   meta?: {
@@ -599,7 +599,7 @@ export interface BlogPost {
   _status?: ('draft' | 'published') | null;
 }
 /**
- * Q&A shown in the FAQ section on the homepage, grouped by journey tab.
+ * Questions and answers shown in the FAQ section on the homepage, grouped into journey tabs (Discover, Learn, Validate, Access). Changes appear on the site after saving.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "faqItems".
@@ -623,18 +623,18 @@ export interface FaqItem {
     [k: string]: unknown;
   } | null;
   /**
-   * Tab the question appears under in the homepage FAQ section.
+   * The tab this question appears under in the homepage FAQ section. Each tab matches a stage of the visitor journey, from discovering the site to enrolling.
    */
   category?: ('discover' | 'learn' | 'validate' | 'access') | null;
   /**
-   * Display order, ascending.
+   * Position of the question within its tab, sorted ascending: lower numbers appear higher in the list.
    */
   order?: number | null;
   updatedAt: string;
   createdAt: string;
 }
 /**
- * Contact + Corporate form submissions. Public create only — read/update/delete are admin-only.
+ * Submissions from the Contact and Corporate forms on the site. Every new entry also triggers a notification email to the site contact address. Entries are created by visitors; only administrators can view or manage them.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "leads".
@@ -647,31 +647,31 @@ export interface Lead {
   phone?: string | null;
   message?: string | null;
   /**
-   * Contact form only.
+   * Contact form only: the topic the visitor picked in the subject dropdown.
    */
   subject?: ('course' | 'corporate' | 'certification' | 'other') | null;
   /**
-   * Corporate form only.
+   * Corporate form only: the company the request comes from.
    */
   companyName?: string | null;
   /**
-   * Corporate form only.
+   * Corporate form only: the person to follow up with at the company.
    */
   contactPerson?: string | null;
   /**
-   * Corporate form only — free-text range, e.g. "10-20".
+   * Corporate form only: estimated number of participants, free text, e.g. "10-20".
    */
   participantsRange?: string | null;
   /**
-   * Corporate form only — pick an existing catalog course as the requested topic.
+   * Corporate form only: the existing catalog course the company asked about.
    */
   topicCourse?: (number | null) | Course;
   /**
-   * Corporate form only — free-text topic when it is not one of the catalog courses.
+   * Corporate form only: free-text topic, used when the request is not about one of the catalog courses.
    */
   topicOther?: string | null;
   /**
-   * Corporate form only — preferred delivery window.
+   * Corporate form only: the delivery window the company prefers (from and to dates).
    */
   preferredPeriod?: {
     from?: string | null;
@@ -681,7 +681,7 @@ export interface Lead {
   createdAt: string;
 }
 /**
- * The full text of the legal pages. What you save here is what visitors read — nothing is hard-coded any more.
+ * The full text of the legal pages: Terms, Privacy, Cookies. What you save here is exactly what visitors read on the site; nothing is hard-coded any more, and every save republishes the pages in both languages.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "legalPages".
@@ -689,32 +689,32 @@ export interface Lead {
 export interface LegalPage {
   id: number;
   /**
-   * Which route this document renders on. One document per page.
+   * Which page of the site this document renders on. Create exactly one document per page; the value cannot repeat.
    */
   page: 'terms' | 'privacy' | 'cookies';
   /**
-   * Browser tab / SEO title, e.g. "Terms and Conditions".
+   * Title shown in the browser tab and used by search engines, e.g. "Terms and Conditions".
    */
   metaTitle: string;
   /**
-   * First part of the on-page heading, in plain ink — e.g. "Terms and " (mind the trailing space).
+   * First part of the on-page heading, rendered in plain ink, e.g. "Terms and " (mind the trailing space).
    */
   titlePlain?: string | null;
   /**
-   * Last part of the heading, rendered in the brand gradient — e.g. "Conditions."
+   * Last part of the on-page heading, rendered in the brand gradient, e.g. "Conditions."
    */
   titleGradient?: string | null;
   /**
-   * Shown verbatim under the title, e.g. "Last updated: 21.07.2026". Free text on purpose — it is the date OF THE DOCUMENT, not of the last save, and those two must not be confused.
+   * Shown verbatim under the title, e.g. "Last updated: 21.07.2026". Free text on purpose: it is the date of the document itself, not of the last save, and the two must not be confused.
    */
   lastUpdated?: string | null;
   /**
-   * Numbered sections. Put the number in the heading, e.g. "1. General information". Leave the heading empty for the preamble.
+   * The numbered sections of the document, in the order they appear on the page. Put the number in the heading itself, e.g. "1. General information". Leave the heading empty for the preamble.
    */
   sections?:
     | {
         /**
-         * Verbatim from the document. Empty = no heading (preamble).
+         * The section heading, copied verbatim from the document. Leave empty for a section without a heading (the preamble).
          */
         heading?: string | null;
         blocks?:
@@ -761,11 +761,11 @@ export interface LegalPage {
                 }
               | {
                   /**
-                   * e.g. the legal name and registration numbers.
+                   * First line of the panel, e.g. the legal name and registration numbers.
                    */
                   line1: string;
                   /**
-                   * e.g. contact e-mails, phone, website.
+                   * Second line of the panel, e.g. contact emails, phone, website.
                    */
                   line2: string;
                   id?: string | null;
@@ -781,7 +781,7 @@ export interface LegalPage {
   createdAt: string;
 }
 /**
- * Write a newsletter and send it to everyone subscribed. Tick “Send now” and save — the message goes out once and cannot be re-sent.
+ * Write a newsletter in the dashboard and broadcast it to every subscriber on the Brevo list. Tick "Send now" and save: the message goes out once and cannot be re-sent.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "newsletters".
@@ -789,15 +789,15 @@ export interface LegalPage {
 export interface Newsletter {
   id: number;
   /**
-   * Subject line recipients see in their inbox.
+   * The subject line recipients see in their inbox.
    */
   subject: string;
   /**
-   * Optional one-line intro shown under the title. Leave empty to skip it.
+   * Optional one-line intro shown under the title in the email. Leave empty to skip it.
    */
   preheader?: string | null;
   /**
-   * The message. Headings, bold, italic, links and lists are carried into the e-mail; images and embeds are not.
+   * The body of the message. Headings, bold, italic, links and lists are carried into the email; images and embeds are not.
    */
   body: {
     root: {
@@ -815,22 +815,22 @@ export interface Newsletter {
     [k: string]: unknown;
   };
   /**
-   * Tick and save to send. Sending happens once — this cannot be undone.
+   * Tick and save to send the newsletter to all subscribers. Sending happens exactly once and cannot be undone.
    */
   sendNow?: boolean | null;
   /**
-   * Stamped when the newsletter was sent. Once set, it can never be re-sent.
+   * Set automatically at the moment the newsletter went out. Once this date exists, the newsletter can never be sent again.
    */
   sentAt?: string | null;
   /**
-   * Outcome of the send — check here if the newsletter did not arrive.
+   * Outcome of the last send attempt. Check here first if the newsletter did not arrive.
    */
   lastResult?: string | null;
   updatedAt: string;
   createdAt: string;
 }
 /**
- * One entry per live event. A pop-up shows on the site only while it is "Published" AND the clock is between "Start showing at" and the event date — after the event it disappears on its own. "Registrations" counts the people who signed up for THAT event; their details are in Event Registrations.
+ * One entry per live event. A pop-up shows on the site only while its status is "Published" AND the current time is between "Start showing at" and the event date; after the event it disappears on its own. "Registrations" counts the people who signed up for that event; their details are in Event Registrations.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "eventPopups".
@@ -838,7 +838,7 @@ export interface Newsletter {
 export interface EventPopup {
   id: number;
   /**
-   * Only visible here, to tell events apart. Not shown to visitors.
+   * Internal name used only in this admin list, to tell events apart. Never shown to visitors.
    */
   internalName: string;
   /**
@@ -846,32 +846,32 @@ export interface EventPopup {
    */
   slug?: string | null;
   /**
-   * Only "Published" is ever shown on the site.
+   * Only "Published" pop-ups can ever appear on the site; drafts and archived entries are never shown to visitors.
    */
   status: 'draft' | 'published' | 'archived';
   /**
-   * Bumped by "Force re-show". Visitors who dismissed an older version see it again.
+   * Increased automatically by "Force re-show". Visitors who dismissed an older version of the pop-up will see the new version again.
    */
   displayVersion?: number | null;
   /**
-   * Tick and save to show this pop-up again to people who dismissed it. Those who already registered never see it again.
+   * Tick and save to show this pop-up again to visitors who dismissed it. People who already registered never see it again. The box un-ticks itself after saving.
    */
   forceReshow?: boolean | null;
   /**
-   * Event title — the part rendered in plain ink, e.g. "AI Governance ".
+   * Event title, the part rendered in the plain ink color, for example "AI Governance ". Keep the trailing space if the gradient segment continues the sentence.
    */
   titlePlain?: string | null;
   /**
-   * Event title — the segment rendered in the brand gradient, e.g. "in Practice.".
+   * Event title, the segment rendered in the brand gradient, for example "in Practice.". Displayed right after the plain part.
    */
   titleGradient?: string | null;
   description?: string | null;
   /**
-   * E.g. "Thu 14 Aug 2026 · 18:00 (EEST) · Live on Zoom".
+   * Short info line shown under the title, for example "Thu 14 Aug 2026 · 18:00 (EEST) · Live on Zoom".
    */
   metaLine?: string | null;
   /**
-   * Shown with photo, or initials when no photo is uploaded.
+   * Speakers shown in the pop-up, each with their photo, or with initials when no photo is uploaded.
    */
   speakers?:
     | {
@@ -882,15 +882,15 @@ export interface EventPopup {
       }[]
     | null;
   /**
-   * Main button label. Empty = "Secure your spot".
+   * Label of the main button in the pop-up. When empty, the site shows "Secure your spot".
    */
   ctaLabel?: string | null;
   /**
-   * Form submit label. Empty = "Join us".
+   * Label of the registration form submit button. When empty, the site shows "Join us".
    */
   joinLabel?: string | null;
   /**
-   * Options offered in the registration form (visitors can also type their own).
+   * Options offered in the occupation list of the registration form. Visitors can also type their own answer.
    */
   occupations?:
     | {
@@ -899,34 +899,34 @@ export interface EventPopup {
       }[]
     | null;
   /**
-   * Countdown target. The pop-up disappears on its own after this moment — no need to unpublish it.
+   * Date and time of the event, used as the countdown target. The pop-up disappears on its own after this moment; there is no need to unpublish it.
    */
   eventDate: string;
   /**
-   * From when the pop-up may appear. Must be before the event date.
+   * The moment from which the pop-up may start appearing on the site. Must be before the event date.
    */
   startShowingAt: string;
   /**
-   * Seconds on the page before the pop-up appears.
+   * How many seconds a visitor stays on the page before the pop-up appears.
    */
   showDelaySeconds?: number | null;
   /**
-   * Show the (unticked) newsletter opt-in in the registration form.
+   * Shows the newsletter opt-in checkbox (unticked by default) in the registration form. Untick to hide the opt-in entirely for this event.
    */
   newsletterOptInEnabled?: boolean | null;
   /**
-   * Wording shown next to the opt-in. Stored as a snapshot on every registration — GDPR proof of what exactly was agreed to.
+   * The wording shown next to the newsletter opt-in. Stored as a snapshot on every registration, as GDPR proof of exactly what was agreed to.
    */
   newsletterConsentText?: string | null;
   /**
-   * How many people signed up for this event.
+   * How many people signed up for this event. Counted live from Event Registrations; read-only.
    */
   registrationsCount?: number | null;
   updatedAt: string;
   createdAt: string;
 }
 /**
- * Everyone who signed up through an event pop-up. Each row belongs to ONE event — see the "Popup" column. Use Filters → Popup to see a single event’s list. Signing up for one event never signs anyone up for another, and it does not subscribe them to the newsletter unless they ticked that box.
+ * Everyone who signed up through an event pop-up. Each row belongs to ONE event, shown in the "Popup" column; use Filters, then Popup, to see a single event's list. Signing up for one event never signs anyone up for another, and it does not subscribe them to the newsletter unless they ticked that box.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "eventRegistrations".
@@ -934,22 +934,22 @@ export interface EventPopup {
 export interface EventRegistration {
   id: number;
   /**
-   * Which event pop-up this sign-up came from.
+   * The event pop-up this sign-up came from. Determines which event the person registered for.
    */
   popup: number | EventPopup;
   firstName: string;
   lastName: string;
   email: string;
   /**
-   * Picked from the configured list or typed freely.
+   * The occupation the person chose from the configured list or typed in freely on the registration form.
    */
   occupation?: string | null;
   /**
-   * Ticked the newsletter box when registering. This alone does NOT make them a subscriber — they still have to confirm the double opt-in e-mail.
+   * Whether the person ticked the newsletter box when registering. This alone does NOT make them a subscriber; they still have to confirm the double opt-in e-mail.
    */
   newsletterOptIn?: boolean | null;
   /**
-   * GDPR proof: the exact wording agreed to, and when. Kept as a snapshot because the pop-up’s consent text can be edited later — the proof must not change with it.
+   * GDPR proof: the exact consent wording agreed to, and when. Kept as a snapshot because the pop-up's consent text can be edited later; the proof must not change with it.
    */
   consentSnapshot?: {
     consentText?: string | null;
@@ -961,7 +961,7 @@ export interface EventRegistration {
   createdAt: string;
 }
 /**
- * Write an e-mail and send it to everyone registered for ONE event. Tick "Send test to me" first to see how it looks; then "Send now" delivers it to the whole list — once, and it cannot be re-sent.
+ * Write an e-mail and send it to everyone registered for ONE event. Tick "Send test to me" first to check how it looks in your own inbox; then "Send now" delivers it to the whole list. Each document sends only once and cannot be re-sent; after sending it stays here as a log of the delivery.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "eventEmails".
@@ -969,15 +969,15 @@ export interface EventRegistration {
 export interface EventEmail {
   id: number;
   /**
-   * Which event’s registrants receive this. Nobody else gets it.
+   * The event whose registrants receive this e-mail. Only people registered for that event get it; nobody else does.
    */
   popup: number | EventPopup;
   /**
-   * Subject line. Variables work here too, e.g. {{firstName}}.
+   * Subject line of the e-mail. Variables work here too, for example {{firstName}}.
    */
   subject: string;
   /**
-   * Variables: {{firstName}}, {{lastName}}, {{eventTitle}}, {{eventDate}}, {{joinUrl}} — replaced per recipient. Headings, bold, links and lists carry into the e-mail; images and embeds do not.
+   * Body of the e-mail. The variables {{firstName}}, {{lastName}}, {{eventTitle}}, {{eventDate}} and {{joinUrl}} are replaced per recipient. Headings, bold, links and lists carry into the e-mail; images and embeds do not.
    */
   body: {
     root: {
@@ -995,31 +995,31 @@ export interface EventEmail {
     [k: string]: unknown;
   };
   /**
-   * Zoom/Meet link, filled in per e-mail rather than on the event (owner 2026-08-07): the link often does not exist yet when the pop-up is created, and a reminder may point somewhere different from the invitation. Becomes the {{joinUrl}} variable. Leave empty if the e-mail does not need it.
+   * Zoom or Meet link, filled in per e-mail rather than on the event: the link often does not exist yet when the pop-up is created, and a reminder may point somewhere different from the invitation. Becomes the {{joinUrl}} variable. Leave empty if this e-mail does not need it.
    */
   joinUrl?: string | null;
   /**
-   * Sends ONE copy to your own account e-mail, with sample names filled into the variables. Changes nothing else — use it as the preview.
+   * Sends ONE copy to your own admin account e-mail, with sample names filled into the variables. Changes nothing else; use it as the preview before the real send.
    */
   sendTestNow?: boolean | null;
   /**
-   * Tick and save to send to every registrant of the selected event. Works ONCE — re-saving afterwards sends nothing. If some addresses failed, ticking it again retries only those.
+   * Tick and save to send the e-mail to every registrant of the selected event. Works ONCE: re-saving afterwards sends nothing. If some addresses failed, ticking it again retries only those addresses.
    */
   sendNow?: boolean | null;
   status?: ('draft' | 'sent' | 'failed') | null;
   /**
-   * What happened on the last attempt — read this after ticking a box.
+   * The outcome of the last send attempt, written automatically. Check it after ticking one of the send boxes.
    */
   lastResult?: string | null;
   sentAt?: string | null;
   /**
-   * Which admin pressed send — an audit trail, NOT the sender address. E-mails always go out from the newsletter sender (news@isad.academy).
+   * Which admin pressed send. This is an audit trail, NOT the sender address: e-mails always go out from the newsletter sender, news@isad.academy.
    */
   sentBy?: (number | null) | User;
   recipientCount?: number | null;
   successCount?: number | null;
   /**
-   * Addresses the provider refused, with the reason. Retry targets exactly these.
+   * Addresses the e-mail provider refused, with the reason for each. Ticking "Send now" again retries exactly these addresses and no others.
    */
   failures?:
     | {
@@ -1770,7 +1770,7 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   createdAt?: T;
 }
 /**
- * Site-wide configuration, including the business decisions still pending from Silviu (CLAUDE.md §13).
+ * Site-wide configuration: currency, price window display, discount stacking policy, legal entity details, contact info and analytics IDs.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "siteSettings".
@@ -1778,31 +1778,31 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
 export interface SiteSetting {
   id: number;
   /**
-   * Show "X seats left" only when seatsRemaining is below this number.
+   * The "X seats left" badge on a course edition appears only when the remaining seats drop below this number. Set 0 to never show it.
    */
   seatsThreshold?: number | null;
   /**
-   * TBD from Silviu (CLAUDE.md §13). Default: EUR.
+   * The site-wide currency setting used when displaying course prices. Default: EUR.
    */
   currency?: ('EUR' | 'RON') | null;
   /**
-   * TBD from Silviu (CLAUDE.md §13). Default: VAT included.
+   * Whether prices across the site are presented as VAT included or VAT excluded. Default: VAT included.
    */
   vatDisplay?: ('incl' | 'excl') | null;
   /**
-   * TBD from Silviu (CLAUDE.md §13). Default: show both windows.
+   * Controls the price block on the course page: show both the Early Bird and Standard price windows, or only the one currently active. Default: show both windows.
    */
   earlyBirdDisplay?: ('bothWindows' | 'activeOnly') | null;
   /**
-   * CRITICAL — TBD from Silviu (CLAUDE.md §8, §13). All three strategies are implemented (T4); this only selects which one applies. Default: stackAll.
+   * How the group, member and discount-code reductions combine at checkout. All three strategies are implemented; this setting only selects which one applies. Changing it affects every new order immediately. Default: stack all discounts.
    */
   stackingPolicy?: ('stackAll' | 'bestOf' | 'groupMemberStack_codeExclusive') | null;
   /**
-   * Member discount % — TBD by Silviu; 0 disables member pricing.
+   * Percentage discount applied for APCF members at checkout. Set 0 to disable member pricing entirely.
    */
   memberDiscountPercent?: number | null;
   /**
-   * Legal entity details for the footer + invoices. TBD from Silviu — footer degrades gracefully while empty.
+   * Legal entity details shown in the site footer and used on invoices: company name, CUI, address and the ANPC dispute-resolution links. The footer simply omits whatever is left empty.
    */
   legalEntity?: {
     name?: string | null;
@@ -1817,7 +1817,7 @@ export interface SiteSetting {
     linkedin?: string | null;
   };
   /**
-   * Optional overrides for the env-based GA4/GTM IDs. Consent-gated + lazy-loaded (CLAUDE.md §7).
+   * Optional overrides for the GA4 and GTM IDs configured through environment variables. The scripts load lazily and only after cookie consent, so filling these in never affects visitors who declined.
    */
   analytics?: {
     ga4Id?: string | null;
@@ -1828,7 +1828,7 @@ export interface SiteSetting {
   createdAt?: string | null;
 }
 /**
- * Homepage content: hero, featured courses, trust stats and newsletter block.
+ * Homepage content: the hero section, the featured course selection, the trust stats and differentiators, and the newsletter block. Saving republishes the homepage in both languages.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "homepage".
@@ -1843,7 +1843,7 @@ export interface Homepage {
     visual?: (number | null) | Media;
   };
   /**
-   * Courses shown in the "Featured courses" section — Silviu chooses.
+   * The courses shown in the "Featured courses" section of the homepage, in the order set here. The selection is manual; nothing is picked automatically.
    */
   featuredCourses?: (number | Course)[] | null;
   whyIsad?: {
@@ -1866,7 +1866,7 @@ export interface Homepage {
     headline?: string | null;
     invitationText?: string | null;
     /**
-     * Optional — offer a downloadable resource in exchange for a newsletter signup.
+     * Optional: offer a downloadable resource in exchange for a newsletter signup, shown with the newsletter block on the homepage.
      */
     leadMagnet?: {
       /**
@@ -1883,7 +1883,7 @@ export interface Homepage {
   createdAt?: string | null;
 }
 /**
- * The expert bio, shown on Home (short) and About (full).
+ * The trainer biography, reused across the site: the short bio appears in the expert band on the homepage, the full bio on the About page. Saving republishes both pages.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "expertBio".
@@ -1892,16 +1892,16 @@ export interface ExpertBio {
   id: number;
   name?: string | null;
   /**
-   * Professional title / headline.
+   * Professional title or headline shown next to the name, e.g. the role and main credential.
    */
   title?: string | null;
   photo?: (number | null) | Media;
   /**
-   * Used in the Home expert band.
+   * Short biography shown in the expert band on the homepage.
    */
   shortBio?: string | null;
   /**
-   * Used on the About page.
+   * Full biography shown on the About page.
    */
   fullBio?: {
     root: {

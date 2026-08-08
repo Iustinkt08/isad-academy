@@ -529,7 +529,7 @@ export function WhyIsadShowcase({
         {/* CTAs (feature texts removed per owner 2026-07-12) — centered */}
         <div className="mx-auto mt-10 flex w-full flex-wrap items-center justify-center gap-4 sm:mt-12">
           <Link
-            href={localePath(locale, '/cursuri')}
+            href={localePath(locale, '/courses')}
             className="ease-brand inline-flex items-center rounded-full border border-blue bg-[linear-gradient(180deg,#407ea2_0%,#1c5d99_80%)] px-6 py-2.5 text-sm font-normal text-white shadow-[0_4px_14px_rgba(28,93,153,0.35)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_7px_20px_rgba(28,93,153,0.45)]"
           >
             {t.exploreCourses}

@@ -36,12 +36,12 @@ test.describe('system routes', () => {
     const xml = await res.text()
 
     // Static + legal routes
-    for (const route of ['/cursuri', '/corporate', '/despre', '/contact', '/blog', ...LEGAL_ROUTES]) {
+    for (const route of ['/courses', '/corporate', '/about', '/contact', '/blog', ...LEGAL_ROUTES]) {
       expect(xml, `sitemap should list ${route}`).toContain(`<loc>http://localhost:3000${route}</loc>`)
     }
     // Published courses + posts, with lastmod from updatedAt
-    expect(xml).toContain(`/cursuri/${COURSE_SLUG}`)
-    expect(xml).toContain(`/cursuri/${COURSE_2_SLUG}`)
+    expect(xml).toContain(`/courses/${COURSE_SLUG}`)
+    expect(xml).toContain(`/courses/${COURSE_2_SLUG}`)
     expect(xml).toContain(`/blog/${POST_SLUG}`)
     expect(xml).toContain(`/blog/${POST_2_SLUG}`)
     expect(xml).toContain('<lastmod>')
@@ -74,7 +74,7 @@ test.describe('system routes', () => {
     expect(response?.status()).toBe(404)
 
     await expect(page.getByRole('heading', { level: 1, name: 'Page not found' })).toBeVisible()
-    await expect(page.getByRole('link', { name: 'Browse courses' })).toHaveAttribute('href', '/cursuri')
+    await expect(page.getByRole('link', { name: 'Browse courses' })).toHaveAttribute('href', '/courses')
     await expect(page.getByRole('link', { name: 'Read the blog' })).toHaveAttribute('href', '/blog')
     await expect(page.getByRole('link', { name: 'Back to home' })).toHaveAttribute('href', '/')
     // Branded = full layout, not Next's bare default page
@@ -95,7 +95,7 @@ test.describe('structured data + meta', () => {
   test('course detail: Course JSON-LD with per-edition CourseInstances, factual R2-safe claims', async ({
     page,
   }) => {
-    await page.goto(`/cursuri/${COURSE_SLUG}`)
+    await page.goto(`/courses/${COURSE_SLUG}`)
     const course = findByType(await readJsonLd(page), 'Course')
     expect(course).toBeDefined()
     expect(course?.name).toContain('ISO/IEC 42001:2023')
@@ -139,7 +139,7 @@ test.describe('structured data + meta', () => {
     )
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
       'href',
-      `http://localhost:3000/cursuri/${COURSE_SLUG}`,
+      `http://localhost:3000/courses/${COURSE_SLUG}`,
     )
     await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute(
       'content',

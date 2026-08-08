@@ -75,7 +75,7 @@ export default buildConfig({
     // fonts/radii/accent in src/app/(payload)/custom.scss. Brand name always lowercase.
     meta: {
       titleSuffix: '· isad.academy',
-      description: 'isad.academy dashboard — courses, editions, orders & content.',
+      description: 'isad.academy dashboard: courses, editions, orders and content.',
       icons: [{ rel: 'icon', type: 'image/svg+xml', url: '/brand/icon-gradient.svg' }],
     },
     components: {

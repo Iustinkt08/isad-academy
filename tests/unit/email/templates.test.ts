@@ -97,7 +97,7 @@ describe('order confirmed (after payment)', () => {
       time: '09:00–17:00 (EEST)',
       duration: '21 hours',
       paymentMethod: 'Card',
-      courseUrl: 'https://isad.academy/cursuri/lead-implementer',
+      courseUrl: 'https://isad.academy/courses/lead-implementer',
     })
 
     expect(full.text).toContain('Format: Live virtual')
@@ -106,20 +106,20 @@ describe('order confirmed (after payment)', () => {
     // Seats only appear for group orders, where the count is meaningful.
     expect(full.text).toContain('Seats: 3')
     expect(full.html).toContain('Access your course')
-    expect(full.html).toContain('https://isad.academy/cursuri/lead-implementer')
+    expect(full.html).toContain('https://isad.academy/courses/lead-implementer')
   })
 })
 
 describe('course launch newsletter', () => {
   const mail = renderCourseAnnouncementEmail({
     courseName: 'AI Governance & Responsible AI',
-    courseUrl: 'https://isad.academy/cursuri/ai-governance-responsible-ai',
+    courseUrl: 'https://isad.academy/courses/ai-governance-responsible-ai',
   })
 
   it('defaults to the "Introducing" subject line and keeps the CTA', () => {
     expect(mail.subject).toBe('Introducing AI Governance & Responsible AI')
     expect(mail.html).toContain('View programme details')
-    expect(mail.html).toContain('https://isad.academy/cursuri/ai-governance-responsible-ai')
+    expect(mail.html).toContain('https://isad.academy/courses/ai-governance-responsible-ai')
   })
 
   it('offers the client’s other two subject-line options', () => {

@@ -14,8 +14,9 @@
  * prin `labels`. NIMIC hardcodat aici.
  * (Chip-ul „Only X seats left" a fost SCOS — decizie owner 2026-07-28.)
  *
- * Comportament: apare o singură dată per vizitator per eveniment (localStorage
- * cu id-ul evenimentului = data eventului), după ~2.5s de la intrare; se
+ * Comportament (owner 2026-08-08): închiderea manuală ascunde pop-up-ul doar pe
+ * SESIUNEA curentă (sessionStorage) — la o vizită ulterioară reapare; înscrierea
+ * îl oprește definitiv (localStorage). Apare după ~2.5s de la intrare; se
  * închide cu X, cu „Maybe later", cu Escape sau cu click pe overlay; blochează
  * scroll-ul paginii și ține focusul în modal cât e deschis. Cheia
  * `isad-event-popup-off` = kill-switch (folosită de suita e2e / QA).
@@ -358,7 +359,7 @@ export default function EventPopup({
             </h2>
             <p className="line-clamp-2 text-[12.5px] leading-[19px] text-[#595959] lg:text-[14px] lg:leading-[22px]">
               {data.titlePlain}
-              {data.titleGradient} · {data.metaLine} — {labels.formIntroSuffix}
+              {data.titleGradient} · {data.metaLine}: {labels.formIntroSuffix}
             </p>
 
             <div className="flex flex-col gap-3 lg:flex-row">

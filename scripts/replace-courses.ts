@@ -59,7 +59,7 @@ const NEW_COURSES: { title: string; category: 'iso' | 'other'; shortDescription:
     title: 'Lead Auditor',
     category: 'iso',
     shortDescription:
-      'Learn to audit an AI Management System against ISO/IEC 42001 — planning, conducting and reporting.',
+      'Learn to audit an AI Management System against ISO/IEC 42001: planning, conducting and reporting.',
   },
 ]
 
@@ -104,7 +104,7 @@ async function main() {
         category: c.category,
         shortDescription: c.shortDescription,
         description: richText([
-          'Placeholder course description — final copy pending Dr. Silviu Gresoi (CLAUDE.md §15).',
+          'Placeholder course description. Final copy pending Dr. Silviu Gresoi.',
         ]),
         _status: 'published',
       },

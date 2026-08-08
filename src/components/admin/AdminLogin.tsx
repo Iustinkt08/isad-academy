@@ -118,7 +118,7 @@ export default function AdminLogin() {
         </button>
 
         <p className="text-center text-[12px] text-grey-600">
-          Admin access only — accounts are created by the site owner.
+          Admin access only. Accounts are created by the site owner.
         </p>
       </form>
     </AdminAuthShell>

@@ -36,15 +36,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const staticRoutes = [
     '/',
-    '/cursuri',
+    '/courses',
     '/corporate',
-    '/despre',
+    '/about',
     '/contact',
     '/blog',
-    '/termeni',
-    '/gdpr',
-    '/politica-cookie',
-    '/politica-livrare',
+    // Canonical legal slugs — the old RO slugs (/termeni, /gdpr, /politica-cookie,
+    // /politica-livrare) are 308 redirects and must not be listed.
+    '/terms',
+    '/privacy',
+    '/cookies',
   ].flatMap((route) => bilingual(route))
 
   try {
@@ -68,7 +69,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     const courseRoutes = courses.docs
       .filter((doc) => typeof doc.slug === 'string' && doc.slug.length > 0)
-      .flatMap((doc) => bilingual(`/cursuri/${doc.slug}`, doc.updatedAt))
+      .flatMap((doc) => bilingual(`/courses/${doc.slug}`, doc.updatedAt))
 
     const postRoutes = posts.docs
       .filter((doc) => typeof doc.slug === 'string' && doc.slug.length > 0)

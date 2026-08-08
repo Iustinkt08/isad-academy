@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload'
 
-import { isAdmin } from '../access/isAdmin'
+import { hiddenFromEditors, isAdminRole } from '../access/isAdminRole'
 
 /**
  * Discount codes (general or member-granting). Admin-only in every direction — the public
@@ -11,15 +11,20 @@ export const DiscountCodes: CollectionConfig = {
   slug: 'discountCodes',
   admin: {
     useAsTitle: 'code',
-    group: 'Sales',
+    group: { en: 'Sales', ro: 'Vânzări' },
     defaultColumns: ['code', 'percentage', 'type', 'isActive', 'usageCount'],
-    description: 'Discount codes. Never publicly readable — checkout validates codes server-side.',
+    description: {
+      en: 'Discount codes entered at checkout. Never publicly readable: the checkout validates a customer\'s code on the server, so visitors cannot list the valid codes.',
+      ro: 'Coduri de reducere introduse la checkout. Nu sunt niciodată vizibile public: checkout-ul validează codul clientului pe server, deci vizitatorii nu pot afla lista codurilor valide.',
+    },
+    // Pricing levers are admin-only — editors manage content, not discounts (owner 2026-08-08).
+    hidden: hiddenFromEditors,
   },
   access: {
-    read: isAdmin,
-    create: isAdmin,
-    update: isAdmin,
-    delete: isAdmin,
+    read: isAdminRole,
+    create: isAdminRole,
+    update: isAdminRole,
+    delete: isAdminRole,
   },
   fields: [
     {
@@ -44,7 +49,10 @@ export const DiscountCodes: CollectionConfig = {
       type: 'number',
       min: 1,
       admin: {
-        description: 'Leave empty for unlimited uses.',
+        description: {
+          en: 'Maximum number of orders that may use this code. Leave empty for unlimited uses; once the limit is reached, checkout rejects the code.',
+          ro: 'Numărul maxim de comenzi care pot folosi acest cod. Lăsați gol pentru utilizări nelimitate; odată atinsă limita, checkout-ul respinge codul.',
+        },
       },
     },
     {
@@ -54,7 +62,10 @@ export const DiscountCodes: CollectionConfig = {
       min: 0,
       admin: {
         readOnly: true,
-        description: 'Incremented by checkout when the code is applied. Do not edit by hand.',
+        description: {
+          en: 'How many times checkout has applied this code so far. Increased automatically on each confirmed use. Do not edit by hand.',
+          ro: 'De câte ori a fost aplicat codul la checkout până acum. Crește automat la fiecare utilizare confirmată. Nu se editează manual.',
+        },
       },
     },
     {
@@ -63,11 +74,14 @@ export const DiscountCodes: CollectionConfig = {
       required: true,
       defaultValue: 'general',
       options: [
-        { label: 'General', value: 'general' },
-        { label: 'Member', value: 'member' },
+        { label: { en: 'General', ro: 'General' }, value: 'general' },
+        { label: { en: 'Member', ro: 'Membru' }, value: 'member' },
       ],
       admin: {
-        description: '"member" codes also grant the member discount (CLAUDE.md §8, §13 — % TBD).',
+        description: {
+          en: 'General codes apply only their own percentage. Member codes additionally grant the member discount to the order, as if the buyer were an APCF member.',
+          ro: 'Codurile generale aplică doar procentul propriu. Codurile de membru acordă în plus și reducerea de membru pentru comandă, ca și cum cumpărătorul ar fi membru APCF.',
+        },
       },
     },
     {

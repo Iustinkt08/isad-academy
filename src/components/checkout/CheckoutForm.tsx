@@ -364,7 +364,7 @@ export function CheckoutForm({
 
   const coursePath = localePath(
     locale,
-    session.courseSlug ? `/cursuri/${session.courseSlug}` : '/cursuri',
+    session.courseSlug ? `/courses/${session.courseSlug}` : '/courses',
   )
   const soldOutNow = Boolean(generalError?.soldOut)
 

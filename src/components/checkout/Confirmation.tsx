@@ -74,7 +74,7 @@ export function ConfirmationStepper({ steps }: { steps: readonly [string, string
                 {label}
               </span>
             </span>
-            {num < 3 && <span aria-hidden className="text-[11px] text-[#cccccc] lg:text-[14px]">—</span>}
+            {num < 3 && <span aria-hidden className="text-[11px] text-[#cccccc] lg:text-[14px]">−</span>}
           </li>
         )
       })}

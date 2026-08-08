@@ -1,6 +1,7 @@
 import Image from 'next/image'
 
 import { getDictionary, type Locale } from '../../lib/i18n'
+import { toImageSrc } from '../../lib/media/imageSrc'
 import { Container } from '../ui/Container'
 import { Reveal } from '../ui/Reveal'
 import { asMedia } from '../courses/helpers'
@@ -70,12 +71,13 @@ const SAMPLE_META: Omit<CardData, 'text'>[] = [
 
 /** Map a Payload review to the card shape; relationship `course` resolves at depth 1. */
 function toCardData(review: Review, participantFallback: string): CardData {
+  const photoUrl = asMedia(review.photo)?.url
   return {
     name: review.authorName?.trim() || participantFallback,
     roleCompany: review.roleCompany?.trim() || '',
     course: typeof review.course === 'object' && review.course ? review.course.title : '',
     text: review.text,
-    photoUrl: asMedia(review.photo)?.url ?? null,
+    photoUrl: photoUrl ? toImageSrc(photoUrl) : null,
   }
 }
 
