@@ -375,3 +375,102 @@ html[data-theme='dark'] .isad-dash__chip--success {
   background: #123222;
   color: #6bd695;
 }
+
+/* ============================================================================
+   Locale banner + logout (admin.components.header) — owner 2026-08-08
+   ========================================================================== */
+.isad-locale-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 8px 16px;
+  background: var(--theme-elevation-100);
+  border-bottom: 1px solid var(--theme-elevation-150);
+  color: var(--theme-elevation-800);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.isad-locale-banner__message {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+}
+
+.isad-locale-banner__select {
+  padding: 4px 8px;
+  border: 1px solid var(--theme-elevation-250);
+  border-radius: 6px;
+  background: var(--theme-input-bg, var(--theme-elevation-0));
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.isad-locale-banner__logout {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: inherit;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 6px 10px;
+  border-radius: 6px;
+
+  &:hover {
+    background: var(--theme-elevation-150);
+  }
+}
+
+/* Profile glyph in the account button (admin.avatar) — replaces text initials. */
+.isad-profile-icon {
+  width: 24px;
+  height: 24px;
+  display: block;
+}
+
+/* ============================================================================
+   Mobile pass (owner 2026-08-08): nothing may overflow the viewport, and the
+   touch targets (hamburger) get a proper size.
+   ========================================================================== */
+@media (max-width: 768px) {
+  /* Belt-and-braces: the admin shell must never scroll sideways as a whole;
+     wide TABLES scroll inside their own wrapper below instead. */
+  body {
+    overflow-x: hidden;
+  }
+
+  /* Collection list tables: scroll within their container, not the page. */
+  .table {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    max-width: 100%;
+  }
+
+  /* Long unbroken values (emails, URLs, ids) must wrap inside cards/fields. */
+  .render-fields,
+  .field-type,
+  .doc-header,
+  .cell {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  /* Bigger hamburger: 44px tap target (was ~26px). */
+  .nav-toggler {
+    width: 44px;
+    height: 44px;
+
+    .hamburger {
+      transform: scale(1.3);
+    }
+  }
+
+  .isad-locale-banner {
+    padding: 8px 12px;
+  }
+}

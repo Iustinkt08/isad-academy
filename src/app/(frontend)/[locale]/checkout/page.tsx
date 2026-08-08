@@ -199,7 +199,8 @@ export default async function CheckoutPage({
     code: null,
     isMember: false,
     policy: siteSettings?.stackingPolicy ?? 'stackAll',
-    memberDiscountPercent: siteSettings?.memberDiscountPercent ?? 0,
+    // Member pricing retired (owner 2026-08-08) — discount codes are the only reductions.
+    memberDiscountPercent: 0,
     now: new Date(),
   })
 

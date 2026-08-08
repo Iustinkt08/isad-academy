@@ -107,19 +107,9 @@ export const SiteSettings: GlobalConfig = {
         },
       },
     },
-    {
-      name: 'memberDiscountPercent',
-      type: 'number',
-      defaultValue: 0,
-      min: 0,
-      max: 100,
-      admin: {
-        description: {
-          en: 'Percentage discount applied for APCF members at checkout. Set 0 to disable member pricing entirely.',
-          ro: 'Procentul de reducere aplicat membrilor APCF la checkout. Setează 0 pentru a dezactiva complet prețul de membru.',
-        },
-      },
-    },
+    // `memberDiscountPercent` removed 2026-08-08 (owner): member pricing is retired in
+    // favour of discount codes (up to two stack at checkout). The pricing engine keeps
+    // its member branch dormant at 0%.
     {
       name: 'legalEntity',
       type: 'group',

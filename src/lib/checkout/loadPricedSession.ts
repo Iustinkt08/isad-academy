@@ -137,7 +137,9 @@ export const loadPricedSession = async ({
     // member pricing is a valid `type: 'member'` discount code, handled inside the engine.
     isMember: false,
     policy: siteSettings.stackingPolicy ?? 'stackAll',
-    memberDiscountPercent: siteSettings.memberDiscountPercent ?? 0,
+    // Member pricing retired (owner 2026-08-08) — the field is gone from siteSettings;
+    // member-type codes now behave like any other code.
+    memberDiscountPercent: 0,
     now,
   })
 

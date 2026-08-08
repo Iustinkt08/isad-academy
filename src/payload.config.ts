@@ -78,7 +78,13 @@ export default buildConfig({
       description: 'isad.academy dashboard: courses, editions, orders and content.',
       icons: [{ rel: 'icon', type: 'image/svg+xml', url: '/brand/icon-gradient.svg' }],
     },
+    // Neutral profile glyph instead of user initials in the account button
+    // (owner 2026-08-08) — src/components/admin/ProfileIcon.tsx.
+    avatar: { Component: '/components/admin/ProfileIcon#ProfileIcon' },
     components: {
+      // "You are editing the site in: <locale>" banner + logout link, above everything
+      // (owner 2026-08-08) — src/components/admin/LocaleBanner.tsx.
+      header: ['/components/admin/LocaleBanner#LocaleBanner'],
       // Quick actions + status cards above the native dashboard (server component,
       // queries via Local API) — src/components/admin/AdminDashboard.tsx.
       beforeDashboard: ['/components/admin/AdminDashboard#AdminDashboard'],

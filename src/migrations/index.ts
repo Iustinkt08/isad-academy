@@ -7,6 +7,7 @@ import * as migration_20260807_120039_drop_unused_collections from './20260807_1
 import * as migration_20260807_121320_drop_partners from './20260807_121320_drop_partners';
 import * as migration_20260807_125555_legal_pages_blocks from './20260807_125555_legal_pages_blocks';
 import * as migration_20260807_142339_retire_legacy_event_popup from './20260807_142339_retire_legacy_event_popup';
+import * as migration_20260808_115522_drop_unused_owner_fields from './20260808_115522_drop_unused_owner_fields';
 
 export const migrations = [
   {
@@ -52,6 +53,11 @@ export const migrations = [
   {
     up: migration_20260807_142339_retire_legacy_event_popup.up,
     down: migration_20260807_142339_retire_legacy_event_popup.down,
-    name: '20260807_142339_retire_legacy_event_popup'
+    name: '20260807_142339_retire_legacy_event_popup',
+  },
+  {
+    up: migration_20260808_115522_drop_unused_owner_fields.up,
+    down: migration_20260808_115522_drop_unused_owner_fields.down,
+    name: '20260808_115522_drop_unused_owner_fields'
   },
 ];

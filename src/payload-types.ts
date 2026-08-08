@@ -231,10 +231,6 @@ export interface Course {
    */
   shortDescription?: string | null;
   /**
-   * Banner image shown on the catalog card and in the course page header. Uploading a new image updates both places.
-   */
-  image?: (number | null) | Media;
-  /**
    * Total course length in hours, shown on the catalog card and on the course page. Also used to calculate CPD credits, at 1 credit per hour.
    */
   durationHours?: number | null;
@@ -1308,7 +1304,6 @@ export interface CoursesSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
   shortDescription?: T;
-  image?: T;
   durationHours?: T;
   category?: T;
   description?: T;
@@ -1798,10 +1793,6 @@ export interface SiteSetting {
    */
   stackingPolicy?: ('stackAll' | 'bestOf' | 'groupMemberStack_codeExclusive') | null;
   /**
-   * Percentage discount applied for APCF members at checkout. Set 0 to disable member pricing entirely.
-   */
-  memberDiscountPercent?: number | null;
-  /**
    * Legal entity details shown in the site footer and used on invoices: company name, CUI, address and the ANPC dispute-resolution links. The footer simply omits whatever is left empty.
    */
   legalEntity?: {
@@ -1840,7 +1831,6 @@ export interface Homepage {
     subtitle?: string | null;
     ctaText?: string | null;
     ctaLink?: string | null;
-    visual?: (number | null) | Media;
   };
   /**
    * The courses shown in the "Featured courses" section of the homepage, in the order set here. The selection is manual; nothing is picked automatically.
@@ -1956,7 +1946,6 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   vatDisplay?: T;
   earlyBirdDisplay?: T;
   stackingPolicy?: T;
-  memberDiscountPercent?: T;
   legalEntity?:
     | T
     | {
@@ -1996,7 +1985,6 @@ export interface HomepageSelect<T extends boolean = true> {
         subtitle?: T;
         ctaText?: T;
         ctaLink?: T;
-        visual?: T;
       };
   featuredCourses?: T;
   whyIsad?:

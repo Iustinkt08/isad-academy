@@ -100,7 +100,7 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
     excerpt(lexicalToPlainText(course.description)) ||
     dict.courseDetail.metaFallbackDescription
   // OG image chain: meta.image → course banner → site default (resolved via metadataBase).
-  const ogImage = asMedia(course.meta?.image)?.url || asMedia(course.image)?.url || DEFAULT_OG_IMAGE
+  const ogImage = asMedia(course.meta?.image)?.url || DEFAULT_OG_IMAGE
 
   return {
     title: metaTitle ? { absolute: metaTitle } : course.title,
@@ -133,7 +133,7 @@ function buildCourseJsonLd(
   const siteUrl = getSiteUrl()
   const courseUrl = `${siteUrl}${localePath(locale, `/courses/${course.slug}`)}`
   const description = excerpt(lexicalToPlainText(course.description))
-  const image = asMedia(course.meta?.image)?.url || asMedia(course.image)?.url
+  const image = asMedia(course.meta?.image)?.url
 
   return {
     '@context': 'https://schema.org',

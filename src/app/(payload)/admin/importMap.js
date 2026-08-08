@@ -28,6 +28,8 @@ import { MetaImageComponent as MetaImageComponent_a8a977ebc872c5d5ea7ee689724c08
 import { PreviewComponent as PreviewComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
 import { BlocksFeatureClient as BlocksFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { TextStateFeatureClient as TextStateFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
+import { ProfileIcon as ProfileIcon_98e43e8b06e5a19b4308385ea03e3fc8 } from '../../../components/admin/ProfileIcon'
+import { LocaleBanner as LocaleBanner_e14550b689c04d773a9edab53d01bae6 } from '../../../components/admin/LocaleBanner'
 import { Icon as Icon_dfe4008080d895d460898c3a6155e9ba } from '../../../components/admin/Icon'
 import { Logo as Logo_91a09b539d3c86b0aebf520e7564ce08 } from '../../../components/admin/Logo'
 import { AdminDashboard as AdminDashboard_0171ae121c3d9523aafb7bdbec1300c5 } from '../../../components/admin/AdminDashboard'
@@ -69,6 +71,8 @@ export const importMap = {
   "@payloadcms/plugin-seo/client#PreviewComponent": PreviewComponent_a8a977ebc872c5d5ea7ee689724c0860,
   "@payloadcms/richtext-lexical/client#BlocksFeatureClient": BlocksFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#TextStateFeatureClient": TextStateFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
+  "/components/admin/ProfileIcon#ProfileIcon": ProfileIcon_98e43e8b06e5a19b4308385ea03e3fc8,
+  "/components/admin/LocaleBanner#LocaleBanner": LocaleBanner_e14550b689c04d773a9edab53d01bae6,
   "/components/admin/Icon#Icon": Icon_dfe4008080d895d460898c3a6155e9ba,
   "/components/admin/Logo#Logo": Logo_91a09b539d3c86b0aebf520e7564ce08,
   "/components/admin/AdminDashboard#AdminDashboard": AdminDashboard_0171ae121c3d9523aafb7bdbec1300c5,

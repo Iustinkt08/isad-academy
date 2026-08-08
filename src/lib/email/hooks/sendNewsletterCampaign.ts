@@ -33,10 +33,17 @@ export const sendNewsletterCampaign: CollectionAfterChangeHook<Newsletter> = asy
   let lastResult = ''
 
   try {
+    // `doc` arrives with richtext upload nodes UNPOPULATED (bare media ids) — re-read at
+    // depth 2 so images inside the body carry their url/alt and actually render in the
+    // email (owner 2026-08-08). Falls back to the raw doc if the read fails.
+    const populated = await req.payload
+      .findByID({ collection: 'newsletters', id: doc.id, depth: 2, overrideAccess: true, req })
+      .catch(() => null)
+
     const { subject, html } = renderNewsletterEmail({
       subject: String(doc.subject ?? ''),
       preheader: doc.preheader,
-      body: doc.body,
+      body: populated?.body ?? doc.body,
     })
 
     const result = await getMailer().broadcastCampaign({

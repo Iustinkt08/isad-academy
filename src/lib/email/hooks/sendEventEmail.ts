@@ -108,6 +108,13 @@ export const sendEventEmail: CollectionAfterChangeHook<EventEmail> = async ({
     // decât invitația, iar linkul de multe ori nici nu există când se creează pop-up-ul.
     const joinUrl = doc.joinUrl ?? ''
 
+    // Richtext upload nodes in `doc.body` are unpopulated (bare media ids) — re-read at
+    // depth 2 so inline images render in the email (same fix as sendNewsletterCampaign).
+    const populatedBody = await req.payload
+      .findByID({ collection: 'eventEmails', id: doc.id, depth: 2, overrideAccess: true, req })
+      .then((d) => d.body)
+      .catch(() => doc.body)
+
     // ——— Destinatarii ———————————————————————————————————————————————————————————————
     type Recipient = { email: string; firstName: string; lastName: string }
     let recipients: Recipient[]
@@ -158,7 +165,7 @@ export const sendEventEmail: CollectionAfterChangeHook<EventEmail> = async ({
           }
           const { subject, html, text } = renderEventEmail({
             subject: String(doc.subject ?? ''),
-            body: doc.body,
+            body: populatedBody,
             variables,
             eventTitleForFooter: eventTitle,
             contactEmail,

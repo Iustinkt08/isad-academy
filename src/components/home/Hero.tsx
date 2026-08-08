@@ -103,7 +103,9 @@ export function HomeHero({
               container, not the 1920 Figma frame); tracking −0.04em scales with the clamp */}
           {/* Clamp-uri: titlul/subtitlul vin din CMS — prea lungi ar împinge evantaiul
               de certificate sub fold */}
-          <h1 className="line-clamp-2 text-[min(8.72vw,34px)] font-semibold leading-[1.1] tracking-[-0.04em] text-ink md:text-[clamp(2.125rem,4vw+1rem,48px)]">
+          {/* No line-clamp on the TITLE (owner 2026-08-08): it must never truncate to "…"
+              on phones; the subtitle below keeps its clamp. */}
+          <h1 className="text-[min(8.72vw,34px)] font-semibold leading-[1.1] tracking-[-0.04em] text-ink md:text-[clamp(2.125rem,4vw+1rem,48px)]">
             {head} <span className="text-gradient">{tail}</span>
             <span className="text-ink">.</span>
           </h1>

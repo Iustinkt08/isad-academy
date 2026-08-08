@@ -35,7 +35,7 @@ export const Homepage: GlobalConfig = {
         { name: 'subtitle', type: 'textarea', localized: true },
         { name: 'ctaText', label: { en: 'CTA text', ro: 'Text CTA' }, type: 'text', localized: true },
         { name: 'ctaLink', label: { en: 'CTA link', ro: 'Link CTA' }, type: 'text' },
-        { name: 'visual', type: 'upload', relationTo: 'media' },
+        // `visual` removed 2026-08-08 (owner): the hero is fully CSS-drawn, no upload slot.
       ],
     },
     {

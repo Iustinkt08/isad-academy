@@ -56,17 +56,8 @@ export const Courses: CollectionConfig = {
         },
       },
     },
-    {
-      name: 'image',
-      type: 'upload',
-      relationTo: 'media',
-      admin: {
-        description: {
-          en: 'Banner image shown on the catalog card and in the course page header. Uploading a new image updates both places.',
-          ro: 'Imaginea banner afișată pe cardul din catalog și în antetul paginii de curs. Încărcarea unei imagini noi le actualizează pe amândouă.',
-        },
-      },
-    },
+    // `image` (course banner) removed 2026-08-08 (owner): the design no longer uses a
+    // banner anywhere; OG/social images come from `meta.image` or the site default.
     {
       name: 'durationHours',
       type: 'number',
