@@ -377,52 +377,53 @@ html[data-theme='dark'] .isad-dash__chip--success {
 }
 
 /* ============================================================================
-   Locale banner + logout (admin.components.header) — owner 2026-08-08
+   Editing-language card in the left nav, under the logo (owner 2026-08-08 v2 —
+   replaced the top strip). Rendered via admin.components.beforeNavLinks, so it
+   also appears in the mobile nav overlay.
    ========================================================================== */
-.isad-locale-banner {
+.isad-nav-locale {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-  padding: 8px 16px;
-  background: var(--theme-elevation-100);
-  border-bottom: 1px solid var(--theme-elevation-150);
-  color: var(--theme-elevation-800);
-  font-size: 13px;
+  flex-direction: column;
+  gap: 10px;
+  margin: 4px 0 24px;
+  padding: 12px;
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: 8px;
+  background: var(--theme-elevation-50);
+  color: var(--theme-elevation-700);
+  font-size: 12px;
   line-height: 1.4;
 }
 
-.isad-locale-banner__message {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
+.isad-nav-locale__label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
   font-weight: 500;
 }
 
-.isad-locale-banner__select {
-  padding: 4px 8px;
+.isad-nav-locale__select {
+  width: 100%;
+  padding: 6px 8px;
   border: 1px solid var(--theme-elevation-250);
   border-radius: 6px;
   background: var(--theme-input-bg, var(--theme-elevation-0));
-  color: inherit;
+  color: var(--theme-elevation-800);
   font: inherit;
   font-weight: 600;
   cursor: pointer;
 }
 
-.isad-locale-banner__logout {
+.isad-nav-locale__logout {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   color: inherit;
   text-decoration: none;
   font-weight: 500;
-  padding: 6px 10px;
-  border-radius: 6px;
 
   &:hover {
-    background: var(--theme-elevation-150);
+    text-decoration: underline;
   }
 }
 
@@ -437,11 +438,23 @@ html[data-theme='dark'] .isad-dash__chip--success {
    Mobile pass (owner 2026-08-08): nothing may overflow the viewport, and the
    touch targets (hamburger) get a proper size.
    ========================================================================== */
-@media (max-width: 768px) {
-  /* Belt-and-braces: the admin shell must never scroll sideways as a whole;
-     wide TABLES scroll inside their own wrapper below instead. */
+@media (max-width: 1024px) {
+  /* The page itself NEVER scrolls sideways (owner 2026-08-08: "contentul trebuie
+     sa se vada pe pagina, nu in afara paginii") — wide TABLES scroll inside their
+     own wrapper below instead. */
+  html,
   body {
     overflow-x: hidden;
+    max-width: 100vw;
+  }
+
+  .app,
+  .template-default,
+  .template-default__wrap,
+  main {
+    min-width: 0;
+    max-width: 100vw;
+    overflow-x: clip;
   }
 
   /* Collection list tables: scroll within their container, not the page. */
@@ -451,26 +464,44 @@ html[data-theme='dark'] .isad-dash__chip--success {
     max-width: 100%;
   }
 
-  /* Long unbroken values (emails, URLs, ids) must wrap inside cards/fields. */
+  /* Long unbroken values (emails, URLs, ids, JSON) wrap instead of pushing the
+     layout wider than the viewport. */
   .render-fields,
   .field-type,
   .doc-header,
-  .cell {
+  .doc-controls,
+  .cell,
+  .step-nav {
     min-width: 0;
     overflow-wrap: anywhere;
   }
 
-  /* Bigger hamburger: 44px tap target (was ~26px). */
+  .field-type input,
+  .field-type textarea {
+    max-width: 100%;
+  }
+
+  pre,
+  code {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  /* Toolbars/controls wrap into rows instead of forcing sideways growth. */
+  .list-controls,
+  .doc-controls__controls-wrapper {
+    flex-wrap: wrap;
+  }
+
+  /* Bigger hamburger tap target: grow the GLYPH via Payload's own size variable —
+     never transform-scale the .hamburger box (it carries the white chrome and blew
+     up over the content on 2026-08-08). */
   .nav-toggler {
     width: 44px;
     height: 44px;
-
-    .hamburger {
-      transform: scale(1.3);
-    }
   }
 
-  .isad-locale-banner {
-    padding: 8px 12px;
+  .hamburger {
+    --hamburger-size: 24px;
   }
 }

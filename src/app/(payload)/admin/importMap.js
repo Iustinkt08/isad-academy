@@ -29,11 +29,11 @@ import { PreviewComponent as PreviewComponent_a8a977ebc872c5d5ea7ee689724c0860 }
 import { BlocksFeatureClient as BlocksFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { TextStateFeatureClient as TextStateFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { ProfileIcon as ProfileIcon_98e43e8b06e5a19b4308385ea03e3fc8 } from '../../../components/admin/ProfileIcon'
-import { LocaleBanner as LocaleBanner_e14550b689c04d773a9edab53d01bae6 } from '../../../components/admin/LocaleBanner'
 import { Icon as Icon_dfe4008080d895d460898c3a6155e9ba } from '../../../components/admin/Icon'
 import { Logo as Logo_91a09b539d3c86b0aebf520e7564ce08 } from '../../../components/admin/Logo'
 import { AdminDashboard as AdminDashboard_0171ae121c3d9523aafb7bdbec1300c5 } from '../../../components/admin/AdminDashboard'
 import { NavLogo as NavLogo_62fd1b684515cecb7439e1dd363f1096 } from '../../../components/admin/NavLogo'
+import { NavLocale as NavLocale_0a335fff4c78b59868b7c523317c36d6 } from '../../../components/admin/NavLocale'
 import { LoginView as LoginView_249db7119b96b4d9f8230bf9c6fe37f4 } from '../../../components/admin/views/LoginView'
 import { CreateFirstUserView as CreateFirstUserView_8e03725038cc339ee8882db66ef1ce1c } from '../../../components/admin/views/CreateFirstUserView'
 import { ForgotPasswordView as ForgotPasswordView_425497e56228a312fab6dff2596bab01 } from '../../../components/admin/views/ForgotPasswordView'
@@ -72,11 +72,11 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#BlocksFeatureClient": BlocksFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#TextStateFeatureClient": TextStateFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "/components/admin/ProfileIcon#ProfileIcon": ProfileIcon_98e43e8b06e5a19b4308385ea03e3fc8,
-  "/components/admin/LocaleBanner#LocaleBanner": LocaleBanner_e14550b689c04d773a9edab53d01bae6,
   "/components/admin/Icon#Icon": Icon_dfe4008080d895d460898c3a6155e9ba,
   "/components/admin/Logo#Logo": Logo_91a09b539d3c86b0aebf520e7564ce08,
   "/components/admin/AdminDashboard#AdminDashboard": AdminDashboard_0171ae121c3d9523aafb7bdbec1300c5,
   "/components/admin/NavLogo#NavLogo": NavLogo_62fd1b684515cecb7439e1dd363f1096,
+  "/components/admin/NavLocale#NavLocale": NavLocale_0a335fff4c78b59868b7c523317c36d6,
   "/components/admin/views/LoginView#LoginView": LoginView_249db7119b96b4d9f8230bf9c6fe37f4,
   "/components/admin/views/CreateFirstUserView#CreateFirstUserView": CreateFirstUserView_8e03725038cc339ee8882db66ef1ce1c,
   "/components/admin/views/ForgotPasswordView#ForgotPasswordView": ForgotPasswordView_425497e56228a312fab6dff2596bab01,

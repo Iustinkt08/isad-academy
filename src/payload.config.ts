@@ -82,15 +82,16 @@ export default buildConfig({
     // (owner 2026-08-08) — src/components/admin/ProfileIcon.tsx.
     avatar: { Component: '/components/admin/ProfileIcon#ProfileIcon' },
     components: {
-      // "You are editing the site in: <locale>" banner + logout link, above everything
-      // (owner 2026-08-08) — src/components/admin/LocaleBanner.tsx.
-      header: ['/components/admin/LocaleBanner#LocaleBanner'],
       // Quick actions + status cards above the native dashboard (server component,
       // queries via Local API) — src/components/admin/AdminDashboard.tsx.
       beforeDashboard: ['/components/admin/AdminDashboard#AdminDashboard'],
-      // Brand lockup at the top of the nav sidebar (owner request) —
-      // src/components/admin/NavLogo.tsx.
-      beforeNavLinks: ['/components/admin/NavLogo#NavLogo'],
+      // Top of the nav sidebar (owner requests): brand lockup, then the
+      // editing-language card + logout (2026-08-08 v2 — replaced the top strip;
+      // being in the nav, both show in the mobile overlay too).
+      beforeNavLinks: [
+        '/components/admin/NavLogo#NavLogo',
+        '/components/admin/NavLocale#NavLocale',
+      ],
       graphics: {
         Logo: '/components/admin/Logo#Logo',
         Icon: '/components/admin/Icon#Icon',

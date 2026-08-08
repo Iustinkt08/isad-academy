@@ -1,31 +1,28 @@
 'use client'
 
-import { useAuth, useLocale, useTranslation } from '@payloadcms/ui'
+import { useLocale, useTranslation } from '@payloadcms/ui'
 import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 
 /**
- * Always-visible banner above the admin (admin.components.header) — owner 2026-08-08:
- * "as pune in partea de sus: Atentie acum editezi siteul in limba: Romana/Engleza".
- * The dropdown drives the SAME `?locale=` mechanism as Payload's own Localizer (top
- * right), which stays in place. The right side carries a logout link because on phones
- * the sidebar logout is hard to reach (same owner round).
+ * Editing-language card in the LEFT NAV, right under the logo (owner 2026-08-08 v2:
+ * the previous top strip is gone — "amplasam asta cu limba in meniul din stanga sub
+ * logo"). Lives in `admin.components.beforeNavLinks`, so it shows in the mobile nav
+ * overlay too. The dropdown drives the same `?locale=` mechanism as Payload's own
+ * Localizer (top right), which stays. The logout link stays here as well — on phones
+ * this card is the easiest place to reach it.
  */
 const CONTENT_LOCALES = [
   { code: 'en', label: 'English' },
   { code: 'ro', label: 'Română' },
 ] as const
 
-export function LocaleBanner() {
-  const { user } = useAuth()
+export function NavLocale() {
   const locale = useLocale()
   const { i18n } = useTranslation()
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
-
-  // Login / logged-out screens have no locale context worth announcing.
-  if (!user) return null
 
   const uiIsRo = String(i18n?.language ?? 'en').startsWith('ro')
   const current = locale?.code === 'ro' ? 'ro' : 'en'
@@ -37,11 +34,11 @@ export function LocaleBanner() {
   }
 
   return (
-    <div className="isad-locale-banner" role="status">
-      <label className="isad-locale-banner__message">
-        {uiIsRo ? 'Atenție: acum editezi site-ul în limba: ' : 'Heads up: you are editing the site in: '}
+    <div className="isad-nav-locale">
+      <label className="isad-nav-locale__label">
+        {uiIsRo ? 'Editezi site-ul în limba:' : 'You are editing the site in:'}
         <select
-          className="isad-locale-banner__select"
+          className="isad-nav-locale__select"
           value={current}
           onChange={(event) => switchLocale(event.target.value)}
         >
@@ -53,11 +50,11 @@ export function LocaleBanner() {
         </select>
       </label>
 
-      <Link className="isad-locale-banner__logout" href="/admin/logout">
+      <Link className="isad-nav-locale__logout" href="/admin/logout">
         <svg
           aria-hidden="true"
-          width="14"
-          height="14"
+          width="13"
+          height="13"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
