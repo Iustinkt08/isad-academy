@@ -20,6 +20,22 @@ export const lexicalToPlainText = (value: unknown): string => {
   return parts.join(' ').replace(/\s+/g, ' ').trim()
 }
 
+/**
+ * `true` when a Lexical value carries anything renderable: visible text, or a non-text
+ * node that renders on its own (custom block, upload, horizontal rule). Used to hide
+ * sections (e.g. the course About card) instead of rendering an empty prose shell.
+ */
+export const hasLexicalContent = (value: unknown): boolean => {
+  const children = (value as { root?: { children?: unknown[] } } | null | undefined)?.root
+    ?.children
+  if (!Array.isArray(children) || children.length === 0) return false
+  if (lexicalToPlainText(value).length > 0) return true
+  return children.some((child) => {
+    const type = (child as { type?: unknown } | null)?.type
+    return type === 'block' || type === 'upload' || type === 'horizontalrule'
+  })
+}
+
 /** Average adult reading speed used for the auto reading-time estimate (CLAUDE.md §4
  * `blogPosts.readingTime` "auto sau manual"). */
 export const WORDS_PER_MINUTE = 200

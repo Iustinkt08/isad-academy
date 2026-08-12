@@ -17,11 +17,15 @@
 
 import { Container } from '../ui/Container'
 import { Reveal } from '../ui/Reveal'
-import type { Locale } from '@/lib/i18n/config'
-import { getDictionary } from '@/lib/i18n/dictionaries'
+import type { CorporateContent } from '@/lib/corporate/formConfig'
 
-export default function CorporateBenefits({ locale }: { locale: Locale }) {
-  const t = getDictionary(locale).corporate.benefits
+// Owner 2026-08-12: copy comes RESOLVED from the `corporatePage` global (dictionary
+// fallback applied in resolveCorporateContent), so this stays purely presentational.
+export default function CorporateBenefits({
+  content: t,
+}: {
+  content: CorporateContent['benefits']
+}) {
 
   return (
     <section id="topics" className="bg-surface-subtle">

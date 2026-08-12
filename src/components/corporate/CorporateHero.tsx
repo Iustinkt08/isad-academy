@@ -1,8 +1,7 @@
 import PillTag from '../PillTag'
 import { Container } from '../ui/Container'
 import { Reveal } from '../ui/Reveal'
-import type { Locale } from '@/lib/i18n/config'
-import { getDictionary } from '@/lib/i18n/dictionaries'
+import type { CorporateContent } from '@/lib/corporate/formConfig'
 
 /**
  * Corporate / Hero — "Help your organization adopt AI responsibly."
@@ -21,8 +20,9 @@ import { getDictionary } from '@/lib/i18n/dictionaries'
  *  - the title clamps below desktop (quality floor, CLAUDE.md §15).
  */
 
-export default function CorporateHero({ locale }: { locale: Locale }) {
-  const t = getDictionary(locale).corporate.hero
+// Owner 2026-08-12: copy comes RESOLVED from the `corporatePage` global (dictionary
+// fallback applied in resolveCorporateContent), so this stays purely presentational.
+export default function CorporateHero({ content: t }: { content: CorporateContent['hero'] }) {
 
   return (
     <section className="bg-surface-subtle">

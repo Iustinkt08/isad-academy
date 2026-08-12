@@ -45,7 +45,8 @@ const getCourseData = cache(async (slug: string, locale: Locale) => {
     collection: 'courses',
     where: { slug: { equals: slug } },
     limit: 1,
-    depth: 1,
+    // depth 2 (was 1): populates `trainer` AND the trainer's `photo` media doc.
+    depth: 2,
     overrideAccess: false,
     locale,
     fallbackLocale: 'en',
@@ -264,16 +265,6 @@ function buildEdition(
   }
 }
 
-/** Top-level Lexical paragraphs → plain-text strings (About card, §6). */
-const descriptionParagraphs = (description: Course['description']): string[] => {
-  const children = (description as { root?: { children?: unknown[] } } | null | undefined)?.root
-    ?.children
-  if (!Array.isArray(children)) return []
-  return children
-    .map((child) => lexicalToPlainText({ root: { children: [child] } }))
-    .filter((p) => p.length > 0)
-}
-
 /** Teaser: shortDescription → SEO meta → truncated body (same chain as the catalog). */
 const courseTeaser = (course: Course): string => {
   const short = course.shortDescription?.trim()
@@ -316,6 +307,10 @@ export default async function CourseDetailPage({ params }: Args) {
   const nextSession = upcomingSessions[0] ?? null
   const credits = cpdCredits(course)
   const isPecbTrack = course.category === 'iso'
+
+  /* ——— Trainer mini-card (owner 2026-08-12): course trainer, or the Silviu default ——— */
+  const trainer = course.trainer && typeof course.trainer === 'object' ? course.trainer : null
+  const trainerPhotoUrl = trainer ? (asMedia(trainer.photo)?.url ?? null) : null
 
   /* ——— Header data (redesign: no meta chips, no Share) ——— */
   const titleWords = course.title.trim().replace(/\.$/, '').split(/\s+/)
@@ -364,7 +359,7 @@ export default async function CourseDetailPage({ params }: Args) {
         {/* Content column */}
         <div className="order-2 flex min-w-0 flex-col gap-5 lg:order-1 lg:min-w-[300px] lg:flex-1 lg:basis-[600px] lg:gap-6">
           <Reveal>
-            <CourseAbout locale={locale} paragraphs={descriptionParagraphs(course.description)} />
+            <CourseAbout locale={locale} description={course.description} />
           </Reveal>
           <Reveal>
             <CourseAudience
@@ -409,13 +404,22 @@ export default async function CourseDetailPage({ params }: Args) {
                 <NewsletterForm tone="light" locale={locale} />
               </div>
             )}
-            <ExpertMiniCard locale={locale} />
+            <ExpertMiniCard
+              locale={locale}
+              {...(trainer
+                ? {
+                    name: trainer.name,
+                    role: trainer.role ?? null,
+                    ...(trainerPhotoUrl ? { photo: trainerPhotoUrl } : {}),
+                  }
+                : {})}
+            />
           </Reveal>
         </aside>
       </Container>
 
       <Reveal>
-        <CourseCallout locale={locale} />
+        <CourseCallout locale={locale} overrides={course.callouts ?? null} />
       </Reveal>
     </div>
   )

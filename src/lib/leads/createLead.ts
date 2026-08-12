@@ -1,6 +1,8 @@
 import type { Payload } from 'payload'
 
-import { HONEYPOT_FIELD, validateLeadInput } from './validateLeadInput'
+import { resolveCorporateFormFields, type CorporateFormField } from '../corporate/formConfig'
+import { getDictionary } from '../i18n/dictionaries'
+import { HONEYPOT_FIELD, validateLeadInput, type NormalizedCorporateAnswer } from './validateLeadInput'
 
 export type LeadSuccessBody = { ok: true }
 export type LeadFailureBody = { ok: false; error: string }
@@ -42,7 +44,12 @@ export async function createLead(raw: unknown, deps: { payload: Payload }): Prom
     return { status: 201, body: { ok: true } }
   }
 
-  const validated = validateLeadInput(raw)
+  // Dynamic corporate form (owner 2026-08-12): validation runs against the CURRENT field
+  // configuration from the `corporatePage` global; a missing/unreadable global falls back
+  // to the built-in default fields (EN dict — labels stored on leads stay consistent).
+  const corporateFields = await resolveCorporateFields(payload)
+
+  const validated = validateLeadInput(raw, corporateFields)
   if (!validated.ok) {
     return { status: 400, body: { ok: false, error: validated.error } }
   }
@@ -64,10 +71,14 @@ export async function createLead(raw: unknown, deps: { payload: Payload }): Prom
     return { status: 201, body: { ok: true } }
   }
 
-  if (input.topicCourse !== undefined) {
+  // courseTopic answers: only a PUBLISHED course id passes (overrideAccess: false), and its
+  // title becomes the stored display value of the answer.
+  const courseTitles = new Map<number, string>()
+  for (const answer of input.answers) {
+    if (answer.fieldType !== 'courseTopic' || answer.courseId === undefined) continue
     const course = await payload.findByID({
       collection: 'courses',
-      id: input.topicCourse,
+      id: answer.courseId,
       depth: 0,
       overrideAccess: false,
       disableErrors: true,
@@ -75,10 +86,15 @@ export async function createLead(raw: unknown, deps: { payload: Payload }): Prom
     if (!course) {
       return {
         status: 400,
-        body: { ok: false, error: '"topicCourse" must reference an existing course.' },
+        body: { ok: false, error: `"${answer.label}" must reference an existing course.` },
       }
     }
+    courseTitles.set(answer.courseId, course.title)
   }
+
+  const firstCourseId = input.answers.find(
+    (answer) => answer.fieldType === 'courseTopic' && answer.courseId !== undefined,
+  )?.courseId
 
   await payload.create({
     collection: 'leads',
@@ -86,16 +102,43 @@ export async function createLead(raw: unknown, deps: { payload: Payload }): Prom
       type: 'corporate',
       name: input.contactPerson,
       email: input.email,
-      phone: input.phone,
       companyName: input.companyName,
       contactPerson: input.contactPerson,
-      participantsRange: input.participantsRange,
-      topicCourse: input.topicCourse,
-      topicOther: input.topicOther,
-      preferredPeriod: input.preferredPeriod,
-      message: input.message,
+      // Kept as a real relationship so the admin list/detail still links to the course.
+      topicCourse: firstCourseId,
+      formData: input.answers.map((answer) => ({
+        label: answer.label,
+        value: answerDisplayValue(answer, courseTitles),
+      })),
     },
     overrideAccess: true,
   })
   return { status: 201, body: { ok: true } }
+}
+
+/** Current corporate form fields, resolved from the global; never throws. */
+async function resolveCorporateFields(payload: Payload): Promise<CorporateFormField[]> {
+  const global = await payload
+    .findGlobal({ slug: 'corporatePage', depth: 0, overrideAccess: true, locale: 'en' })
+    .catch(() => null)
+  return resolveCorporateFormFields(global, getDictionary('en'))
+}
+
+/** "2026-09-01 → 2026-09-05" for periods, the course title (or free text) for topics,
+ * the trimmed value for everything else — what the admin and the e-mail display. */
+function answerDisplayValue(
+  answer: NormalizedCorporateAnswer,
+  courseTitles: Map<number, string>,
+): string {
+  if (answer.fieldType === 'period') {
+    const day = (iso: string | undefined) => (iso ? iso.slice(0, 10) : '—')
+    return `${day(answer.from)} → ${day(answer.to)}`
+  }
+  if (answer.fieldType === 'courseTopic') {
+    if (answer.courseId !== undefined) {
+      return courseTitles.get(answer.courseId) ?? `#${answer.courseId}`
+    }
+    return answer.other ?? ''
+  }
+  return answer.value ?? ''
 }

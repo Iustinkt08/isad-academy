@@ -86,16 +86,21 @@ describe('POST /api/leads/submit (int) — T11', () => {
     })
   })
 
-  it('creates a corporate lead (201) with a validated topicCourse; contactPerson doubles as name', async () => {
+  // Corporate submissions use the DYNAMIC form contract (owner 2026-08-12): the fixed core
+  // trio + `answers` validated against the corporatePage global's field config — which, in
+  // this throwaway test DB, is unset, so the built-in `default-*` fields apply.
+  it('creates a corporate lead (201): answers land in formData, contactPerson doubles as name', async () => {
     const email = uniqueEmail('corporate-happy')
     const { status, json } = await postLead({
       type: 'corporate',
       companyName: 'Acme Bank SRL',
       contactPerson: 'Maria Ionescu',
       email,
-      participantsRange: '6–10',
-      topicCourse: publishedCourseId,
-      preferredPeriod: { from: '2026-09-01', to: '2026-09-30' },
+      answers: [
+        { id: 'default-participants', value: '6–10' },
+        { id: 'default-topic', courseId: publishedCourseId },
+        { id: 'default-period', from: '2026-09-01', to: '2026-09-30' },
+      ],
     })
 
     expect(status).toBe(201)
@@ -107,60 +112,81 @@ describe('POST /api/leads/submit (int) — T11', () => {
       name: 'Maria Ionescu', // leads.name is required — the contact person doubles as it
       companyName: 'Acme Bank SRL',
       contactPerson: 'Maria Ionescu',
-      participantsRange: '6–10',
     })
+    // The catalog course stays a REAL relationship on the lead…
     const topicCourse = lead!.topicCourse
     const topicCourseId = typeof topicCourse === 'object' && topicCourse ? topicCourse.id : topicCourse
     expect(topicCourseId).toBe(publishedCourseId)
-    expect(lead!.preferredPeriod?.from).toBeTruthy()
-    expect(lead!.preferredPeriod?.to).toBeTruthy()
+    // …and every answer is persisted as a label/value row, in form order.
+    const rows = (lead!.formData ?? []).map((row) => [row.label, row.value])
+    expect(rows).toHaveLength(3)
+    expect(rows[0]?.[1]).toBe('6–10')
+    expect(rows[1]?.[1]).toContain(`Leads Route Course ${RUN_ID}`)
+    expect(rows[2]?.[1]).toBe('2026-09-01 → 2026-09-30')
   })
 
-  it('creates a corporate lead with topicOther instead of topicCourse', async () => {
+  it('creates a corporate lead with a free-text topic ("other") instead of a course id', async () => {
     const email = uniqueEmail('corporate-other')
     const { status } = await postLead({
       type: 'corporate',
       companyName: 'Other Topic SRL',
       contactPerson: 'Ion Popescu',
       email,
-      participantsRange: '3–5',
-      topicOther: 'Custom anti-fraud analytics workshop',
+      answers: [{ id: 'default-topic', other: 'Custom anti-fraud analytics workshop' }],
     })
 
     expect(status).toBe(201)
     const [lead] = await leadsByEmail(email)
-    expect(lead!.topicOther).toBe('Custom anti-fraud analytics workshop')
     expect(lead!.topicCourse ?? null).toBeNull()
+    expect(lead!.formData?.[0]?.value).toBe('Custom anti-fraud analytics workshop')
   })
 
-  it('rejects a topicCourse that does not exist (400, no lead created)', async () => {
+  it('rejects a course id that does not exist (400, no lead created)', async () => {
     const email = uniqueEmail('corporate-bad-course')
     const { status, json } = await postLead({
       type: 'corporate',
       companyName: 'Ghost Course SRL',
       contactPerson: 'Ana Ghost',
       email,
-      topicCourse: 99_999_999,
+      answers: [{ id: 'default-topic', courseId: 99_999_999 }],
     })
 
     expect(status).toBe(400)
     expect(json.ok).toBe(false)
-    expect(json.error).toContain('topicCourse')
+    expect(json.error).toContain('must reference an existing course')
     expect(await leadsByEmail(email)).toHaveLength(0)
   })
 
-  it('rejects a DRAFT course as topicCourse — public form only ever offers published ones', async () => {
+  it('rejects a DRAFT course id — public form only ever offers published ones', async () => {
     const email = uniqueEmail('corporate-draft-course')
     const { status, json } = await postLead({
       type: 'corporate',
       companyName: 'Draft Course SRL',
       contactPerson: 'Dan Draft',
       email,
-      topicCourse: draftCourseId,
+      answers: [{ id: 'default-topic', courseId: draftCourseId }],
     })
 
     expect(status).toBe(400)
     expect(json.ok).toBe(false)
+    expect(await leadsByEmail(email)).toHaveLength(0)
+  })
+
+  it('rejects answers the configured form does not contain (400, mass-assignment hygiene)', async () => {
+    const email = uniqueEmail('corporate-ghost-field')
+    const { status, json } = await postLead({
+      type: 'corporate',
+      companyName: 'Ghost Field SRL',
+      contactPerson: 'Gabi Ghost',
+      email,
+      answers: [
+        { id: 'default-topic', other: 'AI governance' },
+        { id: 'not-a-configured-field', value: 'sneaky' },
+      ],
+    })
+
+    expect(status).toBe(400)
+    expect(json.error).toContain('does not match a form field')
     expect(await leadsByEmail(email)).toHaveLength(0)
   })
 
@@ -198,10 +224,22 @@ describe('POST /api/leads/submit (int) — T11', () => {
       type: 'corporate',
       contactPerson: 'No Company',
       email: corporateEmail,
-      topicOther: 'Anything',
+      answers: [{ id: 'default-topic', other: 'Anything' }],
     })
     expect(corporate.status).toBe(400)
     expect(await leadsByEmail(corporateEmail)).toHaveLength(0)
+
+    // corporate without the REQUIRED topic answer (default form config)
+    const noTopicEmail = uniqueEmail('corporate-no-topic')
+    const noTopic = await postLead({
+      type: 'corporate',
+      companyName: 'No Topic SRL',
+      contactPerson: 'Nadia NoTopic',
+      email: noTopicEmail,
+      answers: [{ id: 'default-participants', value: '3–5' }],
+    })
+    expect(noTopic.status).toBe(400)
+    expect(await leadsByEmail(noTopicEmail)).toHaveLength(0)
   })
 
   it('honeypot: non-empty "website" pretends success (201) but creates NO lead', async () => {
@@ -237,15 +275,17 @@ describe('POST /api/leads/submit (int) — T11', () => {
     expect(await leadsByEmail(email)).toHaveLength(0)
   })
 
-  it('rejects a preferredPeriod with from after to (400)', async () => {
+  it('rejects a period answer with from after to (400)', async () => {
     const email = uniqueEmail('corporate-bad-period')
     const { status } = await postLead({
       type: 'corporate',
       companyName: 'Backwards Period SRL',
       contactPerson: 'Tim Traveler',
       email,
-      topicOther: 'AI governance intro',
-      preferredPeriod: { from: '2026-10-01', to: '2026-09-01' },
+      answers: [
+        { id: 'default-topic', other: 'AI governance intro' },
+        { id: 'default-period', from: '2026-10-01', to: '2026-09-01' },
+      ],
     })
 
     expect(status).toBe(400)

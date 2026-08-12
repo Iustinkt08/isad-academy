@@ -12,6 +12,7 @@ import { HomeHero } from '@/components/home/Hero'
 import { OurCoursesSection } from '@/components/home/OurCoursesSection'
 import FaqSection, { type FaqEntry } from '@/components/FaqSection'
 import { TestimonialsSection } from '@/components/home/TestimonialsSection'
+import PartnersStrip from '@/components/sections/PartnersStrip'
 import { WhyIsadShowcase, type ShowcaseStat } from '@/components/home/WhyIsadShowcase'
 import WhySectionMobile from '@/components/sections/WhySectionMobile'
 import { getDictionary, localePath, resolveLocale, type Locale } from '@/lib/i18n'
@@ -192,6 +193,10 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       {/* Mobile counterpart — same section, Figma-exact card carousel (lg:hidden;
           desktop showcase above is hidden lg:block). Owner Figma 3858-2991 / 3781-19 */}
       <WhySectionMobile locale={locale} />
+
+      {/* Partners logo strip (owner 2026-08-12; moved above the courses section same day) —
+          infinite marquee fed by the `partners` collection; renders nothing while empty */}
+      <PartnersStrip locale={locale} placement="home" />
 
       {/* 2 — Explore our upcoming courses (curated via homepage.featuredCourses; owner
           Figma design 2026-07-12, node 3690-2902 — replaces the old FeaturedCoursesSection) */}

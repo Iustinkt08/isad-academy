@@ -7,6 +7,8 @@ import CorporateHero from '@/components/corporate/CorporateHero'
 import CorporateLeadForm, {
   type CorporateTopicOption,
 } from '@/components/corporate/CorporateLeadForm'
+import PartnersStrip from '@/components/sections/PartnersStrip'
+import { resolveCorporateContent, type CorporateContent } from '@/lib/corporate/formConfig'
 import { getDictionary, resolveLocale, type Locale } from '@/lib/i18n'
 
 export async function generateMetadata({
@@ -22,13 +24,15 @@ export async function generateMetadata({
 type CorporateData = {
   courses: CorporateTopicOption[]
   contactEmail?: string
+  content: CorporateContent
 }
 
 /** Public queries via the Local API with access control on — drafts never leak into topics. */
 async function getCorporateData(locale: Locale): Promise<CorporateData> {
+  const dict = getDictionary(locale)
   try {
     const payload = await getPayload({ config })
-    const [coursesResult, settings] = await Promise.all([
+    const [coursesResult, settings, corporatePage] = await Promise.all([
       payload.find({
         collection: 'courses',
         pagination: false,
@@ -44,13 +48,25 @@ async function getCorporateData(locale: Locale): Promise<CorporateData> {
         locale,
         fallbackLocale: 'en',
       }),
+      // Owner 2026-08-12: page copy + form fields from the corporatePage global;
+      // resolveCorporateContent falls back to the dictionary per empty field.
+      payload
+        .findGlobal({
+          slug: 'corporatePage',
+          depth: 0,
+          overrideAccess: false,
+          locale,
+          fallbackLocale: 'en',
+        })
+        .catch(() => null),
     ])
     return {
       courses: coursesResult.docs.map((course) => ({ id: course.id, title: course.title })),
       contactEmail: settings?.contact?.email ?? undefined,
+      content: resolveCorporateContent(corporatePage, dict),
     }
   } catch {
-    return { courses: [] }
+    return { courses: [], content: resolveCorporateContent(null, dict) }
   }
 }
 
@@ -70,13 +86,21 @@ export default async function CorporatePage({
   params: Promise<{ locale: string }>
 }) {
   const locale = resolveLocale((await params).locale)
-  const { courses, contactEmail } = await getCorporateData(locale)
+  const { courses, contactEmail, content } = await getCorporateData(locale)
 
   return (
     <div className="bg-surface-subtle">
-      <CorporateHero locale={locale} />
-      <CorporateBenefits locale={locale} />
-      <CorporateLeadForm locale={locale} courses={courses} contactEmail={contactEmail} />
+      <CorporateHero content={content.hero} />
+      <CorporateBenefits content={content.benefits} />
+      {/* Partners logo strip (owner 2026-08-12) — below "Ideal for", above the form;
+          renders nothing while the `partners` collection is empty */}
+      <PartnersStrip locale={locale} placement="corporate" />
+      <CorporateLeadForm
+        locale={locale}
+        courses={courses}
+        contactEmail={contactEmail}
+        content={{ form: content.form, aside: content.aside }}
+      />
     </div>
   )
 }

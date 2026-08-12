@@ -71,8 +71,10 @@ export interface Config {
     media: Media;
     courses: Course;
     courseSessions: CourseSession;
+    trainers: Trainer;
     orders: Order;
     discountCodes: DiscountCode;
+    partners: Partner;
     reviews: Review;
     blogPosts: BlogPost;
     faqItems: FaqItem;
@@ -98,8 +100,10 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     courses: CoursesSelect<false> | CoursesSelect<true>;
     courseSessions: CourseSessionsSelect<false> | CourseSessionsSelect<true>;
+    trainers: TrainersSelect<false> | TrainersSelect<true>;
     orders: OrdersSelect<false> | OrdersSelect<true>;
     discountCodes: DiscountCodesSelect<false> | DiscountCodesSelect<true>;
+    partners: PartnersSelect<false> | PartnersSelect<true>;
     reviews: ReviewsSelect<false> | ReviewsSelect<true>;
     blogPosts: BlogPostsSelect<false> | BlogPostsSelect<true>;
     faqItems: FaqItemsSelect<false> | FaqItemsSelect<true>;
@@ -123,12 +127,14 @@ export interface Config {
     siteSettings: SiteSetting;
     homepage: Homepage;
     expertBio: ExpertBio;
+    corporatePage: CorporatePage;
     'payload-jobs-stats': PayloadJobsStat;
   };
   globalsSelect: {
     siteSettings: SiteSettingsSelect<false> | SiteSettingsSelect<true>;
     homepage: HomepageSelect<false> | HomepageSelect<true>;
     expertBio: ExpertBioSelect<false> | ExpertBioSelect<true>;
+    corporatePage: CorporatePageSelect<false> | CorporatePageSelect<true>;
     'payload-jobs-stats': PayloadJobsStatsSelect<false> | PayloadJobsStatsSelect<true>;
   };
   locale: 'en' | 'ro';
@@ -239,7 +245,7 @@ export interface Course {
    */
   category?: ('iso' | 'antiFraud' | 'security' | 'other') | null;
   /**
-   * Full course description shown on the course page, below the header. Placeholder copy stays here until the final text is confirmed.
+   * Full course description shown on the course page, below the header. Formatting (titles, quotes, colors, code blocks) renders on the site exactly as set here.
    */
   description?: {
     root: {
@@ -265,6 +271,10 @@ export interface Course {
         id?: string | null;
       }[]
     | null;
+  /**
+   * The trainer profile shown on the course page, under the enrolment card. Leave empty to show the default (Dr. Silviu Gresoi); add other trainers in the Trainers collection.
+   */
+  trainer?: (number | null) | Trainer;
   /**
    * CPD credits shown on the course page. Calculated automatically as 1 credit per course hour from Duration (hours); this field is used only when Duration is empty.
    */
@@ -304,6 +314,19 @@ export interface Course {
      */
     quizPitch?: string | null;
   };
+  /**
+   * The two cards at the bottom of the course page. Leave any field empty to use the default site copy; the left card always links to Corporate, the right one to Contact.
+   */
+  callouts?: {
+    team?: {
+      title?: string | null;
+      body?: string | null;
+    };
+    questions?: {
+      title?: string | null;
+      body?: string | null;
+    };
+  };
   meta?: {
     title?: string | null;
     description?: string | null;
@@ -315,6 +338,29 @@ export interface Course {
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
+}
+/**
+ * Trainer profiles shown on course pages, under the enrolment card. Assign one to a course via its Trainer field; courses without one show the default (Dr. Silviu Gresoi).
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "trainers".
+ */
+export interface Trainer {
+  id: number;
+  /**
+   * Full display name, including titles, e.g. "Dr. Silviu Gresoi, PhD, CFE".
+   */
+  name: string;
+  /**
+   * One line shown under the name, e.g. "Your trainer · 20+ years in AI, risk & financial crime".
+   */
+  role?: string | null;
+  /**
+   * Square portrait; shown as a small round photo. Without one, the default trainer photo is used.
+   */
+  photo?: (number | null) | Media;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * Editions of a course: dates, schedule, capacity and price windows. Each edition sells separately; the seat counts and the Early Bird or Standard prices shown on the site come from here.
@@ -478,6 +524,35 @@ export interface DiscountCode {
    */
   type: 'general' | 'member';
   isActive?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Partner logos shown in the scrolling strip on the homepage (above the FAQ) and on the Corporate page (above the form). While this list is empty, the strip does not appear at all.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "partners".
+ */
+export interface Partner {
+  id: number;
+  /**
+   * Partner name — used as the logo's alt text.
+   */
+  name: string;
+  /**
+   * Logo image, ideally SVG or PNG with a transparent background.
+   */
+  logo: number | Media;
+  showOnHome?: boolean | null;
+  showOnCorporate?: boolean | null;
+  /**
+   * Optional: the partner's website. When set, the logo becomes a link (opens in a new tab).
+   */
+  url?: string | null;
+  /**
+   * Position in the strip — lower numbers come first.
+   */
+  order?: number | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -666,6 +741,16 @@ export interface Lead {
    * Corporate form only: free-text topic, used when the request is not about one of the catalog courses.
    */
   topicOther?: string | null;
+  /**
+   * Corporate form only: the visitor's answers to the configurable form fields (set up on the Corporate Page global), exactly as submitted.
+   */
+  formData?:
+    | {
+        label?: string | null;
+        value?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   /**
    * Corporate form only: the delivery window the company prefers (from and to dates).
    */
@@ -1169,12 +1254,20 @@ export interface PayloadLockedDocument {
         value: number | CourseSession;
       } | null)
     | ({
+        relationTo: 'trainers';
+        value: number | Trainer;
+      } | null)
+    | ({
         relationTo: 'orders';
         value: number | Order;
       } | null)
     | ({
         relationTo: 'discountCodes';
         value: number | DiscountCode;
+      } | null)
+    | ({
+        relationTo: 'partners';
+        value: number | Partner;
       } | null)
     | ({
         relationTo: 'reviews';
@@ -1313,6 +1406,7 @@ export interface CoursesSelect<T extends boolean = true> {
         text?: T;
         id?: T;
       };
+  trainer?: T;
   certificationCredits?: T;
   sessions?: T;
   quizProfile?:
@@ -1322,6 +1416,22 @@ export interface CoursesSelect<T extends boolean = true> {
         outcomes?: T;
         domains?: T;
         quizPitch?: T;
+      };
+  callouts?:
+    | T
+    | {
+        team?:
+          | T
+          | {
+              title?: T;
+              body?: T;
+            };
+        questions?:
+          | T
+          | {
+              title?: T;
+              body?: T;
+            };
       };
   meta?:
     | T
@@ -1370,6 +1480,17 @@ export interface CourseSessionsSelect<T extends boolean = true> {
       };
   seatsRemaining?: T;
   status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "trainers_select".
+ */
+export interface TrainersSelect<T extends boolean = true> {
+  name?: T;
+  role?: T;
+  photo?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1429,6 +1550,20 @@ export interface DiscountCodesSelect<T extends boolean = true> {
   usageCount?: T;
   type?: T;
   isActive?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "partners_select".
+ */
+export interface PartnersSelect<T extends boolean = true> {
+  name?: T;
+  logo?: T;
+  showOnHome?: T;
+  showOnCorporate?: T;
+  url?: T;
+  order?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1509,6 +1644,13 @@ export interface LeadsSelect<T extends boolean = true> {
   participantsRange?: T;
   topicCourse?: T;
   topicOther?: T;
+  formData?:
+    | T
+    | {
+        label?: T;
+        value?: T;
+        id?: T;
+      };
   preferredPeriod?:
     | T
     | {
@@ -1919,6 +2061,100 @@ export interface ExpertBio {
   createdAt?: string | null;
 }
 /**
+ * Content of the Corporate page: hero, benefit cards, industries, the proposal form (including its optional fields) and the side column. Empty fields fall back to the built-in copy. Saving republishes the page.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "corporatePage".
+ */
+export interface CorporatePage {
+  id: number;
+  hero?: {
+    pill?: string | null;
+    /**
+     * First title line, e.g. "Help your organization".
+     */
+    titleTop?: string | null;
+    /**
+     * Start of the second line, before the highlighted phrase.
+     */
+    titleBottomPrefix?: string | null;
+    /**
+     * The gradient-highlighted phrase that ends the title.
+     */
+    titleBottomHighlight?: string | null;
+    subtitle?: string | null;
+    ctaPrimary?: string | null;
+    ctaSecondary?: string | null;
+  };
+  benefits?: {
+    /**
+     * Plain part of the section title, e.g. "One expert.".
+     */
+    titlePlain?: string | null;
+    /**
+     * Gradient-highlighted part of the section title.
+     */
+    titleHighlight?: string | null;
+    /**
+     * The three (or more) benefit cards. When empty, the default three cards are shown.
+     */
+    items?:
+      | {
+          title: string;
+          text?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    idealFor?: string | null;
+    industries?:
+      | {
+          name: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  form?: {
+    title?: string | null;
+    subtitle?: string | null;
+    /**
+     * The form fields AFTER the fixed ones (company name, contact person, e-mail — always shown and required). Add, remove or reorder rows freely; answers are stored on the lead and included in the notification e-mail. When the list is empty, the default fields are shown (phone, participants, topic, preferred period, message).
+     */
+    fields?:
+      | {
+          /**
+           * Shown as the field placeholder and stored next to the answer.
+           */
+          label: string;
+          fieldType: 'text' | 'email' | 'phone' | 'textarea' | 'select' | 'courseTopic' | 'period';
+          required?: boolean | null;
+          /**
+           * The choices of the dropdown, in order.
+           */
+          options?:
+            | {
+                option: string;
+                id?: string | null;
+              }[]
+            | null;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  aside?: {
+    nextTitle?: string | null;
+    steps?:
+      | {
+          text: string;
+          id?: string | null;
+        }[]
+      | null;
+    talkTitle?: string | null;
+    talkNote?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-jobs-stats".
  */
@@ -2044,6 +2280,79 @@ export interface ExpertBioSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "corporatePage_select".
+ */
+export interface CorporatePageSelect<T extends boolean = true> {
+  hero?:
+    | T
+    | {
+        pill?: T;
+        titleTop?: T;
+        titleBottomPrefix?: T;
+        titleBottomHighlight?: T;
+        subtitle?: T;
+        ctaPrimary?: T;
+        ctaSecondary?: T;
+      };
+  benefits?:
+    | T
+    | {
+        titlePlain?: T;
+        titleHighlight?: T;
+        items?:
+          | T
+          | {
+              title?: T;
+              text?: T;
+              id?: T;
+            };
+        idealFor?: T;
+        industries?:
+          | T
+          | {
+              name?: T;
+              id?: T;
+            };
+      };
+  form?:
+    | T
+    | {
+        title?: T;
+        subtitle?: T;
+        fields?:
+          | T
+          | {
+              label?: T;
+              fieldType?: T;
+              required?: T;
+              options?:
+                | T
+                | {
+                    option?: T;
+                    id?: T;
+                  };
+              id?: T;
+            };
+      };
+  aside?:
+    | T
+    | {
+        nextTitle?: T;
+        steps?:
+          | T
+          | {
+              text?: T;
+              id?: T;
+            };
+        talkTitle?: T;
+        talkNote?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-jobs-stats_select".
  */
 export interface PayloadJobsStatsSelect<T extends boolean = true> {
@@ -2073,6 +2382,23 @@ export interface TaskSendReviewRequests {
     emailsSent?: number | null;
     emailsFailed?: number | null;
   };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CodeBlock".
+ */
+export interface CodeBlock {
+  /**
+   * Shown as a small label on the rendered block.
+   */
+  language?: ('plain' | 'typescript' | 'javascript' | 'html' | 'css' | 'json' | 'bash' | 'python' | 'sql') | null;
+  /**
+   * The code is rendered exactly as written, in a monospaced dark panel.
+   */
+  code: string;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'codeBlock';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

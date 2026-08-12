@@ -1,5 +1,8 @@
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import type { Locale } from '@/lib/i18n/config'
+import { hasLexicalContent } from '@/lib/richtext/plainText'
+
+import { RichTextContent } from '../richtext/RichTextContent'
 
 /**
  * Course / Content — the 4 cards of the course page's left column, redesign from the
@@ -18,7 +21,6 @@ const cardCls =
   'flex w-full flex-col gap-4 rounded-[24px] border-[6px] border-line-soft bg-white px-10 pb-8 pt-[30px] shadow-[3px_9px_20px_rgba(77,77,77,0.03)]'
 const headingCls =
   'text-[18px] font-medium leading-[26px] tracking-[-0.5px] text-ink lg:text-[24px] lg:leading-normal lg:tracking-[-0.8px]'
-const bodyText = 'text-[15.5px] leading-[26px] text-grey-600'
 
 /** Gradient checkmark — the "Who it's for" icon (Figma: vector "Line" 8.7×8.7). */
 function CheckIcon() {
@@ -48,18 +50,26 @@ function CheckIcon() {
   )
 }
 
-/** About this course — richText `courses.description`, flattened to paragraphs. */
-export function CourseAbout({ locale, paragraphs }: { locale: Locale; paragraphs: string[] }) {
+/**
+ * About this course — richText `courses.description`, rendered with FULL formatting
+ * (owner 2026-08-12: headings/quotes/colors/code blocks set in the admin editor must
+ * show on the site; the old plain-paragraph flattening dropped them all).
+ */
+export function CourseAbout({ locale, description }: { locale: Locale; description: unknown }) {
   const t = getDictionary(locale).courseDetail
-  if (paragraphs.length === 0) return null
+  if (!hasLexicalContent(description)) return null
   return (
     <section className={cardCls}>
       <h2 className={headingCls}>{t.aboutTitle}</h2>
-      {paragraphs.map((p) => (
-        <p key={p.slice(0, 48)} className={bodyText}>
-          {p}
-        </p>
-      ))}
+      {/* Card-scale prose: body matches the card's grey text; editor headings step down
+          so a "Title 1" reads as a section title inside the card, not a page hero.
+          `cn` is a plain joiner (no tailwind-merge), so every override of a base
+          RichTextContent utility carries `!` to win deterministically. */}
+      <RichTextContent
+        data={description}
+        locale={locale}
+        className="!text-[15.5px] !leading-[26px] !text-grey-600 [&_h1]:!mt-6 [&_h1]:!text-[24px] [&_h1]:!font-medium [&_h1]:!leading-normal [&_h1]:!tracking-[-0.8px] [&_h2]:!mt-6 [&_h2]:!text-[20px] [&_h2]:!font-medium [&_h2]:!leading-normal [&_h2]:!tracking-[-0.6px] [&_h3]:!mt-5 [&_h3]:!text-[17px] [&_h3]:!font-semibold [&_h3]:!leading-normal [&_h1:first-child]:!mt-0 [&_h2:first-child]:!mt-0"
+      />
     </section>
   )
 }

@@ -16,6 +16,8 @@ export type LeadNotificationData = {
   /** Either a raw relationship id or a populated `courses` doc (depth-dependent). */
   topicCourse?: unknown
   preferredPeriod?: { from?: string | null; to?: string | null } | null
+  /** Dynamic corporate form answers (owner 2026-08-12) — label/value, in form order. */
+  formData?: Array<{ label?: string | null; value?: string | null }> | null
 }
 
 const courseTitleOf = (topicCourse: unknown): string | null => {
@@ -63,6 +65,10 @@ export const renderLeadNotificationEmail = (lead: LeadNotificationData): Rendere
     ['Topic (course)', courseTitleOf(lead.topicCourse)],
     ['Topic (other)', lead.topicOther],
     ['Preferred period', preferredPeriod],
+    // Dynamic form answers, already in form order (label/value written by createLead).
+    ...(lead.formData ?? []).map(
+      (row): [string, string | null | undefined] => [row.label?.trim() || 'Field', row.value],
+    ),
   ]
   const rows = allRows.filter(
     (row): row is [string, string] => Boolean(row[1] && row[1].trim().length > 0),

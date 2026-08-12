@@ -6,9 +6,9 @@ import { getDictionary } from '../../lib/i18n/dictionaries'
 import { DEFAULT_LOCALE, type Locale } from '../../lib/i18n/config'
 import { GlassPanel } from '../ui/GlassPanel'
 import { cn } from '../ui/cn'
-import { LINK_CHIP_PLATFORMS } from '@/fields/richTextBlocks'
+import { CODE_BLOCK_LANGUAGES, LINK_CHIP_PLATFORMS } from '@/fields/richTextBlocks'
 import { resolveTextStateStyle } from '@/lib/richtext/textState'
-import type { DownloadableResourceBlock, LinkChipBlock } from '@/payload-types'
+import type { CodeBlock, DownloadableResourceBlock, LinkChipBlock } from '@/payload-types'
 
 /**
  * Server-rendered Lexical rich text with house prose styling (no typography plugin —
@@ -18,11 +18,36 @@ import type { DownloadableResourceBlock, LinkChipBlock } from '@/payload-types'
  * loosely-typed richText shape Payload generates on collections/globals.
  */
 
-type BlogBlockNode = SerializedBlockNode<DownloadableResourceBlock | LinkChipBlock>
+type BlogBlockNode = SerializedBlockNode<DownloadableResourceBlock | LinkChipBlock | CodeBlock>
 
 const PLATFORM_LABELS: Record<string, string> = Object.fromEntries(
   LINK_CHIP_PLATFORMS.map(({ value, label }) => [value, label]),
 )
+
+const CODE_LANGUAGE_LABELS: Record<string, string> = Object.fromEntries(
+  CODE_BLOCK_LANGUAGES.map(({ value, label }) => [value, label]),
+)
+
+/** Dark monospaced panel for the `codeBlock` block — verbatim code, no highlighter. */
+function CodePanel({ fields }: { fields: CodeBlock }) {
+  const language =
+    fields.language && fields.language !== 'plain'
+      ? (CODE_LANGUAGE_LABELS[fields.language] ?? null)
+      : null
+  return (
+    // #091f33 = the dark end of the brand dark gradient (§12) — never a new hue.
+    <div className="my-6 overflow-hidden rounded-2xl bg-[#091f33]" data-testid="code-block">
+      {language && (
+        <div className="px-5 pt-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8fb3d9]">
+          {language}
+        </div>
+      )}
+      <pre className="overflow-x-auto px-5 py-4 font-mono text-[13.5px] leading-[22px] text-[#e8eef5]">
+        <code>{fields.code}</code>
+      </pre>
+    </div>
+  )
+}
 
 /** "245 KB" / "1.2 MB" — best-effort, returns null when the size is unknown. */
 const formatFileSize = (bytes: number | null | undefined): string | null => {
@@ -122,6 +147,7 @@ const jsxConverters =
     downloadableResource: ({ node }) => (
       <DownloadableResource fields={node.fields as DownloadableResourceBlock} locale={locale} />
     ),
+    codeBlock: ({ node }) => <CodePanel fields={node.fields as CodeBlock} />,
   },
   })
 
@@ -143,6 +169,15 @@ export function RichTextContent({
       className={cn(
         'text-body text-ink/80',
         '[&_p+p]:mt-4 [&_h2]:text-h3 [&_h2]:mt-8 [&_h2]:text-ink [&_h3]:text-h4 [&_h3]:mt-6 [&_h3]:text-ink',
+        // Full heading scale (owner 2026-08-12: editor "Title 1…" styles must render) —
+        // h1 steps down to h2 scale inside prose; h4-h6 get a modest semibold treatment.
+        '[&_h1]:text-h2 [&_h1]:mt-8 [&_h1]:text-ink',
+        '[&_h4]:mt-6 [&_h4]:text-[17px] [&_h4]:font-semibold [&_h4]:text-ink',
+        '[&_h5]:mt-6 [&_h5]:text-[16px] [&_h5]:font-semibold [&_h5]:text-ink',
+        '[&_h6]:mt-6 [&_h6]:text-[15px] [&_h6]:font-semibold [&_h6]:text-ink',
+        // Inline code (the toolbar's `code` format) — pre>code panels style themselves.
+        '[&_:not(pre)>code]:rounded-md [&_:not(pre)>code]:bg-line-soft [&_:not(pre)>code]:px-1.5 [&_:not(pre)>code]:py-0.5 [&_:not(pre)>code]:font-mono [&_:not(pre)>code]:text-[0.9em] [&_:not(pre)>code]:text-blue',
+        '[&_hr]:my-8 [&_hr]:border-line',
         '[&_ul]:mt-4 [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:mt-4 [&_ol]:list-decimal [&_ol]:pl-6 [&_li]:mt-1',
         // Prose links are underlined; pill chips/download buttons (data-chip) style themselves.
         '[&_a:not([data-chip])]:font-medium [&_a:not([data-chip])]:text-blue [&_a:not([data-chip])]:underline',

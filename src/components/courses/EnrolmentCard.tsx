@@ -233,15 +233,21 @@ export default function EnrolmentCard({
 
 /**
  * The trainer mini-card under the EnrolmentCard (Figma: Card / Expert Mini).
- * Photo: the Figma drop pointed at /images/expert/silviu-gresoi.jpg, which does not
- * exist in public/ — we keep the existing site asset /silviu-gresoi.png.
+ * Owner 2026-08-12: courses can set their own trainer (`courses.trainer` → Trainers
+ * collection); without one, the defaults below keep the original card — Dr. Silviu
+ * Gresoi with the existing site asset /silviu-gresoi.png (the Figma drop's
+ * /images/expert/silviu-gresoi.jpg never existed in public/).
  */
 export function ExpertMiniCard({
   locale,
   photo = '/silviu-gresoi.png',
+  name = 'Dr. Silviu Gresoi, PhD, CFE',
+  role,
 }: {
   locale: Locale
   photo?: string
+  name?: string
+  role?: string | null
 }) {
   const t = getDictionary(locale).courseDetail
   return (
@@ -250,14 +256,14 @@ export function ExpertMiniCard({
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={photo}
-        alt="Dr. Silviu Gresoi"
+        alt={name}
         className="size-14 rounded-full bg-white object-cover shadow-[0_0_5.3px_rgba(0,0,0,0.28)]"
       />
       <div className="flex min-w-0 flex-col gap-0.5">
-        <p className="text-[15px] font-medium tracking-[-0.3px] text-ink">
-          Dr. Silviu Gresoi, PhD, CFE
+        <p className="text-[15px] font-medium tracking-[-0.3px] text-ink">{name}</p>
+        <p className="text-[12.5px] leading-[19px] text-grey-600">
+          {role?.trim() || t.expertRole}
         </p>
-        <p className="text-[12.5px] leading-[19px] text-grey-600">{t.expertRole}</p>
       </div>
     </div>
   )

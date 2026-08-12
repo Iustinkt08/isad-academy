@@ -24,8 +24,11 @@ import { LegalPages } from './collections/LegalPages'
 import { Media } from './collections/Media'
 import { Newsletters } from './collections/Newsletters'
 import { Orders } from './collections/Orders'
+import { Partners } from './collections/Partners'
 import { Reviews } from './collections/Reviews'
+import { Trainers } from './collections/Trainers'
 import { Users } from './collections/Users'
+import { CorporatePage } from './globals/CorporatePage'
 import { ExpertBio } from './globals/ExpertBio'
 import { Homepage } from './globals/Homepage'
 import { SiteSettings } from './globals/SiteSettings'
@@ -114,8 +117,10 @@ export default buildConfig({
     Media,
     Courses,
     CourseSessions,
+    Trainers,
     Orders,
     DiscountCodes,
+    Partners,
     Reviews,
     BlogPosts,
     FaqItems,
@@ -126,7 +131,7 @@ export default buildConfig({
     EventRegistrations,
     EventEmails,
   ],
-  globals: [SiteSettings, Homepage, ExpertBio],
+  globals: [SiteSettings, Homepage, ExpertBio, CorporatePage],
   // T14 (CLAUDE.md §7 + docs/PLAN.md locked SEO decision): per-page meta/OG via
   // @payloadcms/plugin-seo. Fields live at `meta.*` (meta.title / meta.description /
   // meta.image), grouped into an "SEO" tab (`tabbedUI`). The frontend `generateMetadata`

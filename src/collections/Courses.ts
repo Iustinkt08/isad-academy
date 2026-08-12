@@ -1,7 +1,10 @@
+import { BlocksFeature, lexicalEditor, TextStateFeature } from '@payloadcms/richtext-lexical'
 import type { CollectionConfig } from 'payload'
 
 import { isAdmin } from '../access/isAdmin'
+import { codeBlock } from '../fields/richTextBlocks'
 import { revalidateSiteHook } from '../lib/revalidateSite'
+import { TEXT_STATE_PRESETS } from '../lib/richtext/textState'
 import { publicOrPublished } from '../access/publicOrPublished'
 import { slugField } from '../fields/slug'
 
@@ -89,10 +92,20 @@ export const Courses: CollectionConfig = {
       name: 'description',
       type: 'richText',
       localized: true,
+      // Owner 2026-08-12: the description renders with FULL formatting on the course page
+      // (headings, quotes, lists…) — plus the blog's named brand colors and a code block
+      // for writing code verbatim. Rendered by src/components/richtext/RichTextContent.tsx.
+      editor: lexicalEditor({
+        features: ({ defaultFeatures }) => [
+          ...defaultFeatures,
+          TextStateFeature({ state: TEXT_STATE_PRESETS }),
+          BlocksFeature({ blocks: [codeBlock] }),
+        ],
+      }),
       admin: {
         description: {
-          en: 'Full course description shown on the course page, below the header. Placeholder copy stays here until the final text is confirmed.',
-          ro: 'Descrierea completă a cursului, afișată pe pagina acestuia, sub antet. Rămâne text provizoriu până la confirmarea conținutului final.',
+          en: 'Full course description shown on the course page, below the header. Formatting (titles, quotes, colors, code blocks) renders on the site exactly as set here.',
+          ro: 'Descrierea completă a cursului, afișată pe pagina acestuia, sub antet. Formatarea (titluri, citate, culori, blocuri de cod) apare pe site exact cum este setată aici.',
         },
       },
     },
@@ -117,6 +130,21 @@ export const Courses: CollectionConfig = {
           required: true,
         },
       ],
+    },
+    // Owner 2026-08-12: the trainer profile shown under the enrolment card on the course
+    // page. Empty = the site default (Dr. Silviu Gresoi); pick an entry from Trainers to
+    // show someone else.
+    {
+      name: 'trainer',
+      type: 'relationship',
+      relationTo: 'trainers',
+      hasMany: false,
+      admin: {
+        description: {
+          en: 'The trainer profile shown on the course page, under the enrolment card. Leave empty to show the default (Dr. Silviu Gresoi); add other trainers in the Trainers collection.',
+          ro: 'Profilul de trainer afișat pe pagina cursului, sub cardul de înscriere. Lăsați gol pentru trainerul implicit (Dr. Silviu Gresoi); alți traineri se adaugă în colecția Trainers.',
+        },
+      },
     },
     {
       name: 'certificationCredits',
@@ -221,6 +249,40 @@ export const Courses: CollectionConfig = {
               ro: 'Una sau două propoziții afișate pe ecranul cu rezultatul quiz-ului, ca motiv pentru care recomandăm acest curs. Quiz-ul rulează în română, deci scrieți cel puțin versiunea în română.',
             },
           },
+        },
+      ],
+    },
+    // Owner 2026-08-12: the two callout cards at the bottom of the course page become
+    // editable per course. Empty fields fall back to the site-wide default copy
+    // (src/lib/i18n/dictionaries.ts `courseDetail.callout*`); the links stay fixed
+    // (left card → /corporate, right card → /contact).
+    {
+      name: 'callouts',
+      type: 'group',
+      admin: {
+        description: {
+          en: 'The two cards at the bottom of the course page. Leave any field empty to use the default site copy; the left card always links to Corporate, the right one to Contact.',
+          ro: 'Cele două cartonașe din partea de jos a paginii cursului. Lăsați un câmp gol pentru textul implicit al site-ului; cardul din stânga duce mereu la Corporate, cel din dreapta la Contact.',
+        },
+      },
+      fields: [
+        {
+          name: 'team',
+          type: 'group',
+          label: { en: 'Left card (corporate)', ro: 'Cardul din stânga (corporate)' },
+          fields: [
+            { name: 'title', type: 'text', localized: true },
+            { name: 'body', type: 'textarea', localized: true },
+          ],
+        },
+        {
+          name: 'questions',
+          type: 'group',
+          label: { en: 'Right card (contact)', ro: 'Cardul din dreapta (contact)' },
+          fields: [
+            { name: 'title', type: 'text', localized: true },
+            { name: 'body', type: 'textarea', localized: true },
+          ],
         },
       ],
     },

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import type { CorporateFormField } from '../../../src/lib/corporate/formConfig'
 import {
   validateLeadInput,
   type NormalizedContactLead,
@@ -14,14 +15,33 @@ const validContact = () => ({
   message: 'Tell me more about the ISO/IEC 42001 preparation course.',
 })
 
-const validCorporate = () => ({
+/** Explicit form config (owner 2026-08-12 dynamic corporate form) — one field of every
+ * type, so the per-type validation paths are all exercised deterministically. */
+const FIELDS: CorporateFormField[] = [
+  { id: 'phone', label: 'Phone', fieldType: 'phone', required: false, options: [] },
+  { id: 'participants', label: 'Participants', fieldType: 'text', required: false, options: [] },
+  { id: 'topic', label: 'Topic / course', fieldType: 'courseTopic', required: true, options: [] },
+  { id: 'period', label: 'Preferred period', fieldType: 'period', required: false, options: [] },
+  { id: 'message', label: 'Goals', fieldType: 'textarea', required: false, options: [] },
+  { id: 'dept', label: 'Department', fieldType: 'select', required: false, options: ['IT', 'Legal'] },
+  { id: 'billing', label: 'Billing e-mail', fieldType: 'email', required: false, options: [] },
+]
+
+const validCorporate = (): Record<string, unknown> => ({
   type: 'corporate',
   companyName: 'Acme Bank SRL',
   contactPerson: 'Maria Ionescu',
   email: 'maria@acme.example.com',
-  participantsRange: '6–10',
-  topicCourse: 42,
+  answers: [
+    { id: 'participants', value: '6–10' },
+    { id: 'topic', courseId: 42 },
+  ],
 })
+
+/** Corporate submissions validate against the explicit FIELDS config. */
+const run = (body: unknown) => validateLeadInput(body, FIELDS)
+
+const corporateWithAnswers = (answers: unknown) => ({ ...validCorporate(), answers })
 
 describe('validateLeadInput — shape and type', () => {
   it.each([null, undefined, 'string', 42, [1, 2]])('rejects non-object body %p', (raw) => {
@@ -107,114 +127,177 @@ describe('validateLeadInput — contact', () => {
   })
 })
 
-describe('validateLeadInput — corporate', () => {
-  it('accepts a valid corporate lead with topicCourse', () => {
-    const result = validateLeadInput(validCorporate())
+describe('validateLeadInput — corporate (dynamic form)', () => {
+  it('accepts a valid corporate lead and keeps answers in config order', () => {
+    const result = run({
+      ...validCorporate(),
+      // Submitted out of config order on purpose — normalization must reorder.
+      answers: [
+        { id: 'topic', courseId: 42 },
+        { id: 'participants', value: ' 6–10 ' },
+      ],
+    })
     expect(result.ok).toBe(true)
     const value = (result as { ok: true; value: NormalizedCorporateLead }).value
     expect(value).toMatchObject({
       type: 'corporate',
       companyName: 'Acme Bank SRL',
       contactPerson: 'Maria Ionescu',
-      topicCourse: 42,
+    })
+    expect(value.answers.map((answer) => answer.fieldId)).toEqual(['participants', 'topic'])
+    expect(value.answers[0]).toMatchObject({ label: 'Participants', value: '6–10' })
+    expect(value.answers[1]).toMatchObject({ fieldType: 'courseTopic', courseId: 42 })
+  })
+
+  it('normalizes a numeric-string courseId to a number', () => {
+    const result = run(
+      corporateWithAnswers([{ id: 'topic', courseId: '42' }]),
+    ) as { ok: true; value: NormalizedCorporateLead }
+    expect(result.ok).toBe(true)
+    expect(result.value.answers[0]?.courseId).toBe(42)
+  })
+
+  it('rejects a non-numeric courseId', () => {
+    const result = run(corporateWithAnswers([{ id: 'topic', courseId: 'iso-course' }]))
+    expect(result).toMatchObject({
+      ok: false,
+      error: '"Topic / course": "courseId" must be a course id.',
     })
   })
 
-  it('normalizes a numeric-string topicCourse to a number', () => {
-    const result = validateLeadInput({ ...validCorporate(), topicCourse: '42' })
+  it('accepts "other" instead of courseId on a topic field', () => {
+    const result = run(
+      corporateWithAnswers([{ id: 'topic', other: 'Custom in-house fraud analytics workshop' }]),
+    ) as { ok: true; value: NormalizedCorporateLead }
     expect(result.ok).toBe(true)
-    expect((result as { ok: true; value: NormalizedCorporateLead }).value.topicCourse).toBe(42)
+    expect(result.value.answers[0]?.other).toBe('Custom in-house fraud analytics workshop')
   })
 
-  it('rejects a non-numeric topicCourse', () => {
-    const result = validateLeadInput({ ...validCorporate(), topicCourse: 'iso-course' })
-    expect(result).toMatchObject({ ok: false, error: '"topicCourse" must be a course id.' })
-  })
-
-  it('accepts topicOther instead of topicCourse', () => {
-    const body: Record<string, unknown> = validCorporate()
-    delete body.topicCourse
-    body.topicOther = 'Custom in-house fraud analytics workshop'
-    const result = validateLeadInput(body)
-    expect(result.ok).toBe(true)
+  it('rejects a topic answer with neither courseId nor other, or with both', () => {
+    expect(run(corporateWithAnswers([{ id: 'topic' }]))).toMatchObject({
+      ok: false,
+      error: '"Topic / course": provide exactly one of "courseId" or "other".',
+    })
     expect(
-      (result as { ok: true; value: NormalizedCorporateLead }).value.topicOther,
-    ).toBe('Custom in-house fraud analytics workshop')
+      run(corporateWithAnswers([{ id: 'topic', courseId: 42, other: 'Also this' }])).ok,
+    ).toBe(false)
   })
 
-  it('rejects neither topicCourse nor topicOther', () => {
-    const body: Record<string, unknown> = validCorporate()
-    delete body.topicCourse
-    const result = validateLeadInput(body)
-    expect(result).toMatchObject({
-      ok: false,
-      error: 'Provide exactly one of "topicCourse" or "topicOther".',
-    })
-  })
-
-  it('rejects both topicCourse and topicOther together', () => {
-    const result = validateLeadInput({ ...validCorporate(), topicOther: 'Also this' })
-    expect(result).toMatchObject({
-      ok: false,
-      error: 'Provide exactly one of "topicCourse" or "topicOther".',
-    })
+  it('rejects a missing REQUIRED configured field (topic)', () => {
+    const result = run(corporateWithAnswers([{ id: 'participants', value: '6–10' }]))
+    expect(result).toMatchObject({ ok: false, error: '"Topic / course" is required.' })
   })
 
   it.each(['companyName', 'contactPerson', 'email'])('rejects a missing required %s', (key) => {
-    const body: Record<string, unknown> = validCorporate()
+    const body = validCorporate()
     delete body[key]
-    expect(validateLeadInput(body).ok).toBe(false)
+    expect(run(body).ok).toBe(false)
   })
 
-  it('treats participantsRange as optional but rejects an empty one', () => {
-    const body: Record<string, unknown> = validCorporate()
-    delete body.participantsRange
-    expect(validateLeadInput(body).ok).toBe(true)
-    expect(validateLeadInput({ ...validCorporate(), participantsRange: '  ' }).ok).toBe(false)
+  it('rejects an empty text answer but accepts the field being omitted', () => {
+    expect(
+      run(
+        corporateWithAnswers([
+          { id: 'participants', value: '   ' },
+          { id: 'topic', courseId: 1 },
+        ]),
+      ).ok,
+    ).toBe(false)
+    expect(run(corporateWithAnswers([{ id: 'topic', courseId: 1 }])).ok).toBe(true)
   })
 
-  it('accepts a preferredPeriod with from <= to and normalizes to ISO', () => {
-    const result = validateLeadInput({
-      ...validCorporate(),
-      preferredPeriod: { from: '2026-09-01', to: '2026-09-30' },
-    })
+  it('accepts a period with from <= to and normalizes to ISO', () => {
+    const result = run(
+      corporateWithAnswers([
+        { id: 'topic', courseId: 1 },
+        { id: 'period', from: '2026-09-01', to: '2026-09-30' },
+      ]),
+    ) as { ok: true; value: NormalizedCorporateLead }
     expect(result.ok).toBe(true)
-    const period = (result as { ok: true; value: NormalizedCorporateLead }).value.preferredPeriod
+    const period = result.value.answers.find((answer) => answer.fieldId === 'period')
     expect(period?.from).toBe(new Date('2026-09-01').toISOString())
     expect(period?.to).toBe(new Date('2026-09-30').toISOString())
   })
 
-  it('accepts an open-ended preferredPeriod (only from, or only to)', () => {
+  it('accepts an open-ended period (only from, or only to)', () => {
     expect(
-      validateLeadInput({ ...validCorporate(), preferredPeriod: { from: '2026-09-01' } }).ok,
+      run(corporateWithAnswers([{ id: 'topic', courseId: 1 }, { id: 'period', from: '2026-09-01' }]))
+        .ok,
     ).toBe(true)
     expect(
-      validateLeadInput({ ...validCorporate(), preferredPeriod: { to: '2026-09-30' } }).ok,
+      run(corporateWithAnswers([{ id: 'topic', courseId: 1 }, { id: 'period', to: '2026-09-30' }]))
+        .ok,
     ).toBe(true)
   })
 
-  it('rejects a preferredPeriod with from AFTER to', () => {
+  it('rejects a period with from AFTER to, unparsable dates, or unknown keys', () => {
+    expect(
+      run(
+        corporateWithAnswers([
+          { id: 'topic', courseId: 1 },
+          { id: 'period', from: '2026-10-01', to: '2026-09-01' },
+        ]),
+      ),
+    ).toMatchObject({ ok: false, error: '"Preferred period": "from" must be on or before "to".' })
+    expect(
+      run(corporateWithAnswers([{ id: 'topic', courseId: 1 }, { id: 'period', from: 'next week' }]))
+        .ok,
+    ).toBe(false)
+    expect(
+      run(
+        corporateWithAnswers([
+          { id: 'topic', courseId: 1 },
+          { id: 'period', from: '2026-09-01', tz: 'UTC' },
+        ]),
+      ).ok,
+    ).toBe(false)
+  })
+
+  it('enforces select options and e-mail format on configured fields', () => {
+    expect(
+      run(corporateWithAnswers([{ id: 'topic', courseId: 1 }, { id: 'dept', value: 'IT' }])).ok,
+    ).toBe(true)
+    expect(
+      run(corporateWithAnswers([{ id: 'topic', courseId: 1 }, { id: 'dept', value: 'Sales' }])).ok,
+    ).toBe(false)
+    expect(
+      run(
+        corporateWithAnswers([
+          { id: 'topic', courseId: 1 },
+          { id: 'billing', value: 'not-an-email' },
+        ]),
+      ).ok,
+    ).toBe(false)
+  })
+
+  it('rejects answers for fields outside the config, and duplicates', () => {
+    expect(
+      run(corporateWithAnswers([{ id: 'topic', courseId: 1 }, { id: 'ghost', value: 'x' }])).ok,
+    ).toBe(false)
+    expect(
+      run(
+        corporateWithAnswers([
+          { id: 'topic', courseId: 1 },
+          { id: 'topic', other: 'again' },
+        ]),
+      ),
+    ).toMatchObject({ ok: false, error: 'Duplicate answer for form field "topic".' })
+  })
+
+  it('rejects unknown top-level fields and legacy/contact-only fields', () => {
+    expect(run({ ...validCorporate(), pricing: { total: 0 } }).ok).toBe(false)
+    expect(run({ ...validCorporate(), subject: 'corporate' }).ok).toBe(false)
+    expect(run({ ...validCorporate(), participantsRange: '6-10' }).ok).toBe(false)
+  })
+
+  it('falls back to the built-in default fields when no config is passed', () => {
     const result = validateLeadInput({
       ...validCorporate(),
-      preferredPeriod: { from: '2026-10-01', to: '2026-09-01' },
+      answers: [{ id: 'default-topic', courseId: 7 }],
     })
-    expect(result).toMatchObject({
-      ok: false,
-      error: '"preferredPeriod.from" must be on or before "preferredPeriod.to".',
-    })
-  })
-
-  it('rejects unparsable preferredPeriod dates and unknown period keys', () => {
+    expect(result.ok).toBe(true)
     expect(
-      validateLeadInput({ ...validCorporate(), preferredPeriod: { from: 'next week' } }).ok,
+      validateLeadInput({ ...validCorporate(), answers: [{ id: 'topic', courseId: 7 }] }).ok,
     ).toBe(false)
-    expect(
-      validateLeadInput({ ...validCorporate(), preferredPeriod: { from: '2026-09-01', tz: 'UTC' } }).ok,
-    ).toBe(false)
-  })
-
-  it('rejects unknown fields and contact-only fields on a corporate lead', () => {
-    expect(validateLeadInput({ ...validCorporate(), pricing: { total: 0 } }).ok).toBe(false)
-    expect(validateLeadInput({ ...validCorporate(), subject: 'corporate' }).ok).toBe(false)
   })
 })

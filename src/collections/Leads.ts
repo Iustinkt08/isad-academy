@@ -137,6 +137,25 @@ export const Leads: CollectionConfig = {
         condition: (_, siblingData) => siblingData?.type === 'corporate',
       },
     },
+    // Owner 2026-08-12 (dynamic corporate form): the answers to the admin-configured form
+    // fields, as label/value pairs in form order. Written only by `createLead`; read-only
+    // in the dashboard so the submitted answers stay a faithful record.
+    {
+      name: 'formData',
+      type: 'array',
+      admin: {
+        readOnly: true,
+        description: {
+          en: 'Corporate form only: the visitor\'s answers to the configurable form fields (set up on the Corporate Page global), exactly as submitted.',
+          ro: 'Doar pentru formularul Corporate: răspunsurile vizitatorului la câmpurile configurabile ale formularului (definite în globalul Corporate Page), exact cum au fost trimise.',
+        },
+        condition: (_, siblingData) => siblingData?.type === 'corporate',
+      },
+      fields: [
+        { name: 'label', type: 'text' },
+        { name: 'value', type: 'textarea' },
+      ],
+    },
     {
       name: 'preferredPeriod',
       type: 'group',

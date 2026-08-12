@@ -28,20 +28,23 @@ describe('leads (int)', () => {
     await payload.db.destroy?.()
   })
 
-  it('allows public creation (contact + corporate lead forms submit anonymously)', async () => {
-    const lead = await payload.create({
-      collection: 'leads',
-      data: {
-        type: 'contact',
-        name: `Anon Visitor ${RUN_ID}`,
-        email: `anon-${RUN_ID}@example.com`,
-        subject: 'course',
-        message: 'Tell me more about the ISO 42001 course.',
-      },
-      overrideAccess: false,
-    })
-
-    expect(lead.id).toBeDefined()
+  // Securitate (commit 72b59d9): Payload's own create endpoint is NO LONGER a public
+  // bypass — anonymous submissions go exclusively through the hardened
+  // POST /api/leads/submit (covered by leads-route.int.spec.ts).
+  it('denies anonymous DIRECT creation — the public path is /api/leads/submit only', async () => {
+    await expect(
+      payload.create({
+        collection: 'leads',
+        data: {
+          type: 'contact',
+          name: `Anon Visitor ${RUN_ID}`,
+          email: `anon-${RUN_ID}@example.com`,
+          subject: 'course',
+          message: 'Tell me more about the ISO 42001 course.',
+        },
+        overrideAccess: false,
+      }),
+    ).rejects.toThrow()
   })
 
   it('denies public reads', async () => {
@@ -74,7 +77,8 @@ describe('leads (int)', () => {
         subject: 'certification',
         message: 'What does the CPD credential cover?',
       },
-      overrideAccess: false,
+      // Persistence test — writes exactly like the hardened service (createLead) does.
+      overrideAccess: true,
     })
 
     expect(lead.subject).toBe('certification')
@@ -93,7 +97,7 @@ describe('leads (int)', () => {
         topicCourse: courseId,
         preferredPeriod: { from: new Date().toISOString(), to: new Date(Date.now() + 30 * 86400000).toISOString() },
       },
-      overrideAccess: false,
+      overrideAccess: true,
     })
 
     const fetched = await payload.findByID({
@@ -122,7 +126,7 @@ describe('leads (int)', () => {
         participantsRange: '5-10',
         topicOther: 'Custom in-house fraud detection workshop',
       },
-      overrideAccess: false,
+      overrideAccess: true,
     })
 
     expect(lead.topicOther).toBe('Custom in-house fraud detection workshop')

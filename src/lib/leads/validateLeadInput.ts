@@ -12,11 +12,17 @@
  * the empty honeypot input does not 400.
  */
 
+import {
+  defaultCorporateFormFields,
+  type CorporateFieldType,
+  type CorporateFormField,
+} from '../corporate/formConfig'
+import { getDictionary } from '../i18n/dictionaries'
+
 const MAX_NAME_LENGTH = 200
 const MAX_EMAIL_LENGTH = 254
 const MAX_TEXT_LENGTH = 300
 const MAX_MESSAGE_LENGTH = 5_000
-const MAX_RANGE_LENGTH = 50
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -27,22 +33,10 @@ export const CONTACT_SUBJECTS = ['course', 'corporate', 'certification', 'other'
 export type ContactSubject = (typeof CONTACT_SUBJECTS)[number]
 
 const ALLOWED_CONTACT_KEYS = ['type', 'name', 'email', 'phone', 'subject', 'message', HONEYPOT_FIELD]
-const ALLOWED_CORPORATE_KEYS = [
-  'type',
-  'companyName',
-  'contactPerson',
-  'email',
-  'phone',
-  'participantsRange',
-  'topicCourse',
-  'topicOther',
-  'preferredPeriod',
-  // Optional free-text goals (§4 lists `message` among the common lead fields; the corporate
-  // form gained the box with the 2026-07-13 Figma redesign).
-  'message',
-  HONEYPOT_FIELD,
-]
-const ALLOWED_PERIOD_KEYS = ['from', 'to']
+// Corporate (owner 2026-08-12, dynamic form): only the fixed core trio plus the
+// config-driven `answers` — everything else lives in the admin-configured field list.
+const ALLOWED_CORPORATE_KEYS = ['type', 'companyName', 'contactPerson', 'email', 'answers', HONEYPOT_FIELD]
+const ALLOWED_ANSWER_KEYS = ['id', 'value', 'from', 'to', 'courseId', 'other']
 
 export type NormalizedContactLead = {
   type: 'contact'
@@ -53,18 +47,28 @@ export type NormalizedContactLead = {
   message: string
 }
 
+/** One validated answer of the dynamic corporate form, still structured per field type —
+ * `createLead` flattens it into the lead's `formData` label/value rows. */
+export type NormalizedCorporateAnswer = {
+  fieldId: string
+  label: string
+  fieldType: CorporateFieldType
+  /** text | email | phone | textarea | select */
+  value?: string
+  /** period — ISO strings, `from <= to` already enforced */
+  from?: string
+  to?: string
+  /** courseTopic — EXISTENCE of the course id is verified in `createLead`, not here. */
+  courseId?: number
+  other?: string
+}
+
 export type NormalizedCorporateLead = {
   type: 'corporate'
   companyName: string
   contactPerson: string
   email: string
-  phone?: string
-  participantsRange?: string
-  /** Course id — EXISTENCE is verified against the CMS in `createLead`, not here. */
-  topicCourse?: number
-  topicOther?: string
-  preferredPeriod?: { from?: string; to?: string }
-  message?: string
+  answers: NormalizedCorporateAnswer[]
 }
 
 export type NormalizedLeadInput = NormalizedContactLead | NormalizedCorporateLead
@@ -136,21 +140,106 @@ const validateContact = (raw: Record<string, unknown>): LeadValidationResult => 
   }
 }
 
-const validateCorporate = (raw: Record<string, unknown>): LeadValidationResult => {
+/** One answer of the dynamic form, validated against ITS configured field. */
+const validateAnswer = (
+  raw: Record<string, unknown>,
+  field: CorporateFormField,
+): { ok: true; value: NormalizedCorporateAnswer } | { ok: false; error: string } => {
+  const base: NormalizedCorporateAnswer = {
+    fieldId: field.id,
+    label: field.label,
+    fieldType: field.fieldType,
+  }
+  const { value, from, to, courseId, other } = raw
+  const fail = (error: string): { ok: false; error: string } => ({ ok: false, error })
+
+  switch (field.fieldType) {
+    case 'textarea': {
+      if (!isNonEmptyString(value, MAX_MESSAGE_LENGTH)) {
+        return fail(`"${field.label}" must be a non-empty string.`)
+      }
+      return { ok: true, value: { ...base, value: value.trim() } }
+    }
+    case 'email': {
+      if (!isValidEmail(value)) {
+        return fail(`"${field.label}" must be a valid e-mail address.`)
+      }
+      return { ok: true, value: { ...base, value: value.trim() } }
+    }
+    case 'select': {
+      if (!isNonEmptyString(value, MAX_TEXT_LENGTH) || !field.options.includes(value.trim())) {
+        return fail(`"${field.label}" must be one of its listed options.`)
+      }
+      return { ok: true, value: { ...base, value: value.trim() } }
+    }
+    case 'period': {
+      let fromTime: number | null = null
+      let toTime: number | null = null
+      if (from !== undefined) {
+        fromTime = parseDate(from)
+        if (fromTime === null) return fail(`"${field.label}": "from" must be a valid date.`)
+      }
+      if (to !== undefined) {
+        toTime = parseDate(to)
+        if (toTime === null) return fail(`"${field.label}": "to" must be a valid date.`)
+      }
+      if (fromTime === null && toTime === null) {
+        return fail(`"${field.label}" needs at least one of "from"/"to".`)
+      }
+      if (fromTime !== null && toTime !== null && fromTime > toTime) {
+        return fail(`"${field.label}": "from" must be on or before "to".`)
+      }
+      return {
+        ok: true,
+        value: {
+          ...base,
+          from: fromTime !== null ? new Date(fromTime).toISOString() : undefined,
+          to: toTime !== null ? new Date(toTime).toISOString() : undefined,
+        },
+      }
+    }
+    case 'courseTopic': {
+      // Exactly ONE of catalog course (id) or free-text "other" (§4, §6 Corporate).
+      const hasCourse = courseId !== undefined && courseId !== null
+      const hasOther = other !== undefined && other !== null
+      if (hasCourse === hasOther) {
+        return fail(`"${field.label}": provide exactly one of "courseId" or "other".`)
+      }
+      if (hasCourse) {
+        const id =
+          typeof courseId === 'number'
+            ? courseId
+            : typeof courseId === 'string' && /^\d+$/.test(courseId.trim())
+              ? Number(courseId.trim())
+              : NaN
+        if (!Number.isInteger(id) || id < 1) {
+          return fail(`"${field.label}": "courseId" must be a course id.`)
+        }
+        return { ok: true, value: { ...base, courseId: id } }
+      }
+      if (!isNonEmptyString(other, MAX_TEXT_LENGTH)) {
+        return fail(`"${field.label}": "other" must be a non-empty string.`)
+      }
+      return { ok: true, value: { ...base, other: other.trim() } }
+    }
+    // text | phone
+    default: {
+      if (!isNonEmptyString(value, MAX_TEXT_LENGTH)) {
+        return fail(`"${field.label}" must be a non-empty string.`)
+      }
+      return { ok: true, value: { ...base, value: value.trim() } }
+    }
+  }
+}
+
+const validateCorporate = (
+  raw: Record<string, unknown>,
+  fields: CorporateFormField[],
+): LeadValidationResult => {
   const unknownError = rejectUnknownKeys(raw, ALLOWED_CORPORATE_KEYS, 'request body')
   if (unknownError) return { ok: false, error: unknownError }
 
-  const {
-    companyName,
-    contactPerson,
-    email,
-    phone,
-    participantsRange,
-    topicCourse,
-    topicOther,
-    preferredPeriod,
-    message,
-  } = raw
+  const { companyName, contactPerson, email, answers } = raw
 
   if (!isNonEmptyString(companyName, MAX_TEXT_LENGTH)) {
     return { ok: false, error: '"companyName" is required.' }
@@ -161,80 +250,49 @@ const validateCorporate = (raw: Record<string, unknown>): LeadValidationResult =
   if (!isValidEmail(email)) {
     return { ok: false, error: '"email" must be a valid e-mail address.' }
   }
-  if (phone !== undefined && !isNonEmptyString(phone, MAX_TEXT_LENGTH)) {
-    return { ok: false, error: '"phone" must be a non-empty string.' }
-  }
-  if (participantsRange !== undefined && !isNonEmptyString(participantsRange, MAX_RANGE_LENGTH)) {
-    return { ok: false, error: '"participantsRange" must be a non-empty string.' }
-  }
-  if (message !== undefined && !isNonEmptyString(message, MAX_MESSAGE_LENGTH)) {
-    return { ok: false, error: '"message" must be a non-empty string.' }
-  }
 
-  // Topic: exactly ONE of catalog course (id) or free-text "other" (§4, §6 Corporate).
-  const hasCourse = topicCourse !== undefined && topicCourse !== null
-  const hasOther = topicOther !== undefined && topicOther !== null
-  if (hasCourse === hasOther) {
-    return { ok: false, error: 'Provide exactly one of "topicCourse" or "topicOther".' }
+  if (answers !== undefined && !Array.isArray(answers)) {
+    return { ok: false, error: '"answers" must be an array.' }
   }
+  const rawAnswers = (answers ?? []) as unknown[]
 
-  let normalizedTopicCourse: number | undefined
-  if (hasCourse) {
-    const id =
-      typeof topicCourse === 'number'
-        ? topicCourse
-        : typeof topicCourse === 'string' && /^\d+$/.test(topicCourse.trim())
-          ? Number(topicCourse.trim())
-          : NaN
-    if (!Number.isInteger(id) || id < 1) {
-      return { ok: false, error: '"topicCourse" must be a course id.' }
+  // Allow-list by configured field id (mass-assignment hygiene: an answer the current
+  // form config does not contain is rejected outright), no duplicates.
+  const byId = new Map(fields.map((field) => [field.id, field]))
+  const seen = new Set<string>()
+  const normalizedAnswers: NormalizedCorporateAnswer[] = []
+
+  for (const [index, entry] of rawAnswers.entries()) {
+    if (!isPlainObject(entry)) {
+      return { ok: false, error: `"answers[${index}]" must be an object.` }
     }
-    normalizedTopicCourse = id
-  }
+    const unknownAnswerError = rejectUnknownKeys(entry, ALLOWED_ANSWER_KEYS, `answers[${index}]`)
+    if (unknownAnswerError) return { ok: false, error: unknownAnswerError }
 
-  let normalizedTopicOther: string | undefined
-  if (hasOther) {
-    if (!isNonEmptyString(topicOther, MAX_TEXT_LENGTH)) {
-      return { ok: false, error: '"topicOther" must be a non-empty string.' }
+    const id = entry.id
+    if (typeof id !== 'string' || !byId.has(id)) {
+      return { ok: false, error: `"answers[${index}].id" does not match a form field.` }
     }
-    normalizedTopicOther = topicOther.trim()
+    if (seen.has(id)) {
+      return { ok: false, error: `Duplicate answer for form field "${id}".` }
+    }
+    seen.add(id)
+
+    const validated = validateAnswer(entry, byId.get(id)!)
+    if (!validated.ok) return validated
+    normalizedAnswers.push(validated.value)
   }
 
-  let normalizedPeriod: { from?: string; to?: string } | undefined
-  if (preferredPeriod !== undefined) {
-    if (!isPlainObject(preferredPeriod)) {
-      return { ok: false, error: '"preferredPeriod" must be an object with "from"/"to" dates.' }
-    }
-    const periodError = rejectUnknownKeys(preferredPeriod, ALLOWED_PERIOD_KEYS, 'preferredPeriod')
-    if (periodError) return { ok: false, error: periodError }
-
-    const { from, to } = preferredPeriod
-    let fromTime: number | null = null
-    let toTime: number | null = null
-
-    if (from !== undefined) {
-      fromTime = parseDate(from)
-      if (fromTime === null) {
-        return { ok: false, error: '"preferredPeriod.from" must be a valid date.' }
-      }
-    }
-    if (to !== undefined) {
-      toTime = parseDate(to)
-      if (toTime === null) {
-        return { ok: false, error: '"preferredPeriod.to" must be a valid date.' }
-      }
-    }
-    if (fromTime !== null && toTime !== null && fromTime > toTime) {
-      return { ok: false, error: '"preferredPeriod.from" must be on or before "preferredPeriod.to".' }
-    }
-
-    if (fromTime !== null || toTime !== null) {
-      normalizedPeriod = {
-        from: fromTime !== null ? new Date(fromTime).toISOString() : undefined,
-        to: toTime !== null ? new Date(toTime).toISOString() : undefined,
-      }
+  for (const field of fields) {
+    if (field.required && !seen.has(field.id)) {
+      return { ok: false, error: `"${field.label}" is required.` }
     }
   }
+
+  // Keep the answers in the CONFIGURED field order regardless of submission order —
+  // formData rows and the notification e-mail then always mirror the admin's form.
+  const order = new Map(fields.map((field, index) => [field.id, index]))
+  normalizedAnswers.sort((a, b) => (order.get(a.fieldId) ?? 0) - (order.get(b.fieldId) ?? 0))
 
   return {
     ok: true,
@@ -243,23 +301,26 @@ const validateCorporate = (raw: Record<string, unknown>): LeadValidationResult =
       companyName: companyName.trim(),
       contactPerson: contactPerson.trim(),
       email: email.trim(),
-      phone: phone !== undefined ? phone.trim() : undefined,
-      participantsRange: participantsRange !== undefined ? participantsRange.trim() : undefined,
-      topicCourse: normalizedTopicCourse,
-      topicOther: normalizedTopicOther,
-      preferredPeriod: normalizedPeriod,
-      message: message !== undefined && typeof message === 'string' ? message.trim() : undefined,
+      answers: normalizedAnswers,
     },
   }
 }
 
-export const validateLeadInput = (raw: unknown): LeadValidationResult => {
+/**
+ * `corporateFields` = the CURRENT form configuration (resolved from the `corporatePage`
+ * global by the caller — see `createLead`); it defaults to the built-in field set so a
+ * missing/unreadable global can never take the form down.
+ */
+export const validateLeadInput = (
+  raw: unknown,
+  corporateFields: CorporateFormField[] = defaultCorporateFormFields(getDictionary('en')),
+): LeadValidationResult => {
   if (!isPlainObject(raw)) {
     return { ok: false, error: 'Request body must be a JSON object.' }
   }
 
   const { type } = raw
   if (type === 'contact') return validateContact(raw)
-  if (type === 'corporate') return validateCorporate(raw)
+  if (type === 'corporate') return validateCorporate(raw, corporateFields)
   return { ok: false, error: '"type" must be "contact" or "corporate".' }
 }

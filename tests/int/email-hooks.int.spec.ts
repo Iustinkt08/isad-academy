@@ -199,7 +199,9 @@ describe('email hooks (int) — T7', () => {
           subject: 'course',
           message: 'Tell me more.',
         },
-        overrideAccess: false,
+        // Leads direct-create is admin-only since 72b59d9; the hook fires on create
+        // regardless of the caller, exactly like the hardened createLead service.
+        overrideAccess: true,
       })
 
       expect(fake.calls).toHaveLength(1)
@@ -227,7 +229,9 @@ describe('email hooks (int) — T7', () => {
           email: uniqueEmail('lead-fail'),
           subject: 'other',
         },
-        overrideAccess: false,
+        // Leads direct-create is admin-only since 72b59d9; the hook fires on create
+        // regardless of the caller, exactly like the hardened createLead service.
+        overrideAccess: true,
       })
 
       expect(lead.id).toBeDefined()
@@ -250,7 +254,9 @@ describe('email hooks (int) — T7', () => {
           email: uniqueEmail('no-notify'),
           subject: 'other',
         },
-        overrideAccess: false,
+        // Leads direct-create is admin-only since 72b59d9; the hook fires on create
+        // regardless of the caller, exactly like the hardened createLead service.
+        overrideAccess: true,
       })
 
       expect(lead.id).toBeDefined()

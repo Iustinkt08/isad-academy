@@ -389,6 +389,7 @@ const en = {
         topicOther: 'Please describe the topic you have in mind.',
         periodParse: 'Please enter the preferred period as dates (e.g. 2026-09-01).',
         periodOrder: 'The start of the preferred period must be before its end.',
+        required: (label: string) => `Please fill in "${label}".`,
         generic: 'Something went wrong. Please try again later.',
       },
       submit: 'Request proposal',
@@ -406,6 +407,11 @@ const en = {
       talkTitle: 'Prefer to talk directly?',
       talkNote: 'Mon-Fri · we reply by e-mail',
     },
+  },
+  // Partners logo strip (owner 2026-08-12) — homepage above the FAQ + /corporate above
+  // the form; hidden entirely while the `partners` collection is empty.
+  partnersStrip: {
+    ariaLabel: 'Our partners',
   },
   about: {
     metaTitle: 'About us',
@@ -1304,6 +1310,7 @@ const ro: Dictionary = {
         topicOther: 'Te rugăm să descrii tema pe care o ai în minte.',
         periodParse: 'Te rugăm să introduci perioada preferată ca date (ex. 2026-09-01).',
         periodOrder: 'Începutul perioadei preferate trebuie să fie înaintea sfârșitului ei.',
+        required: (label: string) => `Te rugăm să completezi „${label}".`,
         generic: 'Ceva nu a mers bine. Te rugăm să încerci din nou mai târziu.',
       },
       submit: 'Solicită o ofertă',
@@ -1321,6 +1328,9 @@ const ro: Dictionary = {
       talkTitle: 'Preferi să vorbim direct?',
       talkNote: 'Luni-vineri · răspundem pe e-mail',
     },
+  },
+  partnersStrip: {
+    ariaLabel: 'Partenerii noștri',
   },
   about: {
     metaTitle: 'Despre noi',
