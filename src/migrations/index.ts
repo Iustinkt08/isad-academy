@@ -9,6 +9,7 @@ import * as migration_20260807_125555_legal_pages_blocks from './20260807_125555
 import * as migration_20260807_142339_retire_legacy_event_popup from './20260807_142339_retire_legacy_event_popup';
 import * as migration_20260808_115522_drop_unused_owner_fields from './20260808_115522_drop_unused_owner_fields';
 import * as migration_20260812_140836_courses_trainers_corporate_partners from './20260812_140836_courses_trainers_corporate_partners';
+import * as migration_20260812_160828_courses_trainers_many from './20260812_160828_courses_trainers_many';
 
 export const migrations = [
   {
@@ -64,6 +65,11 @@ export const migrations = [
   {
     up: migration_20260812_140836_courses_trainers_corporate_partners.up,
     down: migration_20260812_140836_courses_trainers_corporate_partners.down,
-    name: '20260812_140836_courses_trainers_corporate_partners'
+    name: '20260812_140836_courses_trainers_corporate_partners',
+  },
+  {
+    up: migration_20260812_160828_courses_trainers_many.up,
+    down: migration_20260812_160828_courses_trainers_many.down,
+    name: '20260812_160828_courses_trainers_many'
   },
 ];

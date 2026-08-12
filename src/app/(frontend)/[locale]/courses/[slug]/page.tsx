@@ -308,9 +308,11 @@ export default async function CourseDetailPage({ params }: Args) {
   const credits = cpdCredits(course)
   const isPecbTrack = course.category === 'iso'
 
-  /* ——— Trainer mini-card (owner 2026-08-12): course trainer, or the Silviu default ——— */
-  const trainer = course.trainer && typeof course.trainer === 'object' ? course.trainer : null
-  const trainerPhotoUrl = trainer ? (asMedia(trainer.photo)?.url ?? null) : null
+  /* ——— Trainer mini-cards (owner 2026-08-12): course trainers (multiple, one card
+         each, in the set order), or the single Silviu default when none are picked ——— */
+  const trainers = (course.trainers ?? []).filter(
+    (entry) => typeof entry === 'object' && entry !== null,
+  )
 
   /* ——— Header data (redesign: no meta chips, no Share) ——— */
   const titleWords = course.title.trim().replace(/\.$/, '').split(/\s+/)
@@ -404,16 +406,22 @@ export default async function CourseDetailPage({ params }: Args) {
                 <NewsletterForm tone="light" locale={locale} />
               </div>
             )}
-            <ExpertMiniCard
-              locale={locale}
-              {...(trainer
-                ? {
-                    name: trainer.name,
-                    role: trainer.role ?? null,
-                    ...(trainerPhotoUrl ? { photo: trainerPhotoUrl } : {}),
-                  }
-                : {})}
-            />
+            {trainers.length > 0 ? (
+              trainers.map((trainer) => {
+                const photoUrl = asMedia(trainer.photo)?.url
+                return (
+                  <ExpertMiniCard
+                    key={trainer.id}
+                    locale={locale}
+                    name={trainer.name}
+                    role={trainer.role ?? null}
+                    {...(photoUrl ? { photo: photoUrl } : {})}
+                  />
+                )
+              })
+            ) : (
+              <ExpertMiniCard locale={locale} />
+            )}
           </Reveal>
         </aside>
       </Container>

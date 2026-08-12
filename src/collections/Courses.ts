@@ -131,18 +131,18 @@ export const Courses: CollectionConfig = {
         },
       ],
     },
-    // Owner 2026-08-12: the trainer profile shown under the enrolment card on the course
-    // page. Empty = the site default (Dr. Silviu Gresoi); pick an entry from Trainers to
-    // show someone else.
+    // Owner 2026-08-12 (v2, same day): the trainer profiles shown under the enrolment
+    // card on the course page — MULTIPLE allowed, one card each, in the order set here.
+    // Empty = the site default (Dr. Silviu Gresoi).
     {
-      name: 'trainer',
+      name: 'trainers',
       type: 'relationship',
       relationTo: 'trainers',
-      hasMany: false,
+      hasMany: true,
       admin: {
         description: {
-          en: 'The trainer profile shown on the course page, under the enrolment card. Leave empty to show the default (Dr. Silviu Gresoi); add other trainers in the Trainers collection.',
-          ro: 'Profilul de trainer afișat pe pagina cursului, sub cardul de înscriere. Lăsați gol pentru trainerul implicit (Dr. Silviu Gresoi); alți traineri se adaugă în colecția Trainers.',
+          en: 'The trainer profiles shown on the course page, under the enrolment card — one card per trainer, in this order. Leave empty to show the default (Dr. Silviu Gresoi); add trainers in the Trainers collection.',
+          ro: 'Profilurile de trainer afișate pe pagina cursului, sub cardul de înscriere — câte un card per trainer, în ordinea de aici. Lăsați gol pentru trainerul implicit (Dr. Silviu Gresoi); trainerii se adaugă în colecția Trainers.',
         },
       },
     },

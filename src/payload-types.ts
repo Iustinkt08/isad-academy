@@ -272,9 +272,9 @@ export interface Course {
       }[]
     | null;
   /**
-   * The trainer profile shown on the course page, under the enrolment card. Leave empty to show the default (Dr. Silviu Gresoi); add other trainers in the Trainers collection.
+   * The trainer profiles shown on the course page, under the enrolment card — one card per trainer, in this order. Leave empty to show the default (Dr. Silviu Gresoi); add trainers in the Trainers collection.
    */
-  trainer?: (number | null) | Trainer;
+  trainers?: (number | Trainer)[] | null;
   /**
    * CPD credits shown on the course page. Calculated automatically as 1 credit per course hour from Duration (hours); this field is used only when Duration is empty.
    */
@@ -1406,7 +1406,7 @@ export interface CoursesSelect<T extends boolean = true> {
         text?: T;
         id?: T;
       };
-  trainer?: T;
+  trainers?: T;
   certificationCredits?: T;
   sessions?: T;
   quizProfile?:
