@@ -1,12 +1,35 @@
 import { BlocksFeature, lexicalEditor, TextStateFeature } from '@payloadcms/richtext-lexical'
-import type { CollectionConfig } from 'payload'
+import type { CollectionBeforeChangeHook, CollectionConfig } from 'payload'
 
 import { isAdmin } from '../access/isAdmin'
 import { codeBlock } from '../fields/richTextBlocks'
 import { revalidateSiteHook } from '../lib/revalidateSite'
+import { htmlSourceToLexical, lexicalToHtmlSource } from '../lib/richtext/htmlSource'
 import { TEXT_STATE_PRESETS } from '../lib/richtext/textState'
 import { publicOrPublished } from '../access/publicOrPublished'
 import { slugField } from '../fields/slug'
+
+/**
+ * Code view for the description (owner 2026-08-12): `descriptionHtml` is a VIRTUAL code
+ * field that always displays the CURRENT description as HTML (afterRead below). On save,
+ * this hook converts the submitted HTML back into the rich text — but ONLY when the HTML
+ * actually differs from the HTML of the stored description, so purely visual edits (or
+ * an untouched code view) never round-trip and never lose fidelity.
+ */
+const applyDescriptionHtml: CollectionBeforeChangeHook = async ({ data, originalDoc, req }) => {
+  const incoming = data?.descriptionHtml
+  if (typeof incoming !== 'string') return data
+
+  const normalize = (html: string) => html.replace(/\s+/g, ' ').trim()
+  // An empty code view never wipes the description — clearing happens in the editor.
+  if (normalize(incoming).length === 0) return data
+
+  const currentHtml = lexicalToHtmlSource(originalDoc?.description ?? data?.description)
+  if (normalize(incoming) === normalize(currentHtml)) return data
+
+  data.description = await htmlSourceToLexical(incoming, req.payload.config)
+  return data
+}
 
 /**
  * Teaser + shared content for a course (CLAUDE.md §4). Dates, prices and seats live on
@@ -36,6 +59,7 @@ export const Courses: CollectionConfig = {
   },
   // Static frontend (EN + /ro) regenerates after every dashboard save.
   hooks: {
+    beforeChange: [applyDescriptionHtml],
     afterChange: [revalidateSiteHook],
     afterDelete: [revalidateSiteHook],
   },
@@ -107,6 +131,25 @@ export const Courses: CollectionConfig = {
           en: 'Full course description shown on the course page, below the header. Formatting (titles, quotes, colors, code blocks) renders on the site exactly as set here.',
           ro: 'Descrierea completă a cursului, afișată pe pagina acestuia, sub antet. Formatarea (titluri, citate, culori, blocuri de cod) apare pe site exact cum este setată aici.',
         },
+      },
+    },
+    // Code view (owner 2026-08-12): the SAME description as editable HTML source. Virtual
+    // (never stored) — afterRead derives it from `description`; the collection's
+    // beforeChange hook (applyDescriptionHtml) converts an EDITED source back.
+    {
+      name: 'descriptionHtml',
+      type: 'code',
+      virtual: true,
+      label: { en: 'Description — HTML (code view)', ro: 'Descriere — HTML (code view)' },
+      admin: {
+        language: 'html',
+        description: {
+          en: 'The description above, as HTML. Edit it here and save to replace the description with the parsed HTML (standard tags: h1-h6, p, blockquote, ul/ol, a, strong/em…). Note: brand colors and code blocks only survive when edited in the visual editor, not through HTML.',
+          ro: 'Descrierea de mai sus, ca HTML. Editați aici și salvați pentru a înlocui descrierea cu HTML-ul interpretat (taguri standard: h1-h6, p, blockquote, ul/ol, a, strong/em…). Notă: culorile de brand și blocurile de cod se păstrează doar din editorul vizual, nu prin HTML.',
+        },
+      },
+      hooks: {
+        afterRead: [({ siblingData }) => lexicalToHtmlSource(siblingData?.description)],
       },
     },
     {

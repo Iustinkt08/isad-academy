@@ -263,6 +263,10 @@ export interface Course {
     [k: string]: unknown;
   } | null;
   /**
+   * The description above, as HTML. Edit it here and save to replace the description with the parsed HTML (standard tags: h1-h6, p, blockquote, ul/ol, a, strong/em…). Note: brand colors and code blocks only survive when edited in the visual editor, not through HTML.
+   */
+  descriptionHtml?: string | null;
+  /**
    * The "Who this course is for" list on the course page. Add one row per bullet point; rows appear on the site in the order set here.
    */
   audience?:
@@ -1400,6 +1404,7 @@ export interface CoursesSelect<T extends boolean = true> {
   durationHours?: T;
   category?: T;
   description?: T;
+  descriptionHtml?: T;
   audience?:
     | T
     | {
