@@ -6,9 +6,13 @@ import { getDictionary } from '../../lib/i18n/dictionaries'
 import { DEFAULT_LOCALE, type Locale } from '../../lib/i18n/config'
 import { GlassPanel } from '../ui/GlassPanel'
 import { cn } from '../ui/cn'
-import { CODE_BLOCK_LANGUAGES, LINK_CHIP_PLATFORMS } from '@/fields/richTextBlocks'
+import {
+  CODE_BLOCK_LANGUAGES,
+  LINK_CHIP_PLATFORMS,
+  type CodeBlockFields,
+} from '@/fields/richTextBlocks'
 import { resolveTextStateStyle } from '@/lib/richtext/textState'
-import type { CodeBlock, DownloadableResourceBlock, LinkChipBlock } from '@/payload-types'
+import type { DownloadableResourceBlock, LinkChipBlock } from '@/payload-types'
 
 /**
  * Server-rendered Lexical rich text with house prose styling (no typography plugin —
@@ -18,7 +22,7 @@ import type { CodeBlock, DownloadableResourceBlock, LinkChipBlock } from '@/payl
  * loosely-typed richText shape Payload generates on collections/globals.
  */
 
-type BlogBlockNode = SerializedBlockNode<DownloadableResourceBlock | LinkChipBlock | CodeBlock>
+type BlogBlockNode = SerializedBlockNode<DownloadableResourceBlock | LinkChipBlock | CodeBlockFields>
 
 const PLATFORM_LABELS: Record<string, string> = Object.fromEntries(
   LINK_CHIP_PLATFORMS.map(({ value, label }) => [value, label]),
@@ -29,7 +33,7 @@ const CODE_LANGUAGE_LABELS: Record<string, string> = Object.fromEntries(
 )
 
 /** Dark monospaced panel for the `codeBlock` block — verbatim code, no highlighter. */
-function CodePanel({ fields }: { fields: CodeBlock }) {
+function CodePanel({ fields }: { fields: CodeBlockFields }) {
   const language =
     fields.language && fields.language !== 'plain'
       ? (CODE_LANGUAGE_LABELS[fields.language] ?? null)
@@ -147,7 +151,7 @@ const jsxConverters =
     downloadableResource: ({ node }) => (
       <DownloadableResource fields={node.fields as DownloadableResourceBlock} locale={locale} />
     ),
-    codeBlock: ({ node }) => <CodePanel fields={node.fields as CodeBlock} />,
+    codeBlock: ({ node }) => <CodePanel fields={node.fields as CodeBlockFields} />,
   },
   })
 

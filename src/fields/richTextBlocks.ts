@@ -61,8 +61,7 @@ export const linkChipBlock: Block = {
   ],
 }
 
-/** Language options for `codeBlock` — labels only inform the reader; the frontend renders
- * plain `<pre><code>` without a syntax highlighter (no client-side JS cost). */
+/** Language labels for LEGACY `codeBlock` content (see CodeBlockFields below). */
 export const CODE_BLOCK_LANGUAGES = [
   { label: 'Plain text', value: 'plain' },
   { label: 'TypeScript', value: 'typescript' },
@@ -76,42 +75,17 @@ export const CODE_BLOCK_LANGUAGES = [
 ] as const
 
 /**
- * Code block for rich text (owner 2026-08-12: "code view" in the course description) —
- * a dedicated block with Payload's `code` field, so code is written verbatim in a real
- * code editor in the admin instead of fighting the prose editor's formatting.
+ * LEGACY shape of the retired `codeBlock` block (owner 2026-08-12: added and removed the
+ * same day — the HTML code view on the course description covers the need). The editor no
+ * longer offers it, but content saved while it existed still renders: RichTextContent and
+ * htmlSource keep converters typed against this shape.
  */
-export const codeBlock: Block = {
-  slug: 'codeBlock',
-  interfaceName: 'CodeBlock',
-  labels: {
-    singular: { en: 'Code block', ro: 'Bloc de cod' },
-    plural: { en: 'Code blocks', ro: 'Blocuri de cod' },
-  },
-  fields: [
-    {
-      name: 'language',
-      type: 'select',
-      defaultValue: 'plain',
-      options: [...CODE_BLOCK_LANGUAGES],
-      admin: {
-        description: {
-          en: 'Shown as a small label on the rendered block.',
-          ro: 'Afișat ca etichetă mică pe blocul randat pe site.',
-        },
-      },
-    },
-    {
-      name: 'code',
-      type: 'code',
-      required: true,
-      admin: {
-        description: {
-          en: 'The code is rendered exactly as written, in a monospaced dark panel.',
-          ro: 'Codul se afișează exact cum este scris, într-un panou întunecat monospaț.',
-        },
-      },
-    },
-  ],
+export type CodeBlockFields = {
+  blockType: 'codeBlock'
+  language?: string | null
+  code: string
+  id?: string | null
+  blockName?: string | null
 }
 
 /** Downloadable resource card — a media file offered inline in the article body. */

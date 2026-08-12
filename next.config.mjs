@@ -36,6 +36,9 @@ const SITE_CSP =
 
 // Panoul Payload (SPA React) are nevoie de 'unsafe-eval'/'unsafe-inline' și de framing
 // same-origin (live preview) — CSP mai permisiv, DOAR pe /admin.
+// `worker-src blob:` (+ `child-src`, fallback-ul Safari): editorul de cod Monaco din
+// câmpurile `code` își pornește workerii ca blob: — fără directivă, default-src 'self'
+// îi blochează și editorul rămâne pe spinner la infinit (owner 2026-08-12).
 const ADMIN_CSP =
   `default-src 'self'; ` +
   `script-src 'self' 'unsafe-inline' 'unsafe-eval'; ` +
@@ -43,6 +46,8 @@ const ADMIN_CSP =
   `img-src 'self' data: blob:; ` +
   `font-src 'self' data:; ` +
   `connect-src 'self'; ` +
+  `worker-src 'self' blob:; ` +
+  `child-src 'self' blob:; ` +
   `frame-ancestors 'self'; base-uri 'self'; object-src 'none'`
 
 /** @type {import('next').NextConfig} */

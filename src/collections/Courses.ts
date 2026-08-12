@@ -1,8 +1,7 @@
-import { BlocksFeature, lexicalEditor, TextStateFeature } from '@payloadcms/richtext-lexical'
+import { lexicalEditor, TextStateFeature } from '@payloadcms/richtext-lexical'
 import type { CollectionBeforeChangeHook, CollectionConfig } from 'payload'
 
 import { isAdmin } from '../access/isAdmin'
-import { codeBlock } from '../fields/richTextBlocks'
 import { revalidateSiteHook } from '../lib/revalidateSite'
 import { htmlSourceToLexical, lexicalToHtmlSource } from '../lib/richtext/htmlSource'
 import { TEXT_STATE_PRESETS } from '../lib/richtext/textState'
@@ -117,19 +116,19 @@ export const Courses: CollectionConfig = {
       type: 'richText',
       localized: true,
       // Owner 2026-08-12: the description renders with FULL formatting on the course page
-      // (headings, quotes, lists…) — plus the blog's named brand colors and a code block
-      // for writing code verbatim. Rendered by src/components/richtext/RichTextContent.tsx.
+      // (headings, quotes, lists…) — plus the blog's named brand colors. The `codeBlock`
+      // feature was REMOVED the same day (owner: unused — the HTML code view below covers
+      // the need); RichTextContent keeps its converter so legacy blocks still render.
       editor: lexicalEditor({
         features: ({ defaultFeatures }) => [
           ...defaultFeatures,
           TextStateFeature({ state: TEXT_STATE_PRESETS }),
-          BlocksFeature({ blocks: [codeBlock] }),
         ],
       }),
       admin: {
         description: {
-          en: 'Full course description shown on the course page, below the header. Formatting (titles, quotes, colors, code blocks) renders on the site exactly as set here.',
-          ro: 'Descrierea completă a cursului, afișată pe pagina acestuia, sub antet. Formatarea (titluri, citate, culori, blocuri de cod) apare pe site exact cum este setată aici.',
+          en: 'Full course description shown on the course page, below the header. Formatting (titles, quotes, colors) renders on the site exactly as set here.',
+          ro: 'Descrierea completă a cursului, afișată pe pagina acestuia, sub antet. Formatarea (titluri, citate, culori) apare pe site exact cum este setată aici.',
         },
       },
     },
@@ -144,8 +143,8 @@ export const Courses: CollectionConfig = {
       admin: {
         language: 'html',
         description: {
-          en: 'The description above, as HTML. Edit it here and save to replace the description with the parsed HTML (standard tags: h1-h6, p, blockquote, ul/ol, a, strong/em…). Note: brand colors and code blocks only survive when edited in the visual editor, not through HTML.',
-          ro: 'Descrierea de mai sus, ca HTML. Editați aici și salvați pentru a înlocui descrierea cu HTML-ul interpretat (taguri standard: h1-h6, p, blockquote, ul/ol, a, strong/em…). Notă: culorile de brand și blocurile de cod se păstrează doar din editorul vizual, nu prin HTML.',
+          en: 'The description above, as editable HTML. Change it here and save — the description is replaced with the parsed HTML (standard tags: h1-h6, p, blockquote, ul/ol, a, strong/em…). Note: brand text colors only survive when set in the visual editor, not through HTML.',
+          ro: 'Descrierea de mai sus, ca HTML editabil. Modificați aici și salvați — descrierea se înlocuiește cu HTML-ul interpretat (taguri standard: h1-h6, p, blockquote, ul/ol, a, strong/em…). Notă: culorile de brand se păstrează doar din editorul vizual, nu prin HTML.',
         },
       },
       hooks: {

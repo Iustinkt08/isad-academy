@@ -7,7 +7,7 @@ import { convertLexicalToHTML, type HTMLConvertersFunction } from '@payloadcms/r
 import { JSDOM } from 'jsdom'
 import type { SanitizedConfig } from 'payload'
 
-import type { CodeBlock } from '../../payload-types'
+import type { CodeBlockFields } from '../../fields/richTextBlocks'
 import { resolveTextStateStyle } from './textState'
 
 /**
@@ -31,7 +31,7 @@ const escapeHtml = (value: string): string =>
 const toHyphen = (property: string): string =>
   property.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)
 
-const htmlConverters: HTMLConvertersFunction<SerializedBlockNode<CodeBlock>> = ({
+const htmlConverters: HTMLConvertersFunction<SerializedBlockNode<CodeBlockFields>> = ({
   defaultConverters,
 }) => ({
   ...defaultConverters,
@@ -51,7 +51,7 @@ const htmlConverters: HTMLConvertersFunction<SerializedBlockNode<CodeBlock>> = (
   },
   blocks: {
     codeBlock: ({ node }) => {
-      const fields = node.fields as CodeBlock
+      const fields = node.fields as CodeBlockFields
       const language = fields.language && fields.language !== 'plain' ? fields.language : ''
       return `<pre${language ? ` data-language="${language}"` : ''}><code>${escapeHtml(fields.code ?? '')}</code></pre>`
     },

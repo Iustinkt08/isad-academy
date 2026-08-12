@@ -245,7 +245,7 @@ export interface Course {
    */
   category?: ('iso' | 'antiFraud' | 'security' | 'other') | null;
   /**
-   * Full course description shown on the course page, below the header. Formatting (titles, quotes, colors, code blocks) renders on the site exactly as set here.
+   * Full course description shown on the course page, below the header. Formatting (titles, quotes, colors) renders on the site exactly as set here.
    */
   description?: {
     root: {
@@ -263,7 +263,7 @@ export interface Course {
     [k: string]: unknown;
   } | null;
   /**
-   * The description above, as HTML. Edit it here and save to replace the description with the parsed HTML (standard tags: h1-h6, p, blockquote, ul/ol, a, strong/em…). Note: brand colors and code blocks only survive when edited in the visual editor, not through HTML.
+   * The description above, as editable HTML. Change it here and save — the description is replaced with the parsed HTML (standard tags: h1-h6, p, blockquote, ul/ol, a, strong/em…). Note: brand text colors only survive when set in the visual editor, not through HTML.
    */
   descriptionHtml?: string | null;
   /**
@@ -2387,23 +2387,6 @@ export interface TaskSendReviewRequests {
     emailsSent?: number | null;
     emailsFailed?: number | null;
   };
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "CodeBlock".
- */
-export interface CodeBlock {
-  /**
-   * Shown as a small label on the rendered block.
-   */
-  language?: ('plain' | 'typescript' | 'javascript' | 'html' | 'css' | 'json' | 'bash' | 'python' | 'sql') | null;
-  /**
-   * The code is rendered exactly as written, in a monospaced dark panel.
-   */
-  code: string;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'codeBlock';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
