@@ -132,13 +132,15 @@ export const Courses: CollectionConfig = {
         },
       },
     },
-    // Code view (owner 2026-08-12): the SAME description as editable HTML source. Virtual
-    // (never stored) — afterRead derives it from `description`; the collection's
-    // beforeChange hook (applyDescriptionHtml) converts an EDITED source back.
+    // Code view (owner 2026-08-12): the SAME description as editable HTML source. Stored
+    // (NOT virtual — Payload renders virtual fields read-only in the admin), but the
+    // stored value is cosmetic: afterRead REGENERATES it from `description` on every
+    // read, and the collection's beforeChange hook (applyDescriptionHtml) converts an
+    // EDITED source back into the rich text.
     {
       name: 'descriptionHtml',
       type: 'code',
-      virtual: true,
+      localized: true,
       label: { en: 'Description — HTML (code view)', ro: 'Descriere — HTML (code view)' },
       admin: {
         language: 'html',

@@ -10,6 +10,7 @@ import * as migration_20260807_142339_retire_legacy_event_popup from './20260807
 import * as migration_20260808_115522_drop_unused_owner_fields from './20260808_115522_drop_unused_owner_fields';
 import * as migration_20260812_140836_courses_trainers_corporate_partners from './20260812_140836_courses_trainers_corporate_partners';
 import * as migration_20260812_160828_courses_trainers_many from './20260812_160828_courses_trainers_many';
+import * as migration_20260812_171143_courses_description_html from './20260812_171143_courses_description_html';
 
 export const migrations = [
   {
@@ -70,6 +71,11 @@ export const migrations = [
   {
     up: migration_20260812_160828_courses_trainers_many.up,
     down: migration_20260812_160828_courses_trainers_many.down,
-    name: '20260812_160828_courses_trainers_many'
+    name: '20260812_160828_courses_trainers_many',
+  },
+  {
+    up: migration_20260812_171143_courses_description_html.up,
+    down: migration_20260812_171143_courses_description_html.down,
+    name: '20260812_171143_courses_description_html'
   },
 ];
