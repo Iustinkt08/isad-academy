@@ -36,16 +36,18 @@ const SITE_CSP =
 
 // Panoul Payload (SPA React) are nevoie de 'unsafe-eval'/'unsafe-inline' și de framing
 // same-origin (live preview) — CSP mai permisiv, DOAR pe /admin.
-// `worker-src blob:` (+ `child-src`, fallback-ul Safari): editorul de cod Monaco din
-// câmpurile `code` își pornește workerii ca blob: — fără directivă, default-src 'self'
-// îi blochează și editorul rămâne pe spinner la infinit (owner 2026-08-12).
+// Editorul Monaco al câmpurilor `code` (owner 2026-08-12, „spinner la infinit"):
+//   - @monaco-editor/loader ÎȘI TRAGE editorul de pe cdn.jsdelivr.net (script + CSS +
+//     fontul codicon) — de aici MONACO_CDN pe script/style/font-src;
+//   - workerii lui pornesc ca blob: — de aici worker-src/child-src blob:.
+const MONACO_CDN = 'https://cdn.jsdelivr.net'
 const ADMIN_CSP =
   `default-src 'self'; ` +
-  `script-src 'self' 'unsafe-inline' 'unsafe-eval'; ` +
-  `style-src 'self' 'unsafe-inline'; ` +
+  `script-src 'self' 'unsafe-inline' 'unsafe-eval' ${MONACO_CDN}; ` +
+  `style-src 'self' 'unsafe-inline' ${MONACO_CDN}; ` +
   `img-src 'self' data: blob:; ` +
-  `font-src 'self' data:; ` +
-  `connect-src 'self'; ` +
+  `font-src 'self' data: ${MONACO_CDN}; ` +
+  `connect-src 'self' ${MONACO_CDN}; ` +
   `worker-src 'self' blob:; ` +
   `child-src 'self' blob:; ` +
   `frame-ancestors 'self'; base-uri 'self'; object-src 'none'`
