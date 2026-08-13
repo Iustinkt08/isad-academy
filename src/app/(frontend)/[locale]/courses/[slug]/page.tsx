@@ -54,7 +54,22 @@ const getCourseData = cache(async (slug: string, locale: Locale) => {
   const course = coursesResult.docs[0]
   if (!course) return null
 
-  const [sessionsResult, siteSettings] = await Promise.all([
+  // Owner 2026-08-13: the per-course override groups (certification card, bottom
+  // callouts) must NOT inherit across locales — an override typed only in EN would
+  // otherwise leak onto the RO page through the EN fallback above and replace the
+  // Romanian default copy. Re-read just those groups with the fallback OFF, so an
+  // empty locale falls back to its own dictionary default instead.
+  const [overridesResult, sessionsResult, siteSettings] = await Promise.all([
+    payload.find({
+      collection: 'courses',
+      where: { id: { equals: course.id } },
+      limit: 1,
+      depth: 0,
+      overrideAccess: false,
+      locale,
+      fallbackLocale: false,
+      select: { certificationCard: true, callouts: true },
+    }),
     payload.find({
       collection: 'courseSessions',
       where: { course: { equals: course.id } },
@@ -72,6 +87,12 @@ const getCourseData = cache(async (slug: string, locale: Locale) => {
       fallbackLocale: 'en',
     }),
   ])
+
+  const overrideGroups = overridesResult.docs[0]
+  if (overrideGroups) {
+    course.certificationCard = overrideGroups.certificationCard
+    course.callouts = overrideGroups.callouts
+  }
 
   return {
     course,
