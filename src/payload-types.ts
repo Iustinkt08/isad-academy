@@ -284,6 +284,25 @@ export interface Course {
    */
   certificationCredits?: number | null;
   /**
+   * The "Certification" card on the course page. Leave any field empty to use the default site copy (which follows the course track — PECB or own certificate — and adds the CPD credits line automatically). A custom text replaces the default exactly as written.
+   */
+  certificationCard?: {
+    title?: string | null;
+    /**
+     * The paragraph under the title. When set, it is shown exactly as written (the automatic CPD credits line is not appended).
+     */
+    body?: string | null;
+    /**
+     * The numbered steps under the paragraph, in this order. Leave empty for the default steps.
+     */
+    steps?:
+      | {
+          text: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  /**
    * The editions of this course, with their dates, prices and seats. Add or edit them in the Course Sessions collection; they appear here automatically.
    */
   sessions?: {
@@ -1413,6 +1432,18 @@ export interface CoursesSelect<T extends boolean = true> {
       };
   trainers?: T;
   certificationCredits?: T;
+  certificationCard?:
+    | T
+    | {
+        title?: T;
+        body?: T;
+        steps?:
+          | T
+          | {
+              text?: T;
+              id?: T;
+            };
+      };
   sessions?: T;
   quizProfile?:
     | T

@@ -201,6 +201,64 @@ export const Courses: CollectionConfig = {
         },
       },
     },
+    // Owner 2026-08-13: the "Certification" card on the course page becomes editable per
+    // course. Empty fields fall back to the site default copy (dictionaries.ts
+    // `courseDetail.cert*` — chosen by track: PECB for ISO courses, own certificate
+    // otherwise, with the CPD line appended automatically).
+    {
+      name: 'certificationCard',
+      type: 'group',
+      label: { en: 'Certification card', ro: 'Cardul de certificare' },
+      admin: {
+        description: {
+          en: 'The "Certification" card on the course page. Leave any field empty to use the default site copy (which follows the course track — PECB or own certificate — and adds the CPD credits line automatically). A custom text replaces the default exactly as written.',
+          ro: 'Cardul „Certificare" de pe pagina cursului. Lăsați un câmp gol pentru textul implicit al site-ului (care urmează traseul cursului — PECB sau certificat propriu — și adaugă automat linia cu creditele CPD). Un text propriu înlocuiește default-ul exact cum este scris.',
+        },
+      },
+      fields: [
+        {
+          name: 'title',
+          type: 'text',
+          localized: true,
+          admin: {
+            placeholder: { en: 'Certification', ro: 'Certificare' },
+          },
+        },
+        {
+          name: 'body',
+          type: 'textarea',
+          localized: true,
+          admin: {
+            description: {
+              en: 'The paragraph under the title. When set, it is shown exactly as written (the automatic CPD credits line is not appended).',
+              ro: 'Paragraful de sub titlu. Dacă este completat, apare exact cum este scris (linia automată cu creditele CPD nu se mai adaugă).',
+            },
+          },
+        },
+        {
+          name: 'steps',
+          type: 'array',
+          localized: true,
+          labels: {
+            singular: { en: 'Step', ro: 'Pas' },
+            plural: { en: 'Steps', ro: 'Pași' },
+          },
+          admin: {
+            description: {
+              en: 'The numbered steps under the paragraph, in this order. Leave empty for the default steps.',
+              ro: 'Pașii numerotați de sub paragraf, în ordinea de aici. Lăsați gol pentru pașii impliciți.',
+            },
+          },
+          fields: [
+            {
+              name: 'text',
+              type: 'text',
+              required: true,
+            },
+          ],
+        },
+      ],
+    },
     {
       name: 'sessions',
       type: 'join',

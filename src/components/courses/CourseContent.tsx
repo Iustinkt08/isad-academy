@@ -133,33 +133,47 @@ export function CourseProgramme({
   )
 }
 
+/** Per-course overrides for the Certification card (`courses.certificationCard`). */
+export type CertificationOverrides = {
+  title?: string | null
+  body?: string | null
+  steps?: string[]
+}
+
 /**
  * Certification — R2 copy per track, full-width text + numbered steps.
  * Redesign: NO certificate preview (the shared Certificate render was removed).
+ * Owner 2026-08-13: every part is overridable per course; an empty field keeps the
+ * default (a custom body also drops the automatic CPD line — it is shown verbatim).
  */
 export function CourseCertification({
   locale,
   hours,
   cpdCredits,
   track,
+  overrides,
 }: {
   locale: Locale
   hours: number | null
   cpdCredits: number | null
   track: 'pecb' | 'own'
+  overrides?: CertificationOverrides
 }) {
   const t = getDictionary(locale).courseDetail
   const cpdLine = hours != null && cpdCredits != null ? ` ${t.certCpdLine(hours, cpdCredits)}` : ''
-  const copy = `${track === 'pecb' ? t.certPecbCopy : t.certOwnCopy}${cpdLine}`
-  const steps = track === 'pecb' ? t.certPecbSteps : t.certOwnSteps
+  const defaultCopy = `${track === 'pecb' ? t.certPecbCopy : t.certOwnCopy}${cpdLine}`
+  const title = overrides?.title?.trim() || t.certificationTitle
+  const copy = overrides?.body?.trim() || defaultCopy
+  const customSteps = overrides?.steps ?? []
+  const steps = customSteps.length > 0 ? customSteps : track === 'pecb' ? t.certPecbSteps : t.certOwnSteps
 
   // Mobil (Figma 3925-115): py-8 (pt 32) + spațieri interne 12; desktop: pt 30 / gap 16
   return (
     <section className="flex w-full flex-col gap-3 rounded-[24px] border-[6px] border-line-soft bg-white px-10 py-8 shadow-[3px_9px_20px_rgba(77,77,77,0.03)] lg:gap-4 lg:pt-[30px]">
-      <h2 className={headingCls}>{t.certificationTitle}</h2>
+      <h2 className={headingCls}>{title}</h2>
       <p className="text-[15px] leading-6 text-grey-600">{copy}</p>
       {steps.map((s: string, i: number) => (
-        <div key={s} className="flex items-center gap-2.5">
+        <div key={`${i}-${s}`} className="flex items-center gap-2.5">
           <span className="flex size-[26px] shrink-0 items-center justify-center rounded-full bg-line-soft text-[12px] font-semibold text-blue">
             {i + 1}
           </span>

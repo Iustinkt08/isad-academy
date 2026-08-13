@@ -387,6 +387,13 @@ export default async function CourseDetailPage({ params }: Args) {
               hours={course.durationHours ?? null}
               cpdCredits={credits}
               track={isPecbTrack ? 'pecb' : 'own'}
+              overrides={{
+                title: course.certificationCard?.title,
+                body: course.certificationCard?.body,
+                steps: (course.certificationCard?.steps ?? [])
+                  .map((step) => step.text?.trim() ?? '')
+                  .filter((text) => text.length > 0),
+              }}
             />
           </Reveal>
         </div>

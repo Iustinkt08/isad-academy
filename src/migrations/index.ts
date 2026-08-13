@@ -11,6 +11,7 @@ import * as migration_20260808_115522_drop_unused_owner_fields from './20260808_
 import * as migration_20260812_140836_courses_trainers_corporate_partners from './20260812_140836_courses_trainers_corporate_partners';
 import * as migration_20260812_160828_courses_trainers_many from './20260812_160828_courses_trainers_many';
 import * as migration_20260812_171143_courses_description_html from './20260812_171143_courses_description_html';
+import * as migration_20260813_200541_courses_certification_card from './20260813_200541_courses_certification_card';
 
 export const migrations = [
   {
@@ -76,6 +77,11 @@ export const migrations = [
   {
     up: migration_20260812_171143_courses_description_html.up,
     down: migration_20260812_171143_courses_description_html.down,
-    name: '20260812_171143_courses_description_html'
+    name: '20260812_171143_courses_description_html',
+  },
+  {
+    up: migration_20260813_200541_courses_certification_card.up,
+    down: migration_20260813_200541_courses_certification_card.down,
+    name: '20260813_200541_courses_certification_card'
   },
 ];
