@@ -327,7 +327,7 @@ export default async function CourseDetailPage({ params }: Args) {
   )
   const nextSession = upcomingSessions[0] ?? null
   const credits = cpdCredits(course)
-  const isPecbTrack = course.category === 'iso'
+  const isPecbTrack = course.categoryKey === 'iso'
 
   /* ——— Trainer mini-cards (owner 2026-08-12): course trainers (multiple, one card
          each, in the set order), or the single Silviu default when none are picked ——— */

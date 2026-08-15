@@ -70,6 +70,7 @@ export interface Config {
     users: User;
     media: Media;
     courses: Course;
+    courseCategories: CourseCategory;
     courseSessions: CourseSession;
     trainers: Trainer;
     orders: Order;
@@ -99,6 +100,7 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     courses: CoursesSelect<false> | CoursesSelect<true>;
+    courseCategories: CourseCategoriesSelect<false> | CourseCategoriesSelect<true>;
     courseSessions: CourseSessionsSelect<false> | CourseSessionsSelect<true>;
     trainers: TrainersSelect<false> | TrainersSelect<true>;
     orders: OrdersSelect<false> | OrdersSelect<true>;
@@ -241,9 +243,10 @@ export interface Course {
    */
   durationHours?: number | null;
   /**
-   * Reserved for future catalog filtering. The category is stored now, but the catalog shows no filter at launch.
+   * Pick a category, or create a new one right here ("Add new") — it is saved and reusable on every other course. Reserved for future catalog filtering; the ISO/IEC 42001 category also switches the course to the PECB certification track.
    */
-  category?: ('iso' | 'antiFraud' | 'security' | 'other') | null;
+  category?: (number | null) | CourseCategory;
+  categoryKey?: string | null;
   /**
    * Full course description shown on the course page, below the header. Formatting (titles, quotes, colors) renders on the site exactly as set here.
    */
@@ -361,6 +364,25 @@ export interface Course {
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
+}
+/**
+ * Categories a course can belong to. Create new ones here or directly from the Category field on a course — they are saved and reusable on every other course. Reserved for future catalog filtering; no filter is shown at launch.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "courseCategories".
+ */
+export interface CourseCategory {
+  id: number;
+  /**
+   * Category name, as shown in the admin (e.g. "ISO/IEC 42001 (AI Management)").
+   */
+  name: string;
+  /**
+   * Stable identifier, generated from the name. The special slug "iso" marks the PECB ISO/IEC 42001 track. Do not change it after creation.
+   */
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * Trainer profiles shown on course pages, under the enrolment card. Assign one to a course via its Trainer field; courses without one show the default (Dr. Silviu Gresoi).
@@ -1273,6 +1295,10 @@ export interface PayloadLockedDocument {
         value: number | Course;
       } | null)
     | ({
+        relationTo: 'courseCategories';
+        value: number | CourseCategory;
+      } | null)
+    | ({
         relationTo: 'courseSessions';
         value: number | CourseSession;
       } | null)
@@ -1422,6 +1448,7 @@ export interface CoursesSelect<T extends boolean = true> {
   shortDescription?: T;
   durationHours?: T;
   category?: T;
+  categoryKey?: T;
   description?: T;
   descriptionHtml?: T;
   audience?:
@@ -1479,6 +1506,16 @@ export interface CoursesSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "courseCategories_select".
+ */
+export interface CourseCategoriesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

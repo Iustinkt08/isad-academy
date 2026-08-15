@@ -79,7 +79,7 @@ NETOPIA_POS_SIGNATURE_ALT=   # opțional: semnături POS extra acceptate ca `aud
 - `slug` (text, unique, auto)
 - `image` (upload → media) — banner
 - `durationHours` (number)
-- `category` (select, optional) — **rezervat** pentru filtrare viitoare; fără UI de filtrare la lansare
+- `category` (relationship → `courseCategories`, optional; era select fix până pe 2026-08-15) — categorii create/refolosite din admin (colecție `courseCategories`: `name` + `slug` stabil); slug-ul `iso` = traseul PECB; cursul ține și `categoryKey` (text ascuns, sincronizat în beforeChange) pe care se face branch în frontend la orice depth. **Rezervat** pentru filtrare viitoare; fără UI de filtrare la lansare
 - `description` (richText) — descriere bogată *(placeholder lorem ipsum până la Silviu)*
 - `audience` (array of text sau richText) — „who it's for" / cui se adresează
 - `certificationCredits` (number) — credite CPD, **variabile per curs**

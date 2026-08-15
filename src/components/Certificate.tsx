@@ -4,26 +4,27 @@ import type { AriaRole } from 'react'
 import { cn } from './ui/cn'
 
 /**
- * Certificate — the 620×371 DOM certificate (Figma node 3725:5), SHARED between the home
- * hero fan (dict-driven RO/EN copy — Hero maps its dictionary onto these flat props) and
- * the course page's Certification card (scaled 0.5 with the REAL course title, uppercase
- * applied by the caller). Markup/classes are byte-identical to the Hero-internal version
- * it replaces, so the hero's visual output does not change.
+ * Certificate — the 620×371 DOM certificate (Figma node 3725:5), rendered by the home
+ * hero fan (dict-driven RO/EN copy — Hero maps its dictionary onto these flat props).
+ * Top-right meta slot shows the participant (owner 2026-08-15; it used to show the
+ * completion date), and the course line can carry an optional subtitle underneath
+ * ("Artificial Intelligence Management Systems").
  *
  * Accessibility is the CALLER's concern: Hero passes role="img"/aria-label for the centre
- * card and aria-hidden for the decorative fan copies; the course page passes aria-hidden.
+ * card and aria-hidden for the decorative fan copies.
  * The icon is /brand/icon-black.svg (no plain icon.svg exists in public/brand/).
  */
 
 export type CertificateProps = {
   trainerLabel: string
   trainer: string
-  dateLabel: string
-  date: string
+  participantLabel: string
+  participant: string
   certifiesLine: string
   studentName: string
   completedLine: string
   courseTitle: string
+  courseSubtitle?: string
   className?: string
   role?: AriaRole
   'aria-label'?: string
@@ -33,12 +34,13 @@ export type CertificateProps = {
 export default function Certificate({
   trainerLabel,
   trainer,
-  dateLabel,
-  date,
+  participantLabel,
+  participant,
   certifiesLine,
   studentName,
   completedLine,
   courseTitle,
+  courseSubtitle,
   className,
   role,
   'aria-label': ariaLabel,
@@ -54,15 +56,15 @@ export default function Certificate({
         className,
       )}
     >
-      {/* Top row: Trainer / Date */}
+      {/* Top row: Trainer / Participant */}
       <div className="absolute inset-x-[46px] top-[22px] flex justify-between text-[14px] font-medium text-ink">
         <div>
           <p>{trainerLabel}</p>
           <p className="mt-[6px]">{trainer}</p>
         </div>
         <div className="text-right">
-          <p>{dateLabel}</p>
-          <p className="mt-[6px]">{date}</p>
+          <p>{participantLabel}</p>
+          <p className="mt-[6px]">{participant}</p>
         </div>
       </div>
 
@@ -76,6 +78,11 @@ export default function Certificate({
         <p className="mt-[12px] whitespace-nowrap text-[14px] font-medium text-grey-600">
           {courseTitle}
         </p>
+        {courseSubtitle ? (
+          <p className="mt-[4px] whitespace-nowrap text-[13px] font-medium text-grey-600">
+            {courseSubtitle}
+          </p>
+        ) : null}
       </div>
 
       {/* Bottom row: logo mark + wordmark (always lowercase) */}

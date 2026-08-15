@@ -217,7 +217,7 @@ export default async function CheckoutPage({
     courseSlug: course?.slug ?? null,
     startDate: session.startDate,
     scheduleSummary: scheduleLabel,
-    trackLabel: course?.category === 'iso' ? 'PECB ISO/IEC 42001' : 'ISAD Academy',
+    trackLabel: course?.categoryKey === 'iso' ? 'PECB ISO/IEC 42001' : 'ISAD Academy',
     cpdCredits: course ? cpdCredits(course) : null,
     seatsRemaining: session.seatsRemaining ?? null,
     earlyBird,

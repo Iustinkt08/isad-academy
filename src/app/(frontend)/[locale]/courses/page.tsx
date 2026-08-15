@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
 
 /** Card subtitle = provider/standard, same heuristic as the Home preview cards (§4 TODO). */
 const courseSubtitle = (course: Course): string =>
-  course.category === 'iso' ? 'PECB ISO/IEC 42001' : 'ISAD Academy'
+  course.categoryKey === 'iso' ? 'PECB ISO/IEC 42001' : 'ISAD Academy'
 
 /** Short blurb: shortDescription → SEO meta → truncated body (same chain as Home). */
 const courseSummary = (course: Course): string => {

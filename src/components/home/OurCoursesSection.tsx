@@ -49,13 +49,13 @@ const GRAIN_URL =
 const STRIP_PAD = 21
 
 /**
- * Card subtitle = the provider / standard behind the course. Derived from `category` (no
+ * Card subtitle = the provider / standard behind the course. Derived from `categoryKey` (no
  * dedicated provider field yet, CLAUDE.md §4). NOTE: the own-course tag is written "ISAD
  * Academy" — a deliberate exception to the lowercase brand rule (owner, 2026-07-12), matching
  * the Figma card exactly. TODO(silviu): swap for a real provider field once one exists.
  */
 function courseSubtitle(course: Course): string {
-  return course.category === 'iso' ? 'PECB ISO/IEC 42001' : 'ISAD Academy'
+  return course.categoryKey === 'iso' ? 'PECB ISO/IEC 42001' : 'ISAD Academy'
 }
 
 /**

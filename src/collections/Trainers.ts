@@ -14,7 +14,7 @@ export const Trainers: CollectionConfig = {
   slug: 'trainers',
   admin: {
     useAsTitle: 'name',
-    group: { en: 'Content', ro: 'Conținut' },
+    group: { en: 'Courses', ro: 'Cursuri' },
     defaultColumns: ['name', 'role'],
     description: {
       en: 'Trainer profiles shown on course pages, under the enrolment card. Assign one to a course via its Trainer field; courses without one show the default (Dr. Silviu Gresoi).',

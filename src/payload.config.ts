@@ -13,6 +13,7 @@ import sharp from 'sharp'
 
 import { BlogPosts } from './collections/BlogPosts'
 import { CourseSessions } from './collections/CourseSessions'
+import { CourseCategories } from './collections/CourseCategories'
 import { Courses } from './collections/Courses'
 import { DiscountCodes } from './collections/DiscountCodes'
 import { EventEmails } from './collections/EventEmails'
@@ -116,6 +117,7 @@ export default buildConfig({
     Users,
     Media,
     Courses,
+    CourseCategories,
     CourseSessions,
     Trainers,
     Orders,

@@ -128,7 +128,7 @@ const priceWindowFields = (label: string): CollectionConfig['fields'] => [
 export const CourseSessions: CollectionConfig = {
   slug: 'courseSessions',
   admin: {
-    group: { en: 'Content', ro: 'Conținut' },
+    group: { en: 'Courses', ro: 'Cursuri' },
     defaultColumns: ['course', 'startDate', 'capacity', 'seatsSold'],
     description: {
       en: 'Editions of a course: dates, schedule, capacity and price windows. Each edition sells separately; the seat counts and the Early Bird or Standard prices shown on the site come from here.',

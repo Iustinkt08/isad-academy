@@ -31,6 +31,29 @@ const applyDescriptionHtml: CollectionBeforeChangeHook = async ({ data, original
 }
 
 /**
+ * Denormalizes the selected category's stable slug into `categoryKey` (hidden text) so the
+ * frontend can branch on it (`'iso'` = PECB track) at ANY query depth, without populating
+ * the relationship. Runs only when `category` is part of the incoming data — partial
+ * updates that do not touch the category keep the stored key.
+ */
+const syncCategoryKey: CollectionBeforeChangeHook = async ({ data, req }) => {
+  if (!data || !('category' in data)) return data
+  const category = data.category
+  const id = typeof category === 'object' && category !== null ? category.id : category
+  if (id === null || id === undefined || id === '') {
+    data.categoryKey = null
+    return data
+  }
+  try {
+    const doc = await req.payload.findByID({ collection: 'courseCategories', id, depth: 0 })
+    data.categoryKey = typeof doc?.slug === 'string' ? doc.slug : null
+  } catch {
+    data.categoryKey = null
+  }
+  return data
+}
+
+/**
  * Teaser + shared content for a course (CLAUDE.md §4). Dates, prices and seats live on
  * `courseSessions` (Variant B), never here. No `modules` field (§3, §9 R3 — resolved:
  * no modules) and no `seo` group yet (lands with `@payloadcms/plugin-seo` in T14).
@@ -39,12 +62,19 @@ export const Courses: CollectionConfig = {
   slug: 'courses',
   admin: {
     useAsTitle: 'title',
-    group: { en: 'Content', ro: 'Conținut' },
+    group: { en: 'Courses', ro: 'Cursuri' },
     defaultColumns: ['title', 'category', 'durationHours', '_status'],
     listSearchableFields: ['title'],
     description: {
       en: 'Course presentation pages shown in the catalog. Each course holds only the shared content (title, description, audience); dates, prices and seats live on Course Sessions, one entry per edition.',
       ro: 'Paginile de prezentare ale cursurilor afișate în catalog. Fiecare curs conține doar conținutul comun (titlu, descriere, public țintă); datele, prețurile și locurile stau în Course Sessions, câte o intrare per ediție.',
+    },
+    components: {
+      edit: {
+        // After-save popup when the other content language (EN/RO) has no title yet,
+        // with a one-click locale switch (owner 2026-08-15).
+        beforeDocumentControls: ['/components/admin/CourseLocaleCheck#CourseLocaleCheck'],
+      },
     },
   },
   versions: {
@@ -58,7 +88,7 @@ export const Courses: CollectionConfig = {
   },
   // Static frontend (EN + /ro) regenerates after every dashboard save.
   hooks: {
-    beforeChange: [applyDescriptionHtml],
+    beforeChange: [applyDescriptionHtml, syncCategoryKey],
     afterChange: [revalidateSiteHook],
     afterDelete: [revalidateSiteHook],
   },
@@ -96,20 +126,27 @@ export const Courses: CollectionConfig = {
       },
     },
     {
+      // Owner 2026-08-15: was a fixed select (iso/antiFraud/security/other) — now a
+      // relationship so new categories can be typed once (the field's "Add new" drawer)
+      // and reused on every later course. The old options live on as seeded docs with the
+      // SAME stable slugs; business logic reads the denormalized `categoryKey` below.
       name: 'category',
-      type: 'select',
+      type: 'relationship',
+      relationTo: 'courseCategories',
       admin: {
         description: {
-          en: 'Reserved for future catalog filtering. The category is stored now, but the catalog shows no filter at launch.',
-          ro: 'Rezervat pentru filtrarea viitoare a catalogului. Categoria se salvează de pe acum, dar catalogul nu afișează încă niciun filtru la lansare.',
+          en: 'Pick a category, or create a new one right here ("Add new") — it is saved and reusable on every other course. Reserved for future catalog filtering; the ISO/IEC 42001 category also switches the course to the PECB certification track.',
+          ro: 'Alege o categorie sau creează una nouă direct de aici („Adaugă") — se salvează și o poți refolosi la orice alt curs. Rezervată pentru filtrarea viitoare a catalogului; categoria ISO/IEC 42001 comută și cursul pe traseul de certificare PECB.',
         },
       },
-      options: [
-        { label: { en: 'ISO/IEC 42001 (AI Management)', ro: 'ISO/IEC 42001 (Management AI)' }, value: 'iso' },
-        { label: { en: 'Anti-Fraud', ro: 'Antifraudă' }, value: 'antiFraud' },
-        { label: { en: 'Security', ro: 'Securitate' }, value: 'security' },
-        { label: { en: 'Other', ro: 'Altele' }, value: 'other' },
-      ],
+    },
+    {
+      // Kept in sync by `syncCategoryKey` (beforeChange). Hidden: admin edits the
+      // relationship above; the frontend branches on this slug at any depth.
+      name: 'categoryKey',
+      type: 'text',
+      index: true,
+      admin: { hidden: true },
     },
     {
       name: 'description',

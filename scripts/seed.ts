@@ -228,6 +228,15 @@ async function upsertSession(
 
 async function seed() {
   const payload = await getPayload({ config })
+
+  // Categoriile au devenit colecție (2026-08-15) — slug-urile vechi rămân stabile.
+  const categoriesResult = await payload.find({
+    collection: 'courseCategories',
+    pagination: false,
+    depth: 0,
+    overrideAccess: true,
+  })
+  const categoryIdBySlug = new Map(categoriesResult.docs.map((c) => [c.slug, c.id]))
   const log = (message: string) => payload.logger.info(`[seed] ${message}`)
 
   // --- Published course: ISO/IEC 42001:2023 preparation training -----------------------
@@ -240,7 +249,7 @@ async function seed() {
       title: courseTitle,
       _status: 'published',
       durationHours: 16,
-      category: 'iso',
+      category: categoryIdBySlug.get('iso') ?? null,
       description: richText([
         'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. [Placeholder copy, pending Silviu review.]',
         'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore.',
@@ -278,7 +287,7 @@ async function seed() {
       title: draftTitle,
       _status: 'draft',
       durationHours: 12,
-      category: 'antiFraud',
+      category: categoryIdBySlug.get('antiFraud') ?? null,
       description: richText([
         'Lorem ipsum dolor sit amet, consectetur adipiscing elit. [Placeholder copy, pending Silviu review.]',
       ]),
@@ -312,7 +321,7 @@ async function seed() {
       title: course2Title,
       _status: 'published',
       durationHours: 8,
-      category: 'iso',
+      category: categoryIdBySlug.get('iso') ?? null,
       description: richText([
         'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore. [Placeholder copy, pending Silviu review.]',
       ]),

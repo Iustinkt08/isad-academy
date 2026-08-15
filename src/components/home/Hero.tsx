@@ -33,10 +33,12 @@ import { Container } from '../ui/Container'
  */
 function HeroCertificate({
   t,
+  card,
   className,
   decorative = false,
 }: {
   t: Dictionary['hero']['cert']
+  card: Dictionary['hero']['cert']['cards']['center']
   className?: string
   decorative?: boolean
 }) {
@@ -47,12 +49,13 @@ function HeroCertificate({
       aria-hidden={decorative || undefined}
       trainerLabel={t.trainerLabel}
       trainer={t.trainer}
-      dateLabel={t.dateLabel}
-      date={t.sampleDate}
+      participantLabel={t.participantLabel}
+      participant={card.name}
       certifiesLine={t.certifies}
-      studentName={t.sampleName}
+      studentName={card.name}
       completedLine={t.completed}
-      courseTitle={t.course}
+      courseTitle={card.course}
+      courseSubtitle={t.courseSubtitle}
       className={className}
     />
   )
@@ -136,17 +139,21 @@ export function HomeHero({
             <div className="relative h-[600px] w-[1920px]">
               {/* Left certificate — fans out from behind the centre card (fade + blur) */}
               <div className="animate-fan-left absolute left-1/2 top-[41px] hidden -translate-x-[calc(50%+488px)] scale-[0.834] blur-[4px] [animation-delay:500ms] md:block">
-                <HeroCertificate t={dict.hero.cert} decorative />
+                <HeroCertificate t={dict.hero.cert} card={dict.hero.cert.cards.left} decorative />
               </div>
 
               {/* Right certificate — fans out from behind the centre card (fade + blur) */}
               <div className="animate-fan-right absolute left-1/2 top-[41px] hidden -translate-x-[calc(50%-488px)] scale-[0.834] blur-[4px] [animation-delay:500ms] md:block">
-                <HeroCertificate t={dict.hero.cert} decorative />
+                <HeroCertificate t={dict.hero.cert} card={dict.hero.cert.cards.right} decorative />
               </div>
 
               {/* Centre certificate — clear, on top */}
               <div className="absolute left-1/2 top-0 z-10 -translate-x-1/2">
-                <HeroCertificate t={dict.hero.cert} className="backdrop-blur-[2px]" />
+                <HeroCertificate
+                  t={dict.hero.cert}
+                  card={dict.hero.cert.cards.center}
+                  className="backdrop-blur-[2px]"
+                />
               </div>
             </div>
           </div>

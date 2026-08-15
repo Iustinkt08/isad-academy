@@ -66,6 +66,15 @@ const NEW_COURSES: { title: string; category: 'iso' | 'other'; shortDescription:
 async function main() {
   const payload = await getPayload({ config })
 
+  // Categoriile au devenit colecție (2026-08-15) — slug-urile vechi rămân stabile.
+  const categoriesResult = await payload.find({
+    collection: 'courseCategories',
+    pagination: false,
+    depth: 0,
+    overrideAccess: true,
+  })
+  const categoryIdBySlug = new Map(categoriesResult.docs.map((c) => [c.slug, c.id]))
+
   const all = { pagination: false, overrideAccess: true, depth: 0 } as const
 
   // 1) Inventory (drafts included) before touching anything.
@@ -101,7 +110,7 @@ async function main() {
       overrideAccess: true,
       data: {
         title: c.title,
-        category: c.category,
+        category: categoryIdBySlug.get(c.category) ?? null,
         shortDescription: c.shortDescription,
         description: richText([
           'Placeholder course description. Final copy pending Dr. Silviu Gresoi.',
