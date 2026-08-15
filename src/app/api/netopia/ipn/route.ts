@@ -18,7 +18,14 @@ const ack = (status: number, errorMessage = '') =>
  * `Verification-token` JWT (see `verifyNetopiaIpn`), never by its body alone. A verified
  * PAID/CONFIRMED status is what flips the order to `confirmed` and consumes seats
  * (atomically, via the Orders afterChange hook); non-final statuses are acknowledged and
- * ignored. Netopia retries non-2xx responses, so verification failures return 4xx.
+ * ignored.
+ *
+ * Response contract (Netopia's activation checklist, 2026-08-15): the notify URL must
+ * answer HTTP 200 with JSON `{"errorCode": 0}` — their reviewer flags ANY non-200 as
+ * `INVALID_RESPONSE_STATUS`. So every handled outcome (including rejected/unverifiable
+ * notifications, which are logged and NOT processed) returns 200 with a non-zero
+ * `errorCode`; non-2xx is reserved for states where a Netopia retry can actually help:
+ * missing configuration (503) and genuine server faults (uncaught → 500).
  */
 export async function POST(request: Request): Promise<Response> {
   const rawBody = await request.text()
@@ -40,16 +47,23 @@ export async function POST(request: Request): Promise<Response> {
     return ack(503, err instanceof Error ? err.message : 'Netopia is not configured.')
   }
 
+  // În perioada de verificare Netopia, tokenul de test poate fi emis pe semnătura LIVE
+  // în timp ce plățile rulează încă pe sandbox — `_ALT` acceptă ambele audiențe.
+  const altSignatures = (process.env.NETOPIA_POS_SIGNATURE_ALT ?? '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean)
+
   const verification = verifyNetopiaIpn(rawBody, request.headers.get('verification-token'), {
     publicKeyPem,
-    posSignature,
+    posSignature: [posSignature, ...altSignatures],
   })
 
   const payload = await getPayload({ config })
 
   if (!verification.ok) {
     payload.logger.warn(`[netopia:ipn] rejected notification — ${verification.reason}`)
-    return ack(400, verification.reason)
+    return ack(200, verification.reason)
   }
 
   const { order: ipnOrder, payment } = verification.payload
@@ -60,7 +74,7 @@ export async function POST(request: Request): Promise<Response> {
     payload.logger.warn(
       `[netopia:ipn] verified but unusable payload (orderID=${ipnOrder?.orderID}, status=${status})`,
     )
-    return ack(400, 'Missing orderID or payment status.')
+    return ack(200, 'Missing orderID or payment status.')
   }
 
   const outcome = mapNetopiaStatus(status)
@@ -103,5 +117,6 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   payload.logger.warn(`[netopia:ipn] order ${orderId} → ${outcome} rejected (${result.reason})`)
-  return ack(result.reason === 'notFound' ? 404 : 400, `Order lookup failed: ${result.reason}.`)
+  // Retrying cannot fix an unknown/invalid order, so acknowledge with a non-zero errorCode.
+  return ack(200, `Order lookup failed: ${result.reason}.`)
 }

@@ -1,7 +1,11 @@
 import { createHash, createSign, generateKeyPairSync } from 'crypto'
 import { describe, expect, it } from 'vitest'
 
-import { parseNetopiaPublicKey, verifyNetopiaIpn } from '../../../src/lib/payments/netopiaIpn'
+import {
+  parseNetopiaPublicKey,
+  parseNetopiaPublicKeys,
+  verifyNetopiaIpn,
+} from '../../../src/lib/payments/netopiaIpn'
 
 /**
  * The IPN's `Verification-token` is a Netopia-signed JWT (RS512): `aud` = our POS
@@ -106,6 +110,37 @@ describe('verifyNetopiaIpn', () => {
     const result = verify(IPN_BODY, signToken(IPN_BODY, {}, privateKey, 'RS256'))
     expect(result.ok).toBe(true)
   })
+
+  // Netopia semnează sandbox și live cu chei diferite; în perioada de verificare a
+  // activării ambele trebuie acceptate simultan (env-ul ține PEM-urile concatenate).
+  it('accepts a token signed with ANY of several concatenated public keys', () => {
+    const { publicKey: livePublic, privateKey: livePrivate } = generateKeyPairSync('rsa', {
+      modulusLength: 2048,
+    })
+    const combinedPem = `${PUBLIC_PEM}\n${livePublic.export({ type: 'spki', format: 'pem' }).toString()}`
+
+    expect(verify(IPN_BODY, signToken(IPN_BODY), combinedPem).ok).toBe(true)
+    expect(verify(IPN_BODY, signToken(IPN_BODY, {}, livePrivate), combinedPem).ok).toBe(true)
+    // ...but a stranger's signature still fails against the whole set.
+    expect(verify(IPN_BODY, signToken(IPN_BODY, {}, strangerKey), combinedPem).ok).toBe(false)
+  })
+
+  it('accepts any POS signature from an accepted-audience list (sandbox + live)', () => {
+    const LIVE_POS = 'LLLL-1111-2222-3333-4444'
+    const token = signToken(IPN_BODY, { aud: [LIVE_POS] })
+    expect(
+      verifyNetopiaIpn(IPN_BODY, token, {
+        publicKeyPem: PUBLIC_PEM,
+        posSignature: [POS_SIGNATURE, LIVE_POS],
+      }).ok,
+    ).toBe(true)
+    expect(
+      verifyNetopiaIpn(IPN_BODY, token, {
+        publicKeyPem: PUBLIC_PEM,
+        posSignature: [POS_SIGNATURE],
+      }),
+    ).toMatchObject({ ok: false, reason: expect.stringMatching(/audience|POS/i) })
+  })
 })
 
 describe('parseNetopiaPublicKey — deploy-friendly env formats', () => {
@@ -123,5 +158,27 @@ describe('parseNetopiaPublicKey — deploy-friendly env formats', () => {
 
   it('throws on garbage', () => {
     expect(() => parseNetopiaPublicKey('definitely not a key')).toThrow()
+  })
+
+  it('parses several concatenated PEM blocks — plain and base64-encoded', () => {
+    const { publicKey: second } = generateKeyPairSync('rsa', { modulusLength: 2048 })
+    const combined = `${PUBLIC_PEM}\n${second.export({ type: 'spki', format: 'pem' }).toString()}`
+    expect(parseNetopiaPublicKeys(combined)).toHaveLength(2)
+    expect(parseNetopiaPublicKeys(Buffer.from(combined).toString('base64'))).toHaveLength(2)
+  })
+
+  it('parses the platform key Netopia support sent for the activation review (2026-08-15)', () => {
+    // Public key, not a secret — kept as a parse regression for the exact PEM they emailed.
+    const NETOPIA_REVIEW_KEY = `-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAy6pUDAFLVul4y499gz1P
+gGSvTSc82U3/ih3e5FDUs/F0Jvfzc4cew8TrBDrw7Y+AYZS37D2i+Xi5nYpzQpu7
+ryS4W+qvgAA1SEjiU1Sk2a4+A1HeH+vfZo0gDrIYTh2NSAQnDSDxk5T475ukSSwX
+L9tYwO6CpdAv3BtpMT5YhyS3ipgPEnGIQKXjh8GMgLSmRFbgoCTRWlCvu7XOg94N
+fS8l4it2qrEldU8VEdfPDfFLlxl3lUoLEmCncCjmF1wRVtk4cNu+WtWQ4mBgxpt0
+tX2aJkqp4PV3o5kI4bqHq/MS7HVJ7yxtj/p8kawlVYipGsQj3ypgltQ3bnYV/LRq
+8QIDAQAB
+-----END PUBLIC KEY-----`
+    expect(parseNetopiaPublicKey(NETOPIA_REVIEW_KEY).type).toBe('public')
+    expect(parseNetopiaPublicKeys(`${PUBLIC_PEM}\n${NETOPIA_REVIEW_KEY}`)).toHaveLength(2)
   })
 })

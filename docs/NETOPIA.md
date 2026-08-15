@@ -23,7 +23,13 @@ PAYMENT_PROVIDER=netopia
 NETOPIA_API_KEY=...          # din admin Netopia
 NETOPIA_POS_SIGNATURE=...    # semnătura POS-ului
 NETOPIA_SANDBOX=true         # DEFAULT sandbox; EXACT 'false' pentru live
-NETOPIA_PUBLIC_KEY=...       # certificatul public (PEM / PEM cu \n / PEM în base64)
+NETOPIA_PUBLIC_KEY=...       # cheile publice pt. IPN (PEM / PEM cu \n / base64); poate
+                             # conține MAI MULTE blocuri PEM concatenate — oricare
+                             # validează tokenul (sandbox + live simultan, necesar în
+                             # perioada de verificare Netopia)
+NETOPIA_POS_SIGNATURE_ALT=   # opțional: semnături POS suplimentare acceptate ca `aud`
+                             # în tokenul IPN (listă separată prin virgulă) — ex. semnătura
+                             # LIVE cât timp plățile încă rulează pe sandbox
 NEXT_PUBLIC_SITE_URL=...     # din el se construiesc notify/return URL-urile
 ```
 
@@ -58,8 +64,11 @@ autoritar. Verifică în dashboard-ul Payload (Sales → Orders) că `paymentSta
   loghează `REFUND REQUIRED` (rambursare manuală din admin Netopia; fluxul de refund
   compensator nu e construit încă).
 - IPN duplicat / IPN + poll simultan → `applyPaymentOutcome` e idempotent.
-- IPN cu semnătură invalidă / audiență greșită / body umblat → respins cu 4xx (Netopia
-  reîncearcă).
+- IPN cu semnătură invalidă / audiență greșită / body umblat → NU se procesează (doar se
+  loghează), dar răspunsul e **HTTP 200 cu `errorCode` ≠ 0** — cerința explicită a echipei
+  de verificare Netopia (2026-08-15) e ca notifyURL să răspundă mereu 200 cu
+  `{"errorCode": 0}` la succes. Non-2xx (→ retry Netopia) rămâne doar pentru configurație
+  lipsă (503) și erori reale de server (500).
 
 ## Identitate vizuală (cerință de aprobare)
 

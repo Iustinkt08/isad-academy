@@ -5,8 +5,9 @@ import { createHash, createPublicKey, createVerify, X509Certificate, type KeyObj
  *
  * Netopia POSTs the IPN JSON to our notify URL with a `Verification-token` header: a JWT
  * signed with THEIR private key (RS512 by default). We verify it against the public
- * certificate downloaded from the Netopia admin (`NETOPIA_PUBLIC_KEY`), and additionally
- * check (mirroring the official SDKs):
+ * key(s)/certificate(s) from the Netopia admin (`NETOPIA_PUBLIC_KEY` — may hold several
+ * concatenated PEM blocks; any of them validates), and additionally check (mirroring the
+ * official SDKs):
  *   - `iss`  === 'NETOPIA Payments'
  *   - `aud`  === our POS signature (string or first array entry)
  *   - `sub`  === base64(sha512(raw request body)) — proves the payload wasn't tampered with
@@ -38,25 +39,41 @@ const base64UrlDecode = (segment: string): Buffer =>
   Buffer.from(segment.replace(/-/g, '+').replace(/_/g, '/'), 'base64')
 
 /**
- * Accepts the `NETOPIA_PUBLIC_KEY` env value in any deploy-friendly shape: a PEM
- * certificate, a bare PEM public key, either of those with `\n` escaped (single-line env
- * vars), or the whole PEM base64-encoded (cPanel env editors mangle multiline values).
+ * Accepts the `NETOPIA_PUBLIC_KEY` env value in any deploy-friendly shape: PEM
+ * certificate(s), bare PEM public key(s), either of those with `\n` escaped (single-line
+ * env vars), or the whole thing base64-encoded (cPanel env editors mangle multiline
+ * values). Multiple PEM blocks may be concatenated — Netopia signs the sandbox and live
+ * verification tokens with different keys, and during the activation review both must be
+ * accepted at once (their tester signs with the live key while the site still runs on
+ * sandbox).
  */
+export const parseNetopiaPublicKeys = (raw: string): KeyObject[] => {
+  let text = raw.trim().replace(/\\n/g, '\n')
+  if (!text.includes('-----BEGIN')) {
+    text = Buffer.from(text, 'base64').toString('utf8').trim()
+  }
+  const blocks = text.match(/-----BEGIN [^-]+-----[\s\S]+?-----END [^-]+-----/g) ?? []
+  if (blocks.length === 0) {
+    throw new Error('No PEM blocks found in NETOPIA_PUBLIC_KEY.')
+  }
+  return blocks.map((pem) =>
+    pem.includes('CERTIFICATE') ? new X509Certificate(pem).publicKey : createPublicKey(pem),
+  )
+}
+
+/** Single-key convenience wrapper (first PEM block) — kept for existing callers/tests. */
 export const parseNetopiaPublicKey = (raw: string): KeyObject => {
-  let pem = raw.trim().replace(/\\n/g, '\n')
-  if (!pem.includes('-----BEGIN')) {
-    pem = Buffer.from(pem, 'base64').toString('utf8').trim()
+  const [first] = parseNetopiaPublicKeys(raw)
+  if (!first) {
+    throw new Error('No PEM blocks found in NETOPIA_PUBLIC_KEY.')
   }
-  if (pem.includes('CERTIFICATE')) {
-    return new X509Certificate(pem).publicKey
-  }
-  return createPublicKey(pem)
+  return first
 }
 
 export const verifyNetopiaIpn = (
   rawBody: string,
   verificationToken: string | null,
-  options: { publicKeyPem: string; posSignature: string; now?: Date },
+  options: { publicKeyPem: string; posSignature: string | string[]; now?: Date },
 ): NetopiaIpnVerification => {
   if (!verificationToken) {
     return { ok: false, reason: 'Missing Verification-token header.' }
@@ -67,9 +84,9 @@ export const verifyNetopiaIpn = (
     return { ok: false, reason: 'Malformed verification token (not a JWT).' }
   }
 
-  let publicKey: KeyObject
+  let publicKeys: KeyObject[]
   try {
-    publicKey = parseNetopiaPublicKey(options.publicKeyPem)
+    publicKeys = parseNetopiaPublicKeys(options.publicKeyPem)
   } catch {
     return { ok: false, reason: 'NETOPIA_PUBLIC_KEY is not a valid certificate/public key.' }
   }
@@ -88,9 +105,11 @@ export const verifyNetopiaIpn = (
     return { ok: false, reason: `Unsupported JWT algorithm "${header.alg}".` }
   }
 
-  const signatureValid = createVerify(signatureAlg)
-    .update(`${headerPart}.${claimsPart}`)
-    .verify(publicKey, base64UrlDecode(signaturePart))
+  const signatureValid = publicKeys.some((publicKey) =>
+    createVerify(signatureAlg)
+      .update(`${headerPart}.${claimsPart}`)
+      .verify(publicKey, base64UrlDecode(signaturePart)),
+  )
   if (!signatureValid) {
     return { ok: false, reason: 'Verification token signature is invalid.' }
   }
@@ -99,8 +118,11 @@ export const verifyNetopiaIpn = (
     return { ok: false, reason: `Unexpected token issuer "${String(claims.iss)}".` }
   }
 
+  const acceptedSignatures = Array.isArray(options.posSignature)
+    ? options.posSignature
+    : [options.posSignature]
   const aud = Array.isArray(claims.aud) ? claims.aud[0] : claims.aud
-  if (aud !== options.posSignature) {
+  if (typeof aud !== 'string' || !acceptedSignatures.includes(aud)) {
     return { ok: false, reason: 'Token audience does not match our POS signature.' }
   }
 

@@ -42,7 +42,10 @@ PAYMENT_PROVIDER=mock        # mock | netopia | stripe | euplatesc
 NETOPIA_API_KEY=             # din admin Netopia (sandbox: sandbox.netopia-payments.com)
 NETOPIA_POS_SIGNATURE=
 NETOPIA_SANDBOX=true         # default sandbox; EXACT 'false' pentru live
-NETOPIA_PUBLIC_KEY=          # certificat PEM (sau base64) pt. verificarea IPN
+NETOPIA_PUBLIC_KEY=          # chei publice pt. verificarea IPN (PEM sau base64); acceptă
+                             #   mai multe blocuri PEM concatenate (sandbox + live simultan)
+NETOPIA_POS_SIGNATURE_ALT=   # opțional: semnături POS extra acceptate ca `aud` în IPN
+                             #   (virgulă) — ex. semnătura live în perioada de verificare
 # STRIPE_SECRET_KEY= / EUPLATESC_* (later)
 # ALLOW_MOCK_PAYMENTS — NU se setează în producție (ar vinde locurile gratis)
 # RUN_MIGRATIONS=true — DOAR în env-ul aplicației din cPanel; migrațiile nu se aplică
