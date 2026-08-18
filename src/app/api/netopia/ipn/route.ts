@@ -70,6 +70,13 @@ export async function POST(request: Request): Promise<Response> {
   const orderId = parseNetopiaOrderId(ipnOrder?.orderID)
   const status = payment?.status
 
+  // Sub Passenger, stdout-ul (pino) se pierde in /dev/null; stderr ajunge in stderr.log.
+  // Sumarul fiecarui IPN verificat ramane astfel vizibil in productie (fara PII).
+  console.error(
+    `[netopia:ipn] verified notification: orderID=${ipnOrder?.orderID ?? '?'} status=${status ?? '?'} ` +
+      `payment=${payment?.amount ?? '?'} ${payment?.currency ?? '?'} order=${ipnOrder?.amount ?? '?'} ${ipnOrder?.currency ?? '?'} ntpID=${payment?.ntpID ?? '?'}`,
+  )
+
   if (orderId === null || typeof status !== 'number') {
     payload.logger.warn(
       `[netopia:ipn] verified but unusable payload (orderID=${ipnOrder?.orderID}, status=${status})`,
@@ -89,9 +96,12 @@ export async function POST(request: Request): Promise<Response> {
     outcome,
     expectedProvider: 'netopia',
     expectedProviderRef: payment?.ntpID,
-    // Ultima verificare independentă: suma efectiv plătită vs. totalul comenzii.
-    expectedAmount: payment?.amount ?? ipnOrder?.amount,
-    expectedCurrency: payment?.currency ?? ipnOrder?.currency,
+    // Ultima verificare independentă: sumele raportate vs. totalul comenzii. Ambele
+    // perechi din IPN (payment = decontarea, order = comanda originală), oricare valida.
+    reportedPayments: [
+      { amount: payment?.amount, currency: payment?.currency },
+      { amount: ipnOrder?.amount, currency: ipnOrder?.currency },
+    ],
   })
 
   if (result.ok) {

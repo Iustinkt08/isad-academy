@@ -34,15 +34,18 @@ export const applyPaymentOutcome = async (args: {
   outcome: PaymentOutcome
   expectedProvider: string
   expectedProviderRef?: string
-  /** Suma/moneda raportate de procesator (IPN). Când sunt date, se compară cu totalul
-   * snapshot al comenzii ÎNAINTE de confirmare, deci o captură parțială sau o sumă
-   * nepotrivită nu mai confirmă comanda la preț întreg (securitate). Suma poate sosi și
-   * ca string numeric (JSON-ul IPN nu garantează tipul). Canalul de return-poll nu le
-   * are, deci verificarea e opțională. */
-  expectedAmount?: number | string
-  expectedCurrency?: string
+  /** Perechile sumă+monedă raportate de procesator în IPN (blocul `payment` și blocul
+   * `order`, în această ordine). Când există, se compară cu totalul snapshot al comenzii
+   * ÎNAINTE de confirmare, deci o captură parțială nu mai confirmă comanda la preț întreg
+   * (securitate). Reguli (feedback verificare Netopia 2026-08-18, testat pe sandbox):
+   *   - oricare pereche care se potrivește (sumă în ±0.01, monedă egală sau lipsă) trece;
+   *   - o pereche decontată în ALTĂ monedă decât a comenzii nu se poate compara fără
+   *     cursul procesatorului (sandbox-ul convertește EUR în RON), deci nu blochează;
+   *   - doar o nepotrivire de sumă în ACEEAȘI monedă, fără nicio pereche validă, refuză.
+   * Sumele pot sosi și ca string numeric. Canalul de return-poll nu le are (opțional). */
+  reportedPayments?: Array<{ amount?: number | string | null; currency?: string | null }>
 }): Promise<ApplyPaymentOutcomeResult> => {
-  const { payload, orderId, outcome, expectedProvider, expectedProviderRef, expectedCurrency } = args
+  const { payload, orderId, outcome, expectedProvider, expectedProviderRef } = args
 
   const order = (await payload
     .findByID({ collection: 'orders', id: orderId, overrideAccess: true, depth: 0 })
@@ -71,26 +74,44 @@ export const applyPaymentOutcome = async (args: {
   if (outcome === 'refunded' && current !== 'confirmed') return { ok: false, reason: 'skipped' }
 
   // Verificarea sumei: doar la confirmarea efectivă (de aici încolo chiar tranziționăm),
-  // doar când procesatorul a raportat o sumă și comanda are un total snapshot. 1 ban
+  // doar când procesatorul a raportat sume și comanda are un total snapshot. 1 ban
   // toleranță pentru rotunjiri float.
-  const reportedAmount =
-    typeof args.expectedAmount === 'string' ? Number(args.expectedAmount) : args.expectedAmount
-  if (
-    outcome === 'confirmed' &&
-    typeof reportedAmount === 'number' &&
-    Number.isFinite(reportedAmount) &&
-    typeof order.pricing?.total === 'number'
-  ) {
-    const amountOk = Math.abs(reportedAmount - order.pricing.total) <= 0.01
-    const currencyOk =
-      !expectedCurrency ||
-      !order.pricing.currency ||
-      expectedCurrency.toUpperCase() === order.pricing.currency.toUpperCase()
-    if (!amountOk || !currencyOk) {
-      payload.logger.error(
-        `[payments] order ${orderId} amount/currency mismatch: paid ${reportedAmount} ${expectedCurrency ?? '?'}, expected ${order.pricing.total} ${order.pricing.currency ?? '?'}; NOT confirming.`,
+  if (outcome === 'confirmed' && typeof order.pricing?.total === 'number') {
+    const total = order.pricing.total
+    const orderCurrency = order.pricing.currency ?? null
+    const candidates = (args.reportedPayments ?? [])
+      .map((pair) => ({
+        amount: typeof pair.amount === 'string' ? Number(pair.amount) : pair.amount,
+        currency: typeof pair.currency === 'string' && pair.currency.trim() ? pair.currency.trim() : null,
+      }))
+      .filter((pair) => typeof pair.amount === 'number' && Number.isFinite(pair.amount))
+
+    if (candidates.length > 0) {
+      const sameCurrency = (currency: string | null) =>
+        !currency || !orderCurrency || currency.toUpperCase() === orderCurrency.toUpperCase()
+      const matches = candidates.some(
+        (pair) => sameCurrency(pair.currency) && Math.abs((pair.amount as number) - total) <= 0.01,
       )
-      return { ok: false, reason: 'amountMismatch' }
+      const describe = candidates
+        .map((pair) => `${pair.amount} ${pair.currency ?? '?'}`)
+        .join(' / ')
+
+      if (!matches) {
+        // Toate perechile sunt în altă monedă => procesatorul a decontat prin conversie
+        // (ex. sandbox: EUR platit ca RON). Nu avem cursul lui, deci nu comparăm; poarta
+        // de autenticitate rămâne semnătura JWT a notificării.
+        const allForeignCurrency = candidates.every((pair) => !sameCurrency(pair.currency))
+        if (allForeignCurrency) {
+          payload.logger.info(
+            `[payments] order ${orderId} settled in a different currency (${describe}; order total ${total} ${orderCurrency ?? '?'}); amount check skipped.`,
+          )
+        } else {
+          payload.logger.error(
+            `[payments] order ${orderId} amount mismatch: paid ${describe}, expected ${total} ${orderCurrency ?? '?'}; NOT confirming.`,
+          )
+          return { ok: false, reason: 'amountMismatch' }
+        }
+      }
     }
   }
 
