@@ -13,13 +13,15 @@ export type ApplyPaymentOutcomeResult =
 
 /**
  * Applies an asynchronous payment result (Netopia IPN / return-status poll) to an order,
- * idempotently — both channels can and will report the same payment, in any order, more
+ * idempotently: both channels can and will report the same payment, in any order, more
  * than once. Transition rules:
- *   - `confirmed`: from any not-confirmed state (pending, or failed — a late IPN outranks
- *     the return poll's earlier verdict). Re-confirming is a no-op. This write is what
- *     fires T5's atomic capacity-guarded seat consumption; its 409 (sold out in the
- *     meantime) is surfaced as `soldOut` so the caller can flag the needed refund.
- *   - `failed`: only from `pending` — never downgrades a confirmed order.
+ *   - `confirmed`: from `pending` or `failed` (a late IPN outranks the return poll's
+ *     earlier verdict), NEVER from `refunded` (money already went back, the seat is
+ *     already released; a replayed paid-IPN must not re-consume it). Re-confirming is a
+ *     no-op. This write is what fires T5's atomic capacity-guarded seat consumption; its
+ *     409 (sold out in the meantime) is surfaced as `soldOut` so the caller can flag the
+ *     needed refund.
+ *   - `failed`: only from `pending`, never downgrades a confirmed order.
  *   - `refunded`: only from `confirmed` (T5 releases the seats symmetrically).
  *
  * `expectedProviderRef` cross-checks the processor's transaction id against the one we
@@ -33,13 +35,14 @@ export const applyPaymentOutcome = async (args: {
   expectedProvider: string
   expectedProviderRef?: string
   /** Suma/moneda raportate de procesator (IPN). Când sunt date, se compară cu totalul
-   * snapshot al comenzii ÎNAINTE de confirmare — o captură parțială sau o sumă nepotrivită
-   * nu mai confirmă comanda la preț întreg (securitate). Canalul de return-poll nu le are,
-   * deci verificarea e opțională. */
-  expectedAmount?: number
+   * snapshot al comenzii ÎNAINTE de confirmare, deci o captură parțială sau o sumă
+   * nepotrivită nu mai confirmă comanda la preț întreg (securitate). Suma poate sosi și
+   * ca string numeric (JSON-ul IPN nu garantează tipul). Canalul de return-poll nu le
+   * are, deci verificarea e opțională. */
+  expectedAmount?: number | string
   expectedCurrency?: string
 }): Promise<ApplyPaymentOutcomeResult> => {
-  const { payload, orderId, outcome, expectedProvider, expectedProviderRef, expectedAmount, expectedCurrency } = args
+  const { payload, orderId, outcome, expectedProvider, expectedProviderRef, expectedCurrency } = args
 
   const order = (await payload
     .findByID({ collection: 'orders', id: orderId, overrideAccess: true, depth: 0 })
@@ -55,27 +58,41 @@ export const applyPaymentOutcome = async (args: {
     return { ok: false, reason: 'refMismatch' }
   }
 
-  // Verificarea sumei — doar la confirmare, doar când procesatorul a raportat o sumă și
-  // comanda are un total snapshot. 1 ban toleranță pentru rotunjiri float.
-  if (outcome === 'confirmed' && typeof expectedAmount === 'number' && typeof order.pricing?.total === 'number') {
-    const amountOk = Math.abs(expectedAmount - order.pricing.total) <= 0.01
+  const current = order.paymentStatus
+
+  // Idempotență ÎNAINTEA verificării de sumă (feedback verificare Netopia, 2026-08-18):
+  // un IPN retrimis/replicat pentru o comandă deja rezolvată nu schimbă nimic, deci nu
+  // are ce "nepotrivire" să semnaleze; răspunsul corect e succes fără efect. Tot aici:
+  // o comandă REFUNDED nu se mai re-confirmă niciodată dintr-un IPN de plată întârziat,
+  // banii au fost deja returnați și locul eliberat.
+  if (outcome === 'confirmed' && current === 'confirmed') return { ok: true, changed: false, order }
+  if (outcome === 'confirmed' && current === 'refunded') return { ok: false, reason: 'skipped' }
+  if (outcome === 'failed' && current !== 'pending') return { ok: false, reason: 'skipped' }
+  if (outcome === 'refunded' && current !== 'confirmed') return { ok: false, reason: 'skipped' }
+
+  // Verificarea sumei: doar la confirmarea efectivă (de aici încolo chiar tranziționăm),
+  // doar când procesatorul a raportat o sumă și comanda are un total snapshot. 1 ban
+  // toleranță pentru rotunjiri float.
+  const reportedAmount =
+    typeof args.expectedAmount === 'string' ? Number(args.expectedAmount) : args.expectedAmount
+  if (
+    outcome === 'confirmed' &&
+    typeof reportedAmount === 'number' &&
+    Number.isFinite(reportedAmount) &&
+    typeof order.pricing?.total === 'number'
+  ) {
+    const amountOk = Math.abs(reportedAmount - order.pricing.total) <= 0.01
     const currencyOk =
       !expectedCurrency ||
       !order.pricing.currency ||
       expectedCurrency.toUpperCase() === order.pricing.currency.toUpperCase()
     if (!amountOk || !currencyOk) {
       payload.logger.error(
-        `[payments] order ${orderId} amount/currency mismatch — paid ${expectedAmount} ${expectedCurrency ?? '?'}, expected ${order.pricing.total} ${order.pricing.currency ?? '?'}; NOT confirming.`,
+        `[payments] order ${orderId} amount/currency mismatch: paid ${reportedAmount} ${expectedCurrency ?? '?'}, expected ${order.pricing.total} ${order.pricing.currency ?? '?'}; NOT confirming.`,
       )
       return { ok: false, reason: 'amountMismatch' }
     }
   }
-
-  const current = order.paymentStatus
-
-  if (outcome === 'confirmed' && current === 'confirmed') return { ok: true, changed: false, order }
-  if (outcome === 'failed' && current !== 'pending') return { ok: false, reason: 'skipped' }
-  if (outcome === 'refunded' && current !== 'confirmed') return { ok: false, reason: 'skipped' }
 
   try {
     const updated = (await payload.update({

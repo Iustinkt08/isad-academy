@@ -111,9 +111,9 @@ export async function POST(request: Request): Promise<Response> {
     return ack(200)
   }
   if (result.reason === 'amountMismatch') {
-    // Sumă/monedă nepotrivite — applyPaymentOutcome a logat deja. NU confirmăm; cerem
+    // Sumă/monedă nepotrivite, applyPaymentOutcome a logat deja. NU confirmăm; cerem
     // Netopiei să nu retrimită (e o discrepanță care se rezolvă manual, nu prin retry).
-    return ack(200, 'Amount mismatch — order left unconfirmed for manual review.')
+    return ack(200, 'Amount mismatch, order left unconfirmed for manual review.')
   }
 
   payload.logger.warn(`[netopia:ipn] order ${orderId} → ${outcome} rejected (${result.reason})`)
