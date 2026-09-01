@@ -15,6 +15,7 @@ import {
   SuccessMark,
   type RecapRow,
 } from './Confirmation'
+import { AddToCalendar } from './AddToCalendar'
 import { CONFIRMATION_STORAGE_KEY, formatDateLocale } from './constants'
 import { WhatHappensNext } from './OrderSummaryCard'
 
@@ -170,6 +171,18 @@ export function ConfirmationRecap({
       <div className="w-full max-w-[min(350px,calc(100vw_-_40px))] lg:max-w-[560px]">
         <WhatHappensNext locale={locale} steps={nextSteps} />
       </div>
+
+      {/* Add-to-calendar (owner 2026-09-01) — only once the payment is confirmed, and
+          only for LIVE editions; self-study courses keep the plain confirmation. */}
+      {!isPending && order.session.selfStudy !== true && (
+        <AddToCalendar
+          locale={locale}
+          orderId={order.orderId}
+          courseTitle={order.session.courseTitle}
+          startDate={order.session.startDate}
+          schedule={order.session.schedule}
+        />
+      )}
 
       {/* Mobil: buton full-width + link dedesubt; desktop: pe un rând */}
       <div className="flex w-full max-w-[min(350px,calc(100vw_-_40px))] flex-col items-center gap-6 lg:w-auto lg:max-w-none lg:flex-row lg:gap-4">

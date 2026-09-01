@@ -247,7 +247,12 @@ const en = {
     gridAria: 'Course catalog',
     dotsAria: 'Courses',
     upcomingCount: (n: number) => `${n} upcoming ${n === 1 ? 'course' : 'courses'}`,
-    sortLabel: 'Sort: Start date',
+    selfStudyCount: (n: number) => `${n} self-study ${n === 1 ? 'course' : 'courses'}`,
+    // Owner 2026-09-01: the sort chip became the live / self-study filter switch.
+    filterAria: 'Show self-study courses',
+    filterLive: 'Live',
+    filterSelfStudy: 'Self-study',
+    filterEmpty: 'No courses of this type yet — check back soon.',
     viewCourse: 'View course',
     emptyTitle: 'Upcoming editions coming soon.',
     emptyBody:
@@ -319,6 +324,10 @@ const en = {
       "New editions are being scheduled. Subscribe and we'll let you know the moment enrolment opens.",
     vatNote: 'Final price: isad.academy is not VAT registered.',
     refundNote: 'Full refund or free transfer if the edition is cancelled.',
+    exportPdf: 'Export to PDF',
+    pdfEditionsTitle: 'Upcoming editions',
+    pdfTrainerTitle: 'Your trainer',
+    pdfFooter: (url: string) => `Full details & enrolment: ${url}`,
     expertRole: 'Your trainer · 20+ years in AI, risk & financial crime',
     calloutTeamTitle: 'Need this for your whole team?',
     calloutTeamBody: 'We deliver this course in-house, online or on-site.',
@@ -839,6 +848,14 @@ const en = {
     nextPendingEmail: 'Confirmation e-mail arrives as soon as the payment is confirmed',
     nextConfirmInvoice: 'Invoice issued automatically to your billing e-mail',
     nextConfirmMeet: 'Zoom invite arrives before the start date',
+    // Add-to-calendar (owner 2026-09-01) — live sessions only, never self-study.
+    addToCalendar: 'Add to calendar',
+    appleCalendar: 'Apple Calendar',
+    googleCalendar: 'Google Calendar',
+    calendarLocation: 'Online (Zoom)',
+    calendarDescription:
+      'Live online course — the Zoom invite arrives by e-mail before the start date.',
+    calendarMoreDays: (rest: string) => `Also on: ${rest}`,
     backToHomepage: 'Back to homepage',
     contactUs: 'Contact us',
   },
@@ -1161,7 +1178,13 @@ const ro: Dictionary = {
     dotsAria: 'Cursuri',
     upcomingCount: (n: number) =>
       n === 1 ? '1 curs viitor' : n < 20 ? `${n} cursuri viitoare` : `${n} de cursuri viitoare`,
-    sortLabel: 'Sortare: Data de început',
+    selfStudyCount: (n: number) =>
+      n === 1 ? '1 curs self-study' : n < 20 ? `${n} cursuri self-study` : `${n} de cursuri self-study`,
+    // Owner 2026-09-01: chip-ul de sortare a devenit switch-ul de filtrare live / self-study.
+    filterAria: 'Arată cursurile self-study',
+    filterLive: 'Live',
+    filterSelfStudy: 'Self-study',
+    filterEmpty: 'Încă nu există cursuri de acest tip — revino în curând.',
     viewCourse: 'Vezi cursul',
     emptyTitle: 'Edițiile viitoare apar în curând.',
     emptyBody:
@@ -1241,6 +1264,10 @@ const ro: Dictionary = {
       'Ediții noi sunt în curs de programare. Abonează-te și te anunțăm imediat ce se deschid înscrierile.',
     vatNote: 'Preț final: isad.academy nu este plătitoare de TVA.',
     refundNote: 'Rambursare integrală sau transfer gratuit dacă ediția este anulată.',
+    exportPdf: 'Exportă în PDF',
+    pdfEditionsTitle: 'Ediții viitoare',
+    pdfTrainerTitle: 'Trainerul tău',
+    pdfFooter: (url: string) => `Detalii complete și înscriere: ${url}`,
     expertRole: 'Trainerul tău · 20+ ani în AI, risc și criminalitate financiară',
     calloutTeamTitle: 'Ai nevoie de acest curs pentru toată echipa?',
     calloutTeamBody: 'Livrăm acest curs in-house, online sau la sediul vostru.',
@@ -1754,6 +1781,14 @@ const ro: Dictionary = {
     nextPendingEmail: 'E-mailul de confirmare sosește imediat ce plata este validată',
     nextConfirmInvoice: 'Factura se emite automat către e-mailul de facturare',
     nextConfirmMeet: 'Invitația Zoom sosește înainte de data de start',
+    // Add-to-calendar (owner 2026-09-01) — doar sesiunile live, niciodată self-study.
+    addToCalendar: 'Adaugă în calendar',
+    appleCalendar: 'Apple Calendar',
+    googleCalendar: 'Google Calendar',
+    calendarLocation: 'Online (Zoom)',
+    calendarDescription:
+      'Curs live online — invitația Zoom sosește pe e-mail înainte de data de start.',
+    calendarMoreDays: (rest: string) => `Continuă în: ${rest}`,
     backToHomepage: 'Înapoi la pagina principală',
     contactUs: 'Contactează-ne',
   },

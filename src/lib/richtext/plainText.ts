@@ -20,6 +20,45 @@ export const lexicalToPlainText = (value: unknown): string => {
   return parts.join(' ').replace(/\s+/g, ' ').trim()
 }
 
+export type LexicalBlock = { kind: 'paragraph' | 'heading' | 'listItem'; text: string }
+
+/**
+ * Flatten a Lexical editor state to a list of BLOCKS (paragraph / heading / list item),
+ * preserving the document's structure where `lexicalToPlainText` collapses it to one
+ * line. Used by the course PDF export (`src/lib/pdf`) so descriptions keep their
+ * paragraphs and bullets in print. Inline formatting (bold, links) is flattened to text.
+ */
+export const lexicalToBlocks = (value: unknown): LexicalBlock[] => {
+  const inlineText = (node: unknown): string => {
+    const parts: string[] = []
+    const walk = (child: unknown): void => {
+      if (child == null || typeof child !== 'object') return
+      const { text, children } = child as LexicalNode
+      if (typeof text === 'string') parts.push(text)
+      if (Array.isArray(children)) children.forEach(walk)
+    }
+    walk(node)
+    return parts.join('').replace(/\s+/g, ' ').trim()
+  }
+
+  const blocks: LexicalBlock[] = []
+  const children = (value as { root?: { children?: unknown[] } } | null | undefined)?.root
+    ?.children
+  for (const child of children ?? []) {
+    const type = (child as { type?: unknown } | null)?.type
+    if (type === 'list') {
+      for (const item of ((child as LexicalNode).children as unknown[]) ?? []) {
+        const text = inlineText(item)
+        if (text) blocks.push({ kind: 'listItem', text })
+      }
+      continue
+    }
+    const text = inlineText(child)
+    if (text) blocks.push({ kind: type === 'heading' ? 'heading' : 'paragraph', text })
+  }
+  return blocks
+}
+
 /**
  * `true` when a Lexical value carries anything renderable: visible text, or a non-text
  * node that renders on its own (custom block, upload, horizontal rule). Used to hide

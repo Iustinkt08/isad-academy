@@ -13,6 +13,7 @@ import * as migration_20260812_160828_courses_trainers_many from './20260812_160
 import * as migration_20260812_171143_courses_description_html from './20260812_171143_courses_description_html';
 import * as migration_20260813_200541_courses_certification_card from './20260813_200541_courses_certification_card';
 import * as migration_20260815_090122_course_categories from './20260815_090122_course_categories';
+import * as migration_20260901_100000_courses_self_study from './20260901_100000_courses_self_study';
 
 export const migrations = [
   {
@@ -89,5 +90,10 @@ export const migrations = [
     up: migration_20260815_090122_course_categories.up,
     down: migration_20260815_090122_course_categories.down,
     name: '20260815_090122_course_categories'
+  },
+  {
+    up: migration_20260901_100000_courses_self_study.up,
+    down: migration_20260901_100000_courses_self_study.down,
+    name: '20260901_100000_courses_self_study'
   },
 ];
