@@ -19,7 +19,7 @@
 #   7. verificare: site-ul și /admin răspund.
 #
 # Utilizare:
-#   scripts/deploy-cpanel.sh /cale/catre/deploy.env [--yes] [--skip-snapshot]
+#   scripts/deploy-cpanel.sh /cale/catre/deploy.env [--yes] [--skip-snapshot] [--snapshot-only]
 #
 # Fișierul de configurare stă ÎN AFARA repo-ului (nu se comite niciodată). Vezi
 # scripts/deploy-cpanel.env.example pentru variabilele cerute.
@@ -31,16 +31,21 @@ shift || true
 
 ASSUME_YES=0
 SKIP_SNAPSHOT=0
+SNAPSHOT_ONLY=0
 for arg in "$@"; do
   case "$arg" in
     --yes) ASSUME_YES=1 ;;
     --skip-snapshot) SKIP_SNAPSHOT=1 ;;
+    # Pentru deploy-urile care schimbă schema: ia doar snapshotul și oprește-te, ca
+    # migrațiile să poată fi aplicate/testate pe el; apoi reia cu --skip-snapshot.
+    # Fără pasul ăsta, build-ul din snapshotul nemigrat pică la prerender pe coloanele noi.
+    --snapshot-only) SNAPSHOT_ONLY=1 ;;
     *) echo "Argument necunoscut: $arg" >&2; exit 2 ;;
   esac
 done
 
 if [[ -z "$CONFIG" || ! -f "$CONFIG" ]]; then
-  echo "Utilizare: $0 /cale/catre/deploy.env [--yes] [--skip-snapshot]" >&2
+  echo "Utilizare: $0 /cale/catre/deploy.env [--yes] [--skip-snapshot] [--snapshot-only]" >&2
   echo "Vezi scripts/deploy-cpanel.env.example." >&2
   exit 2
 fi
@@ -140,6 +145,13 @@ else
   docker exec -i "$PG_CONTAINER" psql -U postgres -d "$SNAPSHOT_DB" -q -v ON_ERROR_STOP=0 < prod.sql >/dev/null
   rm -f prod.sql
   echo "  gata"
+fi
+
+if [[ "$SNAPSHOT_ONLY" -eq 1 ]]; then
+  step "Oprire după snapshot (--snapshot-only)"
+  echo "  Snapshotul producției e în baza locală '$SNAPSHOT_DB'."
+  echo "  Aplică migrațiile pe el, apoi reia deploy-ul cu --skip-snapshot."
+  exit 0
 fi
 
 # ------------------------------------------------------------------- 3. build
