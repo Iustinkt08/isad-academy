@@ -102,8 +102,8 @@ export default function CatalogGrid({
     <section className="flex flex-col items-center bg-[#f8f9fa] pb-[30px]">
       {/* Toolbar — 350 pe mobil; pe desktop aliniat la containerul standard al
           site-ului (max-w-6xl + px-8 = linia navbar/landing) */}
-      <div className="flex w-full max-w-[min(350px,calc(100vw_-_40px))] items-center justify-between pb-8 lg:max-w-6xl lg:px-8 lg:pb-5">
-        <p className="text-[14px] font-medium tracking-[-0.3px] text-[#959595]">
+      <div className="flex w-full max-w-[min(350px,calc(100vw_-_40px))] flex-col items-center gap-4 pb-8 lg:max-w-6xl lg:flex-row lg:justify-between lg:gap-0 lg:px-8 lg:pb-5">
+        <p className="text-center text-[14px] font-medium tracking-[-0.3px] text-[#959595] lg:text-left">
           {selfStudy ? t.selfStudyCount(sorted.length) : t.upcomingCount(sorted.length)}
         </p>
         {/* Switch live / self-study (owner 2026-09-01, înlocuiește chip-ul de sort):
@@ -123,14 +123,14 @@ export default function CatalogGrid({
             }`}
           />
           <span
-            className={`relative z-10 px-4 py-1.5 transition-colors duration-300 ${
+            className={`relative z-10 whitespace-nowrap px-4 py-1.5 transition-colors duration-300 ${
               selfStudy ? 'text-[#222222]' : 'text-white'
             }`}
           >
             {t.filterLive}
           </span>
           <span
-            className={`relative z-10 px-4 py-1.5 transition-colors duration-300 ${
+            className={`relative z-10 whitespace-nowrap px-4 py-1.5 transition-colors duration-300 ${
               selfStudy ? 'text-white' : 'text-[#222222]'
             }`}
           >
