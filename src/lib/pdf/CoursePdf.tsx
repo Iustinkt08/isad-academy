@@ -1,3 +1,5 @@
+import fs from 'fs'
+
 import {
   Document,
   Font,
@@ -22,15 +24,31 @@ import { publicAsset } from './assets'
  * white, EB green #009E56 — same palette as the page (Brand Book p.10).
  */
 
-Font.register({
-  family: 'Poppins',
-  fonts: [
-    { src: publicAsset('fonts', 'Poppins-Regular.ttf'), fontWeight: 400 },
-    { src: publicAsset('fonts', 'Poppins-Medium.ttf'), fontWeight: 500 },
-    { src: publicAsset('fonts', 'Poppins-SemiBold.ttf'), fontWeight: 600 },
-    { src: publicAsset('fonts', 'Poppins-Bold.ttf'), fontWeight: 700 },
-  ],
+const POPPINS = [
+  { src: publicAsset('fonts', 'Poppins-Regular.ttf'), fontWeight: 400 },
+  { src: publicAsset('fonts', 'Poppins-Medium.ttf'), fontWeight: 500 },
+  { src: publicAsset('fonts', 'Poppins-SemiBold.ttf'), fontWeight: 600 },
+  { src: publicAsset('fonts', 'Poppins-Bold.ttf'), fontWeight: 700 },
+]
+
+// Fonturile se înregistrează DOAR dacă fișierele chiar există: un TTF de negăsit aruncă
+// abia la render și dă 500 pe toată ruta (lecția primului deploy, 2026-09-01). Fără
+// Poppins, PDF-ul iese în Helvetica — degradare elegantă, nu eroare — iar breadcrumb-ul
+// de pe stderr spune unde s-a căutat (stdout se pierde sub Passenger).
+const poppinsAvailable = POPPINS.every((font) => {
+  try {
+    return fs.existsSync(font.src)
+  } catch {
+    return false
+  }
 })
+if (poppinsAvailable) {
+  Font.register({ family: 'Poppins', fonts: POPPINS })
+} else {
+  console.error('[course-pdf] Poppins TTF negăsit — folosesc Helvetica; căutat:', POPPINS[0]?.src)
+}
+const FONT_FAMILY = poppinsAvailable ? 'Poppins' : 'Helvetica'
+
 // No mid-word hyphenation — matches the site's clean look; text wraps at spaces only.
 Font.registerHyphenationCallback((word) => [word])
 
@@ -81,7 +99,7 @@ const HAIRLINE = '#e6e6e6'
 
 const styles = StyleSheet.create({
   page: {
-    fontFamily: 'Poppins',
+    fontFamily: FONT_FAMILY,
     fontSize: 10,
     color: INK,
     paddingTop: 42,

@@ -3,22 +3,41 @@ import path from 'path'
 
 import sharp from 'sharp'
 
+import { uploadsDir } from '@/lib/media/uploadsDir'
+
 /**
  * Local asset resolution for the course PDF export. `process.cwd()` is NOT reliable in
  * production — under Passenger the app boots with cwd = the account home, not the app
- * root (see the full diagnosis in `src/lib/media/uploadsDir.ts`, 2026-08-07). Same trick
- * as there: in the standalone bundle `process.argv[1]` is `<app root>/server.js`, and
- * `public/` sits next to it; in dev, cwd is the project root.
+ * root (see the full diagnosis in `src/lib/media/uploadsDir.ts`, 2026-08-07). And
+ * `process.argv[1]` is NOT `server.js` there either: the LiteSpeed loader starts the app
+ * through `app_wrapper.cjs`/`app.js` (PassengerStartupFile), so the first prod deploy of
+ * this route 500-ed on unresolvable font paths (2026-09-01). The reliable anchor is the
+ * one that already works in production: `uploadsDir` (env `PAYLOAD_MEDIA_DIR` or the
+ * startup-file dir) points at `<app root>/media`, and `public/` sits right next to it.
+ * Every candidate is PROBED for an actual `public/` dir instead of being trusted.
  */
 const resolveAppRoot = (): string => {
   const entry = process.argv[1]
-  if (entry && path.basename(entry) === 'server.js') return path.dirname(entry)
+  const candidates = [
+    path.dirname(uploadsDir),
+    entry ? path.dirname(entry) : '',
+    process.cwd(),
+  ]
+  for (const dir of candidates) {
+    try {
+      if (dir && fs.existsSync(path.join(dir, 'public'))) return dir
+    } catch {
+      // un candidat inaccesibil nu oprește căutarea
+    }
+  }
   return process.cwd()
 }
 
-/** Absolute path of a file under `public/`. */
+let appRoot: string | null = null
+
+/** Absolute path of a file under `public/` (app root resolved once per process). */
 export const publicAsset = (...segments: string[]): string =>
-  path.join(resolveAppRoot(), 'public', ...segments)
+  path.join((appRoot ??= resolveAppRoot()), 'public', ...segments)
 
 /**
  * Rasterize a local image (SVG included — the brand logos are SVG, which
