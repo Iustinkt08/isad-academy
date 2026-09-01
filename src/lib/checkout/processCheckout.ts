@@ -14,12 +14,25 @@ export type CheckoutFailureDetail =
   | 'notFound'
   | 'duplicate'
 
+/** Display slice of the purchased edition returned in the 200 body (and stored by the
+ * confirmation page). `selfStudy`/`schedule` (owner 2026-09-01) feed the add-to-calendar
+ * buttons — optional so payloads stored before they existed still parse. */
+export type CheckoutSessionView = {
+  id: number
+  courseTitle: string
+  startDate: string
+  /** Self-study course — the confirmation page hides the add-to-calendar buttons. */
+  selfStudy?: boolean
+  /** Concrete meeting days (live editions) — the calendar events, one per day. */
+  schedule?: { date: string; startTime: string; endTime: string }[]
+}
+
 export type CheckoutSuccessBody = {
   orderId: number
   status: 'confirmed' | 'requiresAction'
   redirectUrl?: string
   pricing: PricingSnapshot
-  session: { id: number; courseTitle: string; startDate: string }
+  session: CheckoutSessionView
   participants: { name: string; email: string }[]
   /** Buyer's email — the confirmation page's "email on its way to {email}" line. */
   buyerEmail?: string

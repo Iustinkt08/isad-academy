@@ -68,15 +68,21 @@ export default function CatalogGrid({
   courses?: CatalogCourse[];
 }) {
   const t = getDictionary(locale).catalog;
-  const [asc, setAsc] = useState(true);
+  // Owner 2026-09-01: sort-ul a fost înlocuit cu switch-ul live / self-study.
+  const [selfStudy, setSelfStudy] = useState(false);
   const scrollerRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
 
-  const sorted = [...courses].sort((a, b) =>
-    asc
-      ? a.nextStartDate.localeCompare(b.nextStartDate)
-      : b.nextStartDate.localeCompare(a.nextStartDate),
-  );
+  const sorted = courses
+    .filter((course) => (course.selfStudy === true) === selfStudy)
+    .sort((a, b) => a.nextStartDate.localeCompare(b.nextStartDate));
+
+  function toggleSelfStudy() {
+    setSelfStudy(!selfStudy);
+    // Strip-ul mobil pornește de la primul card al noii liste.
+    setActiveIndex(0);
+    scrollerRef.current?.scrollTo({ left: 0 });
+  }
 
   function onScroll() {
     const el = scrollerRef.current;
@@ -98,16 +104,47 @@ export default function CatalogGrid({
           site-ului (max-w-6xl + px-8 = linia navbar/landing) */}
       <div className="flex w-full max-w-[min(350px,calc(100vw_-_40px))] items-center justify-between pb-8 lg:max-w-6xl lg:px-8 lg:pb-5">
         <p className="text-[14px] font-medium tracking-[-0.3px] text-[#959595]">
-          {t.upcomingCount(courses.length)}
+          {selfStudy ? t.selfStudyCount(sorted.length) : t.upcomingCount(sorted.length)}
         </p>
+        {/* Switch live / self-study (owner 2026-09-01, înlocuiește chip-ul de sort):
+            pastila gradient glisează stânga↔dreapta sub eticheta activă */}
         <button
-          onClick={() => setAsc(!asc)}
-          className="rounded-[999px] border border-[#e6e6e6] bg-white px-4 py-2 text-[14px] font-medium tracking-[-0.3px] text-[#222222] transition-colors hover:border-[#bdbdbd]"
+          type="button"
+          role="switch"
+          aria-checked={selfStudy}
+          aria-label={t.filterAria}
+          onClick={toggleSelfStudy}
+          className="relative grid grid-cols-2 items-center rounded-[999px] border border-[#e6e6e6] bg-white p-1 text-[14px] font-medium tracking-[-0.3px] transition-colors hover:border-[#bdbdbd]"
         >
-          {/* pe mobil fără săgeată (designul owner-ului); pe desktop cu direcție */}
-          {t.sortLabel}<span className="hidden lg:inline"> {asc ? '↓' : '↑'}</span>
+          <span
+            aria-hidden="true"
+            className={`absolute bottom-1 left-1 top-1 w-[calc(50%_-_4px)] rounded-[999px] bg-gradient-to-b from-[#407ea2] to-[#1c5d99] to-[80%] shadow-[0_2px_4px_-1px_rgba(0,0,0,0.25)] transition-transform duration-300 ease-out ${
+              selfStudy ? 'translate-x-full' : 'translate-x-0'
+            }`}
+          />
+          <span
+            className={`relative z-10 px-4 py-1.5 transition-colors duration-300 ${
+              selfStudy ? 'text-[#222222]' : 'text-white'
+            }`}
+          >
+            {t.filterLive}
+          </span>
+          <span
+            className={`relative z-10 px-4 py-1.5 transition-colors duration-300 ${
+              selfStudy ? 'text-white' : 'text-[#222222]'
+            }`}
+          >
+            {t.filterSelfStudy}
+          </span>
         </button>
       </div>
+
+      {/* Partea selectată nu are încă niciun curs → mesaj în locul stripului */}
+      {sorted.length === 0 && (
+        <p className="px-5 pb-10 pt-4 text-center text-[14px] text-[#959595]">
+          {t.filterEmpty}
+        </p>
+      )}
 
       {/* Mobil: strip cu snap-scroll; Desktop: wrap centrat gap 30 */}
       <div
@@ -120,7 +157,7 @@ export default function CatalogGrid({
         <div className="flex w-max gap-3 pl-[21px] pr-[10px] lg:mx-auto lg:w-auto lg:max-w-[1103px] lg:flex-wrap lg:justify-center lg:gap-[30px] lg:p-0">
           {sorted.map((course, i) => (
             <CourseCard
-              key={course.title}
+              key={course.href}
               locale={locale}
               course={course}
               active={i === activeIndex}
@@ -137,7 +174,7 @@ export default function CatalogGrid({
       >
         {sorted.map((course, i) => (
           <button
-            key={course.title}
+            key={course.href}
             role="tab"
             aria-selected={i === activeIndex}
             aria-label={course.title}

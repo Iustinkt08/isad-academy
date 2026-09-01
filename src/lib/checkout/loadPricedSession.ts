@@ -3,7 +3,7 @@ import type { Payload } from 'payload'
 import type { CourseSession, DiscountCode, SiteSetting } from '../../payload-types'
 import { resolveCurrency, windowForCurrency, type Currency } from '../currency'
 import { computeOrderPricing, type PricingSnapshot } from '../pricing'
-import type { CheckoutFailureBody } from './processCheckout'
+import type { CheckoutFailureBody, CheckoutSessionView } from './processCheckout'
 
 /**
  * Shared checkout/quote pipeline (T16 dedupe): session lookup → up-front status gates →
@@ -31,7 +31,7 @@ export type PricedSession = {
   ok: true
   session: CourseSession
   /** Display slice both endpoints return verbatim in their 200 bodies. */
-  sessionView: { id: number; courseTitle: string; startDate: string }
+  sessionView: CheckoutSessionView
   /** The looked-up code docs, in application order (order snapshot + usage accounting). */
   codeDocs: DiscountCode[]
   siteSettings: SiteSetting
@@ -56,6 +56,27 @@ const courseTitleOf = (course: unknown): string => {
     return typeof title === 'string' ? title : ''
   }
   return ''
+}
+
+/** Same populated-or-id duality as `courseTitleOf` — a raw id (or missing flag) counts as
+ * a live course, so the confirmation page only drops the calendar buttons on a definite
+ * self-study course. */
+const courseSelfStudyOf = (course: unknown): boolean =>
+  course != null &&
+  typeof course === 'object' &&
+  (course as { isSelfStudy?: unknown }).isSelfStudy === true
+
+/** The session's concrete meeting days, normalized to plain strings for the 200 body —
+ * rows missing any part are skipped (they cannot become a calendar event). */
+const scheduleOf = (
+  schedule: CourseSession['schedule'],
+): CheckoutSessionView['schedule'] => {
+  const rows = (schedule ?? []).flatMap((row) =>
+    row?.date && row.startTime && row.endTime
+      ? [{ date: String(row.date), startTime: row.startTime, endTime: row.endTime }]
+      : [],
+  )
+  return rows.length > 0 ? rows : undefined
 }
 
 export const loadPricedSession = async ({
@@ -177,6 +198,8 @@ export const loadPricedSession = async ({
       id: session.id,
       courseTitle: courseTitleOf(session.course),
       startDate: String(session.startDate),
+      selfStudy: courseSelfStudyOf(session.course),
+      schedule: scheduleOf(session.schedule),
     },
     codeDocs,
     siteSettings,

@@ -243,6 +243,10 @@ export interface Course {
    */
   durationHours?: number | null;
   /**
+   * Tick for a self-study course (studied at your own pace, no live sessions). The catalog filter switch separates self-study courses from live ones, and the checkout confirmation skips the add-to-calendar buttons.
+   */
+  isSelfStudy?: boolean | null;
+  /**
    * Pick a category, or create a new one right here ("Add new") — it is saved and reusable on every other course. Reserved for future catalog filtering; the ISO/IEC 42001 category also switches the course to the PECB certification track.
    */
   category?: (number | null) | CourseCategory;
@@ -1447,6 +1451,7 @@ export interface CoursesSelect<T extends boolean = true> {
   slug?: T;
   shortDescription?: T;
   durationHours?: T;
+  isSelfStudy?: T;
   category?: T;
   categoryKey?: T;
   description?: T;

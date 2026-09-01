@@ -92,20 +92,25 @@ async function getCatalogData(locale: Locale): Promise<CatalogData> {
       const sessions = byCourse.get(course.id) ?? []
       const upcomingStart = earliestUpcomingStart(sessions)
       const hasUpcoming = upcomingStart != null
+      // Owner 2026-09-01: self-study courses run at the buyer's own pace — they always
+      // sit in the grid (behind the toolbar switch) and never feed the past strip.
+      const selfStudy = course.isSelfStudy === true
 
       // Past editions strip — every already-delivered edition, newest first (below).
       // v2 (owner Figma 3908-107): the muted cards are NOT clickable anymore.
-      for (const session of sessions.filter(isPastSession)) {
-        past.push({
-          title: course.title,
-          subtitle: courseSubtitle(course),
-          meta: dict.catalog.editionMeta(formatDotDate(session.startDate), session.seatsSold ?? 0),
-        })
+      if (!selfStudy) {
+        for (const session of sessions.filter(isPastSession)) {
+          past.push({
+            title: course.title,
+            subtitle: courseSubtitle(course),
+            meta: dict.catalog.editionMeta(formatDotDate(session.startDate), session.seatsSold ?? 0),
+          })
+        }
       }
 
       // Grid: courses with an upcoming edition, or with no editions scheduled yet.
       // v2: no durationLabel / earlyBirdOpen — the chips were removed from the card.
-      if (hasUpcoming || sessions.length === 0) {
+      if (selfStudy || hasUpcoming || sessions.length === 0) {
         catalog.push({
           title: course.title,
           subtitle: courseSubtitle(course),
@@ -113,6 +118,7 @@ async function getCatalogData(locale: Locale): Promise<CatalogData> {
           href: localePath(locale, `/courses/${course.slug}`),
           // No upcoming edition → sort last (the date is never rendered).
           nextStartDate: hasUpcoming ? new Date(upcomingStart).toISOString() : '9999-12-31',
+          selfStudy,
         })
       }
     }

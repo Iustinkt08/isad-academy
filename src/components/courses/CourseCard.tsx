@@ -29,6 +29,8 @@ export type CatalogCourse = {
   icon?: string;
   /** Folosit doar pentru sortare (nu se afișează pe card) */
   nextStartDate: string; // ISO, ex. "2026-07-28"
+  /** Curs self-study (owner 2026-09-01) — switch-ul din toolbar filtrează după acest flag */
+  selfStudy?: boolean;
 };
 
 export default function CourseCard({

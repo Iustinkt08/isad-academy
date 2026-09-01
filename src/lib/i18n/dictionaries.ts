@@ -247,7 +247,12 @@ const en = {
     gridAria: 'Course catalog',
     dotsAria: 'Courses',
     upcomingCount: (n: number) => `${n} upcoming ${n === 1 ? 'course' : 'courses'}`,
-    sortLabel: 'Sort: Start date',
+    selfStudyCount: (n: number) => `${n} self-study ${n === 1 ? 'course' : 'courses'}`,
+    // Owner 2026-09-01: the sort chip became the live / self-study filter switch.
+    filterAria: 'Show self-study courses',
+    filterLive: 'Live',
+    filterSelfStudy: 'Self-study',
+    filterEmpty: 'No courses of this type yet — check back soon.',
     viewCourse: 'View course',
     emptyTitle: 'Upcoming editions coming soon.',
     emptyBody:
@@ -839,6 +844,14 @@ const en = {
     nextPendingEmail: 'Confirmation e-mail arrives as soon as the payment is confirmed',
     nextConfirmInvoice: 'Invoice issued automatically to your billing e-mail',
     nextConfirmMeet: 'Zoom invite arrives before the start date',
+    // Add-to-calendar (owner 2026-09-01) — live sessions only, never self-study.
+    addToCalendar: 'Add to calendar',
+    appleCalendar: 'Apple Calendar',
+    googleCalendar: 'Google Calendar',
+    calendarLocation: 'Online (Zoom)',
+    calendarDescription:
+      'Live online course — the Zoom invite arrives by e-mail before the start date.',
+    calendarMoreDays: (rest: string) => `Also on: ${rest}`,
     backToHomepage: 'Back to homepage',
     contactUs: 'Contact us',
   },
@@ -1161,7 +1174,13 @@ const ro: Dictionary = {
     dotsAria: 'Cursuri',
     upcomingCount: (n: number) =>
       n === 1 ? '1 curs viitor' : n < 20 ? `${n} cursuri viitoare` : `${n} de cursuri viitoare`,
-    sortLabel: 'Sortare: Data de început',
+    selfStudyCount: (n: number) =>
+      n === 1 ? '1 curs self-study' : n < 20 ? `${n} cursuri self-study` : `${n} de cursuri self-study`,
+    // Owner 2026-09-01: chip-ul de sortare a devenit switch-ul de filtrare live / self-study.
+    filterAria: 'Arată cursurile self-study',
+    filterLive: 'Live',
+    filterSelfStudy: 'Self-study',
+    filterEmpty: 'Încă nu există cursuri de acest tip — revino în curând.',
     viewCourse: 'Vezi cursul',
     emptyTitle: 'Edițiile viitoare apar în curând.',
     emptyBody:
@@ -1754,6 +1773,14 @@ const ro: Dictionary = {
     nextPendingEmail: 'E-mailul de confirmare sosește imediat ce plata este validată',
     nextConfirmInvoice: 'Factura se emite automat către e-mailul de facturare',
     nextConfirmMeet: 'Invitația Zoom sosește înainte de data de start',
+    // Add-to-calendar (owner 2026-09-01) — doar sesiunile live, niciodată self-study.
+    addToCalendar: 'Adaugă în calendar',
+    appleCalendar: 'Apple Calendar',
+    googleCalendar: 'Google Calendar',
+    calendarLocation: 'Online (Zoom)',
+    calendarDescription:
+      'Curs live online — invitația Zoom sosește pe e-mail înainte de data de start.',
+    calendarMoreDays: (rest: string) => `Continuă în: ${rest}`,
     backToHomepage: 'Înapoi la pagina principală',
     contactUs: 'Contactează-ne',
   },

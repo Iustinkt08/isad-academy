@@ -126,6 +126,20 @@ export const Courses: CollectionConfig = {
       },
     },
     {
+      // Owner 2026-09-01: self-study courses — the catalog filter switch groups the grid
+      // by this flag, and the checkout confirmation hides the add-to-calendar buttons.
+      name: 'isSelfStudy',
+      type: 'checkbox',
+      defaultValue: false,
+      label: { en: 'Self-study course', ro: 'Curs self-study' },
+      admin: {
+        description: {
+          en: 'Tick for a self-study course (studied at your own pace, no live sessions). The catalog filter switch separates self-study courses from live ones, and the checkout confirmation skips the add-to-calendar buttons.',
+          ro: 'Bifați pentru un curs self-study (parcurs în ritm propriu, fără sesiuni live). Comutatorul de filtrare din catalog separă cursurile self-study de cele live, iar confirmarea de la checkout nu mai afișează butoanele de adăugare în calendar.',
+        },
+      },
+    },
+    {
       // Owner 2026-08-15: was a fixed select (iso/antiFraud/security/other) — now a
       // relationship so new categories can be typed once (the field's "Add new" drawer)
       // and reused on every later course. The old options live on as seeded docs with the

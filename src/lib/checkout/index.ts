@@ -14,6 +14,7 @@ export type {
   CheckoutFailureBody,
   CheckoutFailureDetail,
   CheckoutResult,
+  CheckoutSessionView,
   CheckoutSuccessBody,
   ProcessCheckoutDeps,
 } from './processCheckout'
