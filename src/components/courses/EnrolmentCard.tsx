@@ -68,9 +68,12 @@ function editionSummary(e: Edition, t: Dictionary['courseDetail']) {
 export default function EnrolmentCard({
   locale,
   editions,
+  pdfHref,
 }: {
   locale: Locale
   editions: Edition[]
+  /** Course PDF export route (`/courses/[slug]/pdf`) — shows the black download pill. */
+  pdfHref?: string
 }) {
   const t = getDictionary(locale).courseDetail
   const firstOpen = editions.find((e) => !e.soldOut) ?? editions[0]
@@ -226,6 +229,28 @@ export default function EnrolmentCard({
             {t.refundNote}
           </p>
         </>
+      )}
+
+      {/* Export to PDF (owner 2026-09-01) — black pill, the CourseCard "View course"
+          style; a plain download link to the server-rendered PDF route. */}
+      {pdfHref && (
+        <a
+          href={pdfHref}
+          download
+          className="mt-1 flex items-center justify-center gap-2 rounded-full bg-black pb-[13px] pt-3 text-[15px] font-semibold text-white shadow-[0_0_0_1px_rgba(255,255,255,0.2),4px_6px_25px_rgba(0,0,0,0.25),8px_10px_45px_rgba(0,0,0,0.2)] transition-transform hover:scale-[1.02]"
+        >
+          <svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path
+              d="M8 2.5v7m0 0 3-3m-3 3-3-3"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path d="M3 13.5h10" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+          </svg>
+          {t.exportPdf}
+        </a>
       )}
     </div>
   )
