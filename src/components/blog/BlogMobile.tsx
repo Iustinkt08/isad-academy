@@ -60,11 +60,26 @@ export function BlogHeaderMobile({ locale }: { locale: Locale }) {
 }
 
 /* ---------- Coperta / placeholder-ul de brand (ACELAȘI asset ca pe desktop) ---------- */
-function CardCover({ post, brandLabel }: { post: BlogPostCard; brandLabel: string }) {
+function CardCover({
+  post,
+  brandLabel,
+  fit = 'cover',
+}: {
+  post: BlogPostCard;
+  brandLabel: string;
+  /** `contain` = imaginea întreagă, necropată (sliderul mobil — owner 2026-09-01). */
+  fit?: 'cover' | 'contain';
+}) {
   if (post.cover) {
     return (
       // eslint-disable-next-line @next/next/no-img-element
-      <img src={post.cover} alt="" className="h-[190px] w-full shrink-0 object-cover" />
+      <img
+        src={post.cover}
+        alt=""
+        className={`h-[190px] w-full shrink-0 ${
+          fit === 'contain' ? 'bg-white object-contain' : 'object-cover'
+        }`}
+      />
     );
   }
   return (
@@ -144,7 +159,10 @@ function SliderCard({ post, locale }: { post: BlogPostCard; locale: Locale }) {
       href={post.href}
       className="group flex h-[458px] w-[min(300px,calc(100vw_-_40px))] shrink-0 snap-start flex-col overflow-hidden rounded-[24px] bg-white shadow-[3px_9px_20px_rgba(77,77,77,0.04)]"
     >
-      <CardCover post={post} brandLabel={t.brandLabel} />
+      {/* Cardul de 300 e mai îngust decât featured-ul (350) — object-cover ar mări și
+          tăia bannerul ca să umple cutia 300×190 („zoom", owner 2026-09-01). `contain`
+          arată imaginea ÎNTREAGĂ, nemărită, centrată pe alb; featured rămâne pe cover. */}
+      <CardCover post={post} brandLabel={t.brandLabel} fit="contain" />
       <div className="flex min-h-0 flex-1 flex-col justify-between px-7 pb-6 pt-[22px]">
         <div className="flex flex-col gap-3">
           {/* Clamp-uri: cardul are 458px ficși — textul lung din CMS s-ar tăia brut */}
