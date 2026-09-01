@@ -82,7 +82,12 @@ const nextConfig = {
   output: 'standalone',
   // Media (uploads Payload) e pe disc, în afara git-ului; pe Vercel funcțiile primesc doar
   // fișierele trasate — includem explicit folderul ca imaginile să fie servite și acolo.
-  outputFileTracingIncludes: { '/**': ['./media/**'] },
+  // + pdfkit/standard-fonts: @react-pdf (ruta /courses/[slug]/pdf) le cere la runtime
+  //   printr-un require dinamic pe care tracing-ul nu-l vede — fara ele, standalone-ul
+  //   moare cu MODULE_NOT_FOUND pe Helvetica.cjs (deploy 2026-09-01, reprodus local).
+  outputFileTracingIncludes: {
+    '/**': ['./media/**', './node_modules/pdfkit/js/standard-fonts/**'],
+  },
   async redirects() {
     return [
       // /certificare retired 2026-07-11 — certification lives on Home as a section
