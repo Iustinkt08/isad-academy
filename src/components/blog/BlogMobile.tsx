@@ -67,8 +67,10 @@ function CardCover({
 }: {
   post: BlogPostCard;
   brandLabel: string;
-  /** `contain` = imaginea întreagă, necropată (sliderul mobil — owner 2026-09-01). */
-  fit?: 'cover' | 'contain';
+  /** Sliderul mobil (owner 2026-09-01): `matchFeatured` = banda păstrează PROPORȚIA
+   *  cutiei cardului Latest (350:190), deci același nivel mic de zoom ca acolo — nu
+   *  crop-ul agresiv al cutiei 300×190; `contain` = imaginea întreagă pe alb. */
+  fit?: 'cover' | 'contain' | 'matchFeatured';
 }) {
   if (post.cover) {
     return (
@@ -76,9 +78,13 @@ function CardCover({
       <img
         src={post.cover}
         alt=""
-        className={`h-[190px] w-full shrink-0 ${
-          fit === 'contain' ? 'bg-white object-contain' : 'object-cover'
-        }`}
+        className={
+          fit === 'matchFeatured'
+            ? 'aspect-[35/19] h-auto w-full shrink-0 object-cover'
+            : `h-[190px] w-full shrink-0 ${
+                fit === 'contain' ? 'bg-white object-contain' : 'object-cover'
+              }`
+        }
       />
     );
   }
@@ -159,10 +165,11 @@ function SliderCard({ post, locale }: { post: BlogPostCard; locale: Locale }) {
       href={post.href}
       className="group flex h-[458px] w-[min(300px,calc(100vw_-_40px))] shrink-0 snap-start flex-col overflow-hidden rounded-[24px] bg-white shadow-[3px_9px_20px_rgba(77,77,77,0.04)]"
     >
-      {/* Cardul de 300 e mai îngust decât featured-ul (350) — object-cover ar mări și
-          tăia bannerul ca să umple cutia 300×190 („zoom", owner 2026-09-01). `contain`
-          arată imaginea ÎNTREAGĂ, nemărită, centrată pe alb; featured rămâne pe cover. */}
-      <CardCover post={post} brandLabel={t.brandLabel} fit="contain" />
+      {/* Cardul de 300 e mai îngust decât featured-ul (350) — cutia fixă 300×190 mărea
+          și tăia bannerul („zoom", owner 2026-09-01). `matchFeatured`: banda păstrează
+          proporția cutiei Latest (350:190 → ~163px la 300 lățime), deci același decupaj
+          discret ca la cardul Latest; featured rămâne pe cover în cutia lui. */}
+      <CardCover post={post} brandLabel={t.brandLabel} fit="matchFeatured" />
       <div className="flex min-h-0 flex-1 flex-col justify-between px-7 pb-6 pt-[22px]">
         <div className="flex flex-col gap-3">
           {/* Clamp-uri: cardul are 458px ficși — textul lung din CMS s-ar tăia brut */}
