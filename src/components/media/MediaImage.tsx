@@ -16,6 +16,7 @@ export function MediaImage({
   sizes,
   fill = false,
   priority = false,
+  quality,
 }: {
   media: Media | null
   className?: string
@@ -23,6 +24,8 @@ export function MediaImage({
   /** Fill the parent (parent must be `relative` with a fixed aspect/size). */
   fill?: boolean
   priority?: boolean
+  /** next/image re-encode quality (1–100); omit for the Next default (75). */
+  quality?: number
 }) {
   if (!media?.url) return null
 
@@ -37,6 +40,7 @@ export function MediaImage({
         fill
         sizes={sizes}
         priority={priority}
+        quality={quality}
         className={cn('object-cover', className)}
       />
     )
@@ -50,6 +54,7 @@ export function MediaImage({
       height={media.height ?? 675}
       sizes={sizes}
       priority={priority}
+      quality={quality}
       className={className}
     />
   )

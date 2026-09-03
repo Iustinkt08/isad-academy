@@ -48,7 +48,7 @@ function ArticleCover({ post }: { post: BlogPost }) {
   if (cover) {
     return (
       <div className="relative h-[166px] w-full overflow-hidden rounded-[24px] lg:h-[360px]">
-        <MediaImage media={cover} fill sizes="(min-width: 1024px) 760px, 100vw" priority />
+        <MediaImage media={cover} fill sizes="(min-width: 1024px) 760px, 100vw" priority quality={100} />
       </div>
     )
   }
