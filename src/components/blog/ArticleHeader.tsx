@@ -43,12 +43,28 @@ function GradientTitle({ title }: { title: string }) {
 }
 
 /** Cover — real image, or the gradient placeholder with the brand "A" watermark centered. */
+/**
+ * Covers at or under this size are served as the uploaded file, untouched (owner
+ * 2026-09-15: flat title graphics rang at the text edges after the WebP re-encode,
+ * even at quality 100). Heavier files (photo PNGs of 1–2 MB) still go through the
+ * optimizer at quality 100 so mobile visitors don't download megabytes for a banner.
+ */
+const COVER_ORIGINAL_MAX_BYTES = 500 * 1024
+
 function ArticleCover({ post }: { post: BlogPost }) {
   const cover = asMedia(post.coverImage)
   if (cover) {
+    const serveOriginal = typeof cover.filesize === 'number' && cover.filesize <= COVER_ORIGINAL_MAX_BYTES
     return (
       <div className="relative h-[166px] w-full overflow-hidden rounded-[24px] lg:h-[360px]">
-        <MediaImage media={cover} fill sizes="(min-width: 1024px) 760px, 100vw" priority quality={100} />
+        <MediaImage
+          media={cover}
+          fill
+          sizes="(min-width: 1024px) 760px, 100vw"
+          priority
+          quality={100}
+          unoptimized={serveOriginal}
+        />
       </div>
     )
   }

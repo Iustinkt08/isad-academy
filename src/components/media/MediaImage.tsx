@@ -17,6 +17,7 @@ export function MediaImage({
   fill = false,
   priority = false,
   quality,
+  unoptimized = false,
 }: {
   media: Media | null
   className?: string
@@ -26,6 +27,12 @@ export function MediaImage({
   priority?: boolean
   /** next/image re-encode quality (1–100); omit for the Next default (75). */
   quality?: number
+  /**
+   * Serve the uploaded file byte-for-byte (no resize, no WebP re-encode). Use for
+   * flat graphics (text/logo on solid colour) where lossy re-encoding rings at the
+   * edges even at quality 100. The browser downloads the full original.
+   */
+  unoptimized?: boolean
 }) {
   if (!media?.url) return null
 
@@ -41,6 +48,7 @@ export function MediaImage({
         sizes={sizes}
         priority={priority}
         quality={quality}
+        unoptimized={unoptimized}
         className={cn('object-cover', className)}
       />
     )
@@ -55,6 +63,7 @@ export function MediaImage({
       sizes={sizes}
       priority={priority}
       quality={quality}
+      unoptimized={unoptimized}
       className={className}
     />
   )
