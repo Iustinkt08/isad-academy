@@ -2,13 +2,14 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useRef } from 'react'
 
 import { getDictionary, type Dictionary } from '../../lib/i18n/dictionaries'
 import { localePath, type Locale } from '../../lib/i18n/config'
 import { cn } from '../ui/cn'
 import { Container } from '../ui/Container'
 import { Reveal } from '../ui/Reveal'
+import { useSnapCarousel } from '../ui/useSnapCarousel'
 import { excerpt, lexicalToPlainText } from '../courses/helpers'
 import type { Course } from '@/payload-types'
 
@@ -43,10 +44,6 @@ const CARD_SHADOW =
 /** Film grain (SVG fractal noise) layered over the hover wash — pronounced per owner 2026-07-13. */
 const GRAIN_URL =
   "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")"
-
-/** Snap geometry (Figma 3784-26): 21px strip padding, mirrored by the scroll-detection math
- *  below and the scroll-padding-left utility. Keep them in sync. */
-const STRIP_PAD = 21
 
 /**
  * Card subtitle = the provider / standard behind the course. Derived from `categoryKey` (no
@@ -196,59 +193,11 @@ export function OurCoursesSection({
   locale: Locale
 }) {
   const scrollerRef = useRef<HTMLDivElement>(null)
-  const [activeIndex, setActiveIndex] = useState(0)
-
-  /* Track the snapped card by measuring each card's left edge against the strip's start
-     (21px inset via scroll-padding-left). Robust to any card width / device pixel ratio,
-     rAF-throttled so scroll stays smooth. */
-  useEffect(() => {
-    const scroller = scrollerRef.current
-    if (!scroller) return
-
-    let raf = 0
-    const sync = () => {
-      raf = 0
-      const cards = scroller.querySelectorAll<HTMLElement>('[data-carousel-card]')
-      if (cards.length === 0) return
-      const stripLeft = scroller.getBoundingClientRect().left + STRIP_PAD
-      let best = 0
-      let bestDist = Infinity
-      cards.forEach((card, i) => {
-        const dist = Math.abs(card.getBoundingClientRect().left - stripLeft)
-        if (dist < bestDist) {
-          bestDist = dist
-          best = i
-        }
-      })
-      setActiveIndex(best)
-    }
-    const onScroll = () => {
-      if (raf) return
-      raf = requestAnimationFrame(sync)
-    }
-
-    sync()
-    scroller.addEventListener('scroll', onScroll, { passive: true })
-    return () => {
-      scroller.removeEventListener('scroll', onScroll)
-      if (raf) cancelAnimationFrame(raf)
-    }
-  }, [courses.length])
-
-  const scrollToIndex = useCallback((i: number) => {
-    const scroller = scrollerRef.current
-    if (!scroller) return
-    const card = scroller.querySelectorAll<HTMLElement>('[data-carousel-card]')[i]
-    if (!card) return
-    const left =
-      scroller.scrollLeft +
-      (card.getBoundingClientRect().left - scroller.getBoundingClientRect().left) -
-      STRIP_PAD
-    const reduce =
-      typeof window !== 'undefined' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    scroller.scrollTo({ left, behavior: reduce ? 'auto' : 'smooth' })
-  }, [])
+  /* Snapped-card tracking + dot navigation — shared hook (also drives the testimonials
+     carousel since 2026-09-22). Cards snap to the CENTRE of the strip (owner 2026-09-22). */
+  const { activeIndex, scrollToIndex } = useSnapCarousel(scrollerRef, courses.length, {
+    align: 'center',
+  })
 
   if (courses.length === 0) return null
   const t = getDictionary(locale).ourCourses
@@ -274,20 +223,22 @@ export function OurCoursesSection({
             </h2>
           </Container>
 
-          {/* MOBILE (< lg) — full-bleed horizontal snap carousel (Figma 3784-26): 21px left
-              padding, 12px gap, one full card + ~10px peek, momentum + snap-mandatory, hidden
-              scrollbar. Card width = viewport − 21(pad) − 12(gap) − 10(peek), capped at the
-              Figma 347px so tablets keep the design size and simply reveal more peek. */}
+          {/* MOBILE (< lg) — full-bleed horizontal snap carousel (Figma 3784-26): 12px gap,
+              momentum + snap-mandatory, hidden scrollbar. Card width = viewport − 43px, capped
+              at the Figma 347px. Owner 2026-09-22: the snapped card is CENTRED — the strip
+              padding equals (viewport − card) / 2 on both sides (21.5px on a 390px phone, so
+              the first/last card can centre too), cards snap-center, and the neighbours peek
+              symmetrically (~10px each side on phones, more on tablets). */}
           <div className="w-full lg:hidden">
             <div
               ref={scrollerRef}
-              className="flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-pl-[21px] py-4 pl-[21px] pr-[21px] [-ms-overflow-style:none] [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              className="flex snap-x snap-mandatory gap-3 overflow-x-auto px-[calc((100vw_-_min(347px,100vw_-_43px))_/_2)] py-4 [-ms-overflow-style:none] [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             >
               {courses.map((course, i) => (
                 <div
                   key={course.id}
                   data-carousel-card
-                  className="w-[calc(100vw_-_43px)] max-w-[347px] shrink-0 snap-start"
+                  className="w-[calc(100vw_-_43px)] max-w-[347px] shrink-0 snap-center"
                 >
                   <CourseCard
                     course={course}
@@ -333,17 +284,16 @@ export function OurCoursesSection({
             )}
           </div>
 
-          {/* DESKTOP (≥ lg) — unchanged 4-up row inside the shared Container. */}
+          {/* DESKTOP (≥ lg) — 4-up row inside the shared Container. Owner 2026-09-22: the row
+              is CENTRED — with fewer than four featured courses the cards sit in the middle
+              instead of hugging the left edge. Each slot keeps the exact 4-column grid width
+              ((100% − 3 × 24px gap) / 4), so a full row is pixel-identical to the old grid. */}
           <Container className="hidden w-full lg:block">
-            <div className="grid grid-cols-4 gap-6">
+            <div className="flex flex-wrap justify-center gap-6">
               {courses.map((course) => (
-                <CourseCard
-                  key={course.id}
-                  course={course}
-                  chip={chips[course.id]}
-                  locale={locale}
-                  t={t}
-                />
+                <div key={course.id} className="w-[calc((100%_-_72px)_/_4)]">
+                  <CourseCard course={course} chip={chips[course.id]} locale={locale} t={t} />
+                </div>
               ))}
             </div>
           </Container>

@@ -82,8 +82,10 @@ const en = {
     subTail: 'built for real-world compliance.',
     cards: {
       practitioner: {
-        title: 'Learn from a Practitioner',
-        body: 'Courses led by Dr. Silviu Gresoi (PhD, CFE), with 20+ years in AI, risk, governance and financial crime.',
+        // Owner copy 2026-09-22 (replaces "Learn from a Practitioner" + the 20+ years line).
+        title: 'Learn from Experts and Practitioners',
+        tagline: 'AI Governance Expert | Fraud Risk Specialist | PhD, CFE',
+        body: 'Programs coordinated by Dr. Silviu Gresoi and delivered together with experts in AI, risk, governance, compliance and financial crime.',
       },
       pecb: {
         title: 'Official PECB Partner',
@@ -127,6 +129,9 @@ const en = {
     headingProfessionals: 'professionals',
     headingPost: "we've trained",
     participantFallback: 'Course participant',
+    // Mobile snap carousel (owner 2026-09-22): pagination dots.
+    dotsAria: 'Testimonials',
+    goTo: (n: number) => `Go to testimonial ${n}`,
     fallbackQuotes: [
       'The Lead Implementer course gave me a clear, step-by-step path to roll out our AI Management System. I walked out ready to run the project, not just talk about it.',
       'Finally a training that treats AI governance as something practical, not just theory. The examples mapped directly to problems we face every day.',
@@ -1012,8 +1017,10 @@ const ro: Dictionary = {
     subTail: 'construit pentru conformitatea din lumea reală.',
     cards: {
       practitioner: {
-        title: 'Învață de la un practician',
-        body: 'Cursuri susținute de Dr. Silviu Gresoi (PhD, CFE), cu 20+ ani de experiență în AI, risc, guvernanță și criminalitate financiară.',
+        // Copy owner 2026-09-22 (înlocuiește „Învață de la un practician" + rândul cu 20+ ani).
+        title: 'Învață de la experți și practicieni',
+        tagline: 'Expert AI Governance | Specialist Fraud Risk | PhD, CFE',
+        body: 'Programe coordonate de Dr. Silviu Gresoi și livrate împreună cu experți în AI, risc, guvernanță, conformitate și criminalitate financiară.',
       },
       pecb: {
         title: 'Partener oficial PECB',
@@ -1057,6 +1064,9 @@ const ro: Dictionary = {
     headingProfessionals: 'profesioniștii',
     headingPost: 'pe care i-am format',
     participantFallback: 'Participant la curs',
+    // Carusel snap pe mobil (owner 2026-09-22): punctele de paginare.
+    dotsAria: 'Testimoniale',
+    goTo: (n: number) => `Mergi la testimonialul ${n}`,
     fallbackQuotes: [
       'Cursul de Lead Implementer mi-a oferit un parcurs clar, pas cu pas, pentru implementarea sistemului nostru de management al AI. Am plecat pregătit să conduc proiectul, nu doar să vorbesc despre el.',
       'În sfârșit un training care tratează guvernanța AI ca pe ceva practic, nu doar teorie. Exemplele s-au potrivit direct cu problemele cu care ne confruntăm zi de zi.',

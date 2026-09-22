@@ -23,7 +23,7 @@ import { Reveal } from '../ui/Reveal'
 export type ShowcaseStat = { num?: string; label: string }
 type Stat = ShowcaseStat
 type Card =
-  | { key: 'practitioner'; title: string; kind: 'expert'; body: string; pillW: number }
+  | { key: 'practitioner'; title: string; kind: 'expert'; tagline: string; body: string; pillW: number }
   | { key: string; title: string; kind: 'text'; body: string; pillW: number }
 
 /** Cards/stats copy lives in the dictionary (`whyShowcase`) — RO/EN site (owner 2026-07-13). */
@@ -33,6 +33,7 @@ const buildCards = (t: Dictionary['whyShowcase']): Card[] => [
     title: t.cards.practitioner.title,
     kind: 'expert',
     pillW: 383,
+    tagline: t.cards.practitioner.tagline,
     body: t.cards.practitioner.body,
   },
   {
@@ -112,12 +113,24 @@ function CarouselCard({ card, photoUrl }: { card: Card; photoUrl: string }) {
               Dr. Silviu Gresoi
             </span>
           </div>
-          <p
-            className="flex-1 text-right font-medium text-[#000000]"
-            style={{ fontSize: type(16, 11), lineHeight: 1.56, paddingLeft: size(6) }}
-          >
-            {card.body}
-          </p>
+          {/* Tagline (owner 2026-09-22: "AI Governance Expert | Fraud Risk Specialist | PhD,
+              CFE") sits above the body, in black like the rest of the card (owner: not blue);
+              the column stays right-aligned and vertically centred on the photo like the
+              single paragraph before it. */}
+          <div className="flex flex-1 flex-col text-right" style={{ paddingLeft: size(6) }}>
+            <p
+              className="font-medium text-[#000000]"
+              style={{ fontSize: type(13, 10), lineHeight: 1.4, letterSpacing: '-0.2px' }}
+            >
+              {card.tagline}
+            </p>
+            <p
+              className="font-medium text-[#000000]"
+              style={{ fontSize: type(16, 11), lineHeight: 1.56, marginTop: size(8) }}
+            >
+              {card.body}
+            </p>
+          </div>
         </div>
       ) : (
         <p

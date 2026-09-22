@@ -35,6 +35,8 @@ type WhyCardData = {
   /** doar primul slide are foto + nume */
   photo?: string;
   name?: string;
+  /** rând scurt sub nume (owner 2026-09-22): „AI Governance Expert | … | PhD, CFE" */
+  tagline?: string;
   body: string;
 };
 
@@ -79,6 +81,7 @@ export default function WhySectionMobile({
       pill: tw.cards.practitioner.title,
       photo: '/silviu-gresoi.png', // ← asset-ul existent al pozei lui Dr. Gresoi din repo
       name: 'Dr. Silviu Gresoi',
+      tagline: tw.cards.practitioner.tagline,
       body: tw.cards.practitioner.body,
     },
     {
@@ -306,6 +309,20 @@ export default function WhySectionMobile({
                   {card.name && (
                     <p className="text-center text-[14px] font-medium leading-[21px] tracking-[-0.3px] text-[#222222]">
                       {card.name}
+                    </p>
+                  )}
+
+                  {card.tagline && (
+                    /* Segmentele separate prin „|" nu se rup în interior (fără orfan „CFE"
+                       pe rândul următor); rândul se rupe doar la separator. Negru, nu albastru
+                       (owner 2026-09-22). */
+                    <p className="-mt-2 text-center text-[12px] font-medium leading-[18px] tracking-[-0.2px] text-black">
+                      {card.tagline.split(' | ').map((segment, i, all) => (
+                        <span key={segment}>
+                          <span className="whitespace-nowrap">{segment}</span>
+                          {i < all.length - 1 && ' | '}
+                        </span>
+                      ))}
                     </p>
                   )}
 

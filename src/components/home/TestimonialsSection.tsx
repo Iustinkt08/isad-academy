@@ -1,9 +1,16 @@
-import Image from 'next/image'
+'use client'
 
-import { getDictionary, type Locale } from '../../lib/i18n'
+import Image from 'next/image'
+import { useRef } from 'react'
+
+import { getDictionary } from '../../lib/i18n/dictionaries'
+import type { Locale } from '../../lib/i18n/config'
 import { toImageSrc } from '../../lib/media/imageSrc'
+import { cn } from '../ui/cn'
 import { Container } from '../ui/Container'
+import { useMarqueeHoverEase } from '../ui/MarqueeHoverPause'
 import { Reveal } from '../ui/Reveal'
+import { useSnapCarousel } from '../ui/useSnapCarousel'
 import { asMedia } from '../courses/helpers'
 import type { Review } from '@/payload-types'
 
@@ -179,6 +186,17 @@ export function TestimonialsSection({ reviews, locale }: { reviews: Review[]; lo
   const cards =
     reviews.length > 0 ? reviews.map((review) => toCardData(review, t.participantFallback)) : sample
 
+  /* Mobile snap carousel (owner 2026-09-22): dots synced to the snapped card, same hook and
+     centred geometry as the courses carousel. Inert on desktop, where the track is a marquee. */
+  const scrollerRef = useRef<HTMLDivElement>(null)
+  const { activeIndex, scrollToIndex } = useSnapCarousel(scrollerRef, cards.length, {
+    align: 'center',
+  })
+  /* Desktop marquee: eases to a halt under the mouse and back up when it leaves (owner
+     2026-09-22 — "not stop dead"), and can be DRAGGED to browse the cards by hand (owner,
+     same day); no-op on mobile where the track has no animation (native swipe instead). */
+  useMarqueeHoverEase(scrollerRef, { drag: true })
+
   return (
     <section
       id="testimonials"
@@ -209,20 +227,77 @@ export function TestimonialsSection({ reviews, locale }: { reviews: Review[]; lo
           <span className="text-gradient-brand">.</span>
         </h2>
 
-        {/* Marquee — clipped to the container (owner 2026-07-13), gap 44; the list is
-            duplicated for a seamless loop (trailing pr = gap keeps the −50% wrap exact)
-            and the clones are aria-hidden so screen readers hear each review once.
-            py lets the card shadow breathe past the clip; the horizontal mask melts the
-            cards at both edges instead of a hard cut. */}
-        <div className="mt-12 overflow-hidden py-3 [mask-image:linear-gradient(to_right,transparent,black_7%,black_93%,transparent)] sm:mt-16">
-          <div className="flex w-max animate-marquee gap-11 pr-11">
-            {[...cards, ...cards].map((card, index) => (
-              <div key={`${card.name}-${index}`} aria-hidden={index >= cards.length || undefined}>
-                <TestimonialCard card={card} />
-              </div>
-            ))}
+        {/* Track — one DOM, two behaviours (owner 2026-09-22):
+            — ≥ lg: the Figma marquee, clipped to the container (owner 2026-07-13), gap 44;
+              the list is duplicated for a seamless loop (trailing pr = gap keeps the −50%
+              wrap exact) and the clones are aria-hidden so screen readers hear each review
+              once. The animation EASES TO A HALT while the mouse is anywhere over the strip
+              (useMarqueeHoverEase) so a review can actually be read, and eases back up when
+              it leaves. The horizontal mask melts the cards at both edges.
+            — < lg: a full-bleed horizontal SNAP carousel (native scroll, one card per swipe,
+              CENTRED like the courses carousel: track padding = (viewport − card) / 2 so every
+              card, first and last included, rests in the middle with symmetric peeks; 12px
+              gap; dots below) — each testimonial can be read on a phone. No auto-motion here:
+              touch has no hover to pause it, and the other mobile carousels on Home are manual
+              too. The clones are display:none below lg so the swipe list holds each review
+              exactly once.
+            py lets the card shadow breathe past the clip. */}
+        <div
+          ref={scrollerRef}
+          className="-mx-4 mt-12 snap-x snap-mandatory overflow-x-auto py-3 [-ms-overflow-style:none] [-webkit-overflow-scrolling:touch] [scrollbar-width:none] sm:-mx-6 sm:mt-16 lg:mx-0 lg:cursor-grab lg:select-none lg:snap-none lg:overflow-hidden lg:[mask-image:linear-gradient(to_right,transparent,black_7%,black_93%,transparent)] [&::-webkit-scrollbar]:hidden"
+        >
+          {/* Bare `animate-marquee` (not `lg:`) so the prefers-reduced-motion override in
+              globals.css keeps stilling it; `max-lg:animate-none` turns it off for the swipe
+              list. Mobile padding mirrors the card width in TestimonialCard (min(431, 100vw − 40)). */}
+          <div className="flex w-max animate-marquee gap-3 px-[calc((100vw_-_min(431px,100vw_-_40px))_/_2)] max-lg:animate-none lg:gap-11 lg:pl-0 lg:pr-11">
+            {[...cards, ...cards].map((card, index) => {
+              const clone = index >= cards.length
+              return (
+                <div
+                  key={`${card.name}-${index}`}
+                  data-carousel-card={clone ? undefined : ''}
+                  aria-hidden={clone || undefined}
+                  className={cn('shrink-0 snap-center', clone && 'hidden lg:block')}
+                >
+                  <TestimonialCard card={card} />
+                </div>
+              )
+            })}
           </div>
         </div>
+
+        {/* Pagination dots (mobile only) — synced to the snapped card. Active = 22×8 gradient
+            pill, inactive = 8px #d1d1d1, each clickable to jump (same as the courses dots). */}
+        {cards.length > 1 && (
+          <div
+            className="mt-6 flex items-center justify-center gap-[7px] lg:hidden"
+            role="tablist"
+            aria-label={t.dotsAria}
+          >
+            {cards.map((card, i) => (
+              <button
+                key={`${card.name}-${i}`}
+                type="button"
+                role="tab"
+                aria-selected={i === activeIndex}
+                aria-label={t.goTo(i + 1)}
+                onClick={() => scrollToIndex(i)}
+                className={cn(
+                  'relative h-2 overflow-hidden rounded-full bg-[#d1d1d1] transition-[width] duration-300 ease-out',
+                  i === activeIndex ? 'w-[22px]' : 'w-2',
+                )}
+              >
+                <span
+                  aria-hidden="true"
+                  className={cn(
+                    'absolute inset-0 rounded-full bg-gradient-to-r from-steel to-blue transition-opacity duration-300',
+                    i === activeIndex ? 'opacity-100' : 'opacity-0',
+                  )}
+                />
+              </button>
+            ))}
+          </div>
+        )}
         </Reveal>
       </Container>
     </section>

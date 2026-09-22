@@ -3,6 +3,7 @@ import { getPayload } from 'payload'
 import config from '@payload-config'
 import { asMedia } from '../courses/helpers'
 import { Container } from '../ui/Container'
+import { MarqueeHoverPause } from '../ui/MarqueeHoverPause'
 import { Reveal } from '../ui/Reveal'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import type { Locale } from '@/lib/i18n/config'
@@ -99,7 +100,10 @@ export default async function PartnersStrip({
     <section aria-label={t.ariaLabel} className={sectionCls}>
       <Container>
         <Reveal>
-          <div className="overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
+          {/* Owner 2026-09-22: the marquee eases to a halt while the mouse is anywhere over
+              the strip (not just a logo) and eases back up when it leaves — MarqueeHoverPause
+              ramps the CSS animation's playbackRate instead of snapping play-state. */}
+          <MarqueeHoverPause className="overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
             <div className="flex w-max animate-marquee gap-14 pr-14 motion-reduce:animate-none">
               {[...half, ...half].map((logo, index) => (
                 <div key={`${logo.name}-${index}`} aria-hidden={index >= half.length || undefined}>
@@ -107,7 +111,7 @@ export default async function PartnersStrip({
                 </div>
               ))}
             </div>
-          </div>
+          </MarqueeHoverPause>
         </Reveal>
       </Container>
     </section>
